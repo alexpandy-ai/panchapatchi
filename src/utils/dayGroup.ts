@@ -1,4 +1,4 @@
-import { bi, DAY_GROUP_EN, WEEKDAY_EN, type Bilingual } from "./bilingual";
+import { bi, DAY_GROUP_EN, patchiBilingual, WEEKDAY_EN, type Bilingual } from "./bilingual";
 import type { PakshaId } from "./paksha";
 
 /** Weekday index: 0 = Sunday … 6 = Saturday */
@@ -130,4 +130,22 @@ export function getPakshaGroupDayBilingual(pakshaId: PakshaId, groupKey: string)
     return bi(ta, DAY_GROUP_EN[groupKey] ?? ta);
   }
   return bi(TAMIL_WEEKDAYS[weekday], WEEKDAY_EN[weekday]);
+}
+
+/** Pancha bird for each schedule row weekday (Wed→Crow, Fri→Vulture, etc.). */
+const WEEKDAY_PATCHI: Record<number, string> = {
+  2: "கோழி",
+  3: "காகம்",
+  4: "ஆந்தை",
+  5: "வல்லூறு",
+  6: "மயில்",
+};
+
+export function getPakshaGroupPatchiBilingual(pakshaId: PakshaId, groupKey: string): Bilingual {
+  const weekday = getPakshaGroupDisplayWeekday(pakshaId, groupKey);
+  const patchi = weekday === null ? undefined : WEEKDAY_PATCHI[weekday];
+  if (!patchi) {
+    return getPakshaGroupDayBilingual(pakshaId, groupKey);
+  }
+  return patchiBilingual(patchi);
 }

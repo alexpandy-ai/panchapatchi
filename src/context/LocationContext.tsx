@@ -104,8 +104,8 @@ export function LocationProvider({ children }: { children: ReactNode }) {
   );
 
   const locationDisplay = useMemo(
-    () => locationDisplayLabel(source, countryName, geoPending, manualCoords),
-    [source, countryName, geoPending, manualCoords],
+    () => locationDisplayLabel(source, countryName, geoPending, coords),
+    [source, countryName, geoPending, coords],
   );
 
   const value = useMemo(

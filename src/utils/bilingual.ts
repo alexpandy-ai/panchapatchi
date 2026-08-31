@@ -188,7 +188,7 @@ export function durationBilingual(h: number, m: number): Bilingual {
 
 export const PATCHI_EN: Record<string, string> = {
   காகம்: "Crow",
-  வல்லூறு: "Eagle",
+  வல்லூறு: "Vulture",
   கோழி: "Hen",
   ஆந்தை: "Owl",
   மயில்: "Peacock",

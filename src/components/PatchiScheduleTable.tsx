@@ -4,7 +4,7 @@ import { isActiveJamamColumn, isActivePeriodCell } from "../utils/patchi";
 import type { PeriodId } from "../utils/jamam";
 import { jamamIndexForYama } from "../utils/jamam";
 import { displayActivityBi } from "../utils/activityLabel";
-import { getPakshaGroupDayBilingual } from "../utils/dayGroup";
+import { getPakshaGroupPatchiBilingual } from "../utils/dayGroup";
 import {
   jamamBilingual,
   pakshaLabelBilingual,
@@ -86,7 +86,7 @@ function PeriodPivotTable({
           <thead>
             <tr>
               <th className="patchi-pivot-table__day-col">
-                <BilingualText text={UI.day} />
+                <BilingualText text={UI.patchi} />
               </th>
               {schedule.jamamColumns.map((column) => (
                 <th
@@ -110,7 +110,7 @@ function PeriodPivotTable({
                 <tr key={row.groupKey}>
                   <td className="patchi-pivot-table__day">
                     <BilingualText
-                      text={getPakshaGroupDayBilingual(schedule.pakshaId, row.groupKey)}
+                      text={getPakshaGroupPatchiBilingual(schedule.pakshaId, row.groupKey)}
                     />
                   </td>
                   {(period === "day" ? row.dayCells : row.nightCells).map((status, index) => {

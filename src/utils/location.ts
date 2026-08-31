@@ -15,9 +15,43 @@ export type LocationSource = "geolocation" | "manual" | "fallback";
 
 export const LOCATION_DISPLAY = {
   detecting: bi("இடம் கண்டறிகிறது…", "Detecting location…"),
-  geolocation: bi("உங்கள் இடம்", "Your location"),
   fallback: bi("6:00 மணி இயல்பு", "6:00 AM default"),
 } as const;
+
+function toRadians(degrees: number): number {
+  return (degrees * Math.PI) / 180;
+}
+
+function haversineKm(a: GeoCoords, b: GeoCoords): number {
+  const earthRadiusKm = 6371;
+  const dLat = toRadians(b.lat - a.lat);
+  const dLng = toRadians(b.lng - a.lng);
+  const lat1 = toRadians(a.lat);
+  const lat2 = toRadians(b.lat);
+  const x =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+  return 2 * earthRadiusKm * Math.asin(Math.sqrt(x));
+}
+
+/** Nearest country capital for displaying a default location from coordinates. */
+export function findNearestCountry(coords: GeoCoords): Country {
+  let nearest = COUNTRIES[0];
+  let bestDistance = Infinity;
+  for (const country of COUNTRIES) {
+    const distance = haversineKm(coords, { lat: country.lat, lng: country.lng });
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      nearest = country;
+    }
+  }
+  return nearest;
+}
+
+export function coordsDisplayBilingual(coords: GeoCoords): Bilingual {
+  const label = `${formatCoord(coords.lat)}, ${formatCoord(coords.lng)}`;
+  return bi(label, label);
+}
 
 export function getLocationCountry(id: string): Country {
   return getCountry(id);
@@ -49,20 +83,17 @@ export function locationDisplayLabel(
   source: LocationSource,
   countryName: Bilingual | null,
   geoPending = false,
-  manualCoords: GeoCoords | null = null,
+  activeCoords: GeoCoords | null = null,
 ): Bilingual {
   if (source === "manual") {
     if (countryName) return countryName;
-    if (manualCoords) {
-      const label = `${manualCoords.lat.toFixed(4)}, ${manualCoords.lng.toFixed(4)}`;
-      return bi(label, label);
-    }
+    if (activeCoords) return coordsDisplayBilingual(activeCoords);
   }
   if (geoPending) {
     return LOCATION_DISPLAY.detecting;
   }
-  if (source === "geolocation") {
-    return LOCATION_DISPLAY.geolocation;
+  if (source === "geolocation" && activeCoords) {
+    return countryBilingual(findNearestCountry(activeCoords));
   }
   return LOCATION_DISPLAY.fallback;
 }
