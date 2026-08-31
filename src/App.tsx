@@ -104,22 +104,6 @@ export default function App() {
         </nav>
       </header>
 
-      <figure className="hero-image">
-        <img
-          src="/pancha-patchi-hero.png"
-          alt={
-            language === "ta"
-              ? "பஞ்ச பட்சி நட்சத்திர வரைபடம் — ஐந்து பறவைகள் (கழுகு, ஆந்தை, காகம், சேவல், மயில்)"
-              : "Pancha Pakshi star chart labeled with five birds (Vulture, Owl, Crow, Cock, Peacock)"
-          }
-          className="hero-image__img"
-          width={1024}
-          height={1024}
-          loading="eager"
-          decoding="async"
-        />
-      </figure>
-
       <ScheduleSummary selectedDateTime={selectedDateTime} />
 
       <DateTimeCard value={selectedDateTime} onChange={setSelectedDateTime} />
