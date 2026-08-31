@@ -1,34 +1,19 @@
-import type { Bilingual } from "../utils/bilingual";
+import { useLanguage } from "../context/LanguageContext";
+import { pickBilingual, type Bilingual } from "../utils/bilingual";
 
 interface BilingualTextProps {
   text: Bilingual | string;
   className?: string;
-  /** Stack Tamil above English (default). */
+  /** Kept for API compatibility; single-language display ignores layout mode. */
   block?: boolean;
 }
 
-export function BilingualText({ text, className = "", block = true }: BilingualTextProps) {
+export function BilingualText({ text, className = "" }: BilingualTextProps) {
+  const { language } = useLanguage();
+
   if (typeof text === "string") {
     return <span className={className}>{text}</span>;
   }
 
-  if (!block) {
-    return (
-      <span className={`bilingual bilingual--inline ${className}`.trim()}>
-        <span className="bi-ta">{text.ta}</span>
-        <span className="bi-sep" aria-hidden="true">
-          {" "}
-          ·{" "}
-        </span>
-        <span className="bi-en">{text.en}</span>
-      </span>
-    );
-  }
-
-  return (
-    <span className={`bilingual ${className}`.trim()}>
-      <span className="bi-ta">{text.ta}</span>
-      <span className="bi-en">{text.en}</span>
-    </span>
-  );
+  return <span className={className}>{pickBilingual(text, language)}</span>;
 }

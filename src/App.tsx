@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { AppMenu, viewTitle, type AppView } from "./components/AppMenu";
 import { BilingualText } from "./components/BilingualText";
+import { useLanguage } from "./context/LanguageContext";
 import { DateTimeCard } from "./components/DateTimeCard";
 import { DaysView } from "./components/DaysView";
 import { FindPatchiView } from "./components/FindPatchiView";
@@ -14,6 +15,7 @@ import "./index.css";
 type SheetTab = "valarpirai" | "theipirai";
 
 export default function App() {
+  const { language, setLanguage } = useLanguage();
   const [selectedDateTime, setSelectedDateTime] = useState(() => new Date());
   const [activeView, setActiveView] = useState<AppView>("status");
   const [data, setData] = useState<Record<SheetTab, PakshaData | null>>({
@@ -72,7 +74,51 @@ export default function App() {
         <h1>
           <BilingualText text={UI.appTitle} />
         </h1>
+        <nav className="language-toggle" role="tablist" aria-label="Language">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={language === "ta"}
+            className={
+              language === "ta"
+                ? "language-toggle__btn language-toggle__btn--active"
+                : "language-toggle__btn"
+            }
+            onClick={() => setLanguage("ta")}
+          >
+            தமிழ்
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={language === "en"}
+            className={
+              language === "en"
+                ? "language-toggle__btn language-toggle__btn--active"
+                : "language-toggle__btn"
+            }
+            onClick={() => setLanguage("en")}
+          >
+            English
+          </button>
+        </nav>
       </header>
+
+      <figure className="hero-image">
+        <img
+          src="/pancha-patchi-hero.png"
+          alt={
+            language === "ta"
+              ? "பஞ்ச பட்சி நட்சத்திர வரைபடம் — ஐந்து பறவைகள் (கழுகு, ஆந்தை, காகம், சேவல், மயில்)"
+              : "Pancha Pakshi star chart labeled with five birds (Vulture, Owl, Crow, Cock, Peacock)"
+          }
+          className="hero-image__img"
+          width={1024}
+          height={1024}
+          loading="eager"
+          decoding="async"
+        />
+      </figure>
 
       <ScheduleSummary selectedDateTime={selectedDateTime} />
 

@@ -50,6 +50,10 @@ export interface JamamColumn {
   yamaLabel: string;
   dayTimeRange: string;
   nightTimeRange: string;
+  dayStart: Date;
+  dayEnd: Date;
+  nightStart: Date;
+  nightEnd: Date;
   dayJamamActive: boolean;
   nightJamamActive: boolean;
 }
@@ -144,8 +148,8 @@ function buildGridRow(yama: YamaRow, daySlot: JamamSlot, nightSlot: JamamSlot): 
     yamaLabel: jamamLabel(yama.yama),
     dayTimeRange: formatTimeRange(daySlot.start, daySlot.end),
     nightTimeRange: formatTimeRange(nightSlot.start, nightSlot.end),
-    dayBirds: yama.day.map((slot) => slot.bird.trim() || "—"),
-    nightBirds: yama.night.map((slot) => slot.bird.trim() || "—"),
+    dayBirds: yama.day.map((slot) => normalizeBird(slot.bird) || "—"),
+    nightBirds: yama.night.map((slot) => normalizeBird(slot.bird) || "—"),
     dayJamamActive: daySlot.isActive,
     nightJamamActive: nightSlot.isActive,
   };
@@ -243,6 +247,10 @@ function buildPatchiScheduleForPaksha(
         yamaLabel: jamamLabel(jamamIndexForYama(yama.yama, "day")),
         dayTimeRange: formatTimeRange(slots.day.start, slots.day.end),
         nightTimeRange: formatTimeRange(slots.night.start, slots.night.end),
+        dayStart: slots.day.start,
+        dayEnd: slots.day.end,
+        nightStart: slots.night.start,
+        nightEnd: slots.night.end,
         dayJamamActive: isActivePaksha && slots.day.isActive,
         nightJamamActive: isActivePaksha && slots.night.isActive,
       },

@@ -132,8 +132,26 @@ export function formatTime(date: Date): string {
   });
 }
 
+export function formatTimeWithSeconds(date: Date): string {
+  return date.toLocaleTimeString("ta-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  });
+}
+
 export function formatTimeRange(start: Date, end: Date): string {
   return `${formatTime(start)} – ${formatTime(end)}`;
+}
+
+const JAMAM_SEGMENT_COUNT = 10;
+
+/** Split a jamam window into equal parts; returns each part's start time. */
+export function splitJamamStartTimes(start: Date, end: Date, parts = JAMAM_SEGMENT_COUNT): Date[] {
+  const durationMs = end.getTime() - start.getTime();
+  const segmentMs = durationMs / parts;
+  return Array.from({ length: parts }, (_, index) => new Date(start.getTime() + segmentMs * index));
 }
 
 export function formatCountdown(target: Date, now: Date): string {

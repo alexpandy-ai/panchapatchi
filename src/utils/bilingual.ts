@@ -1,6 +1,12 @@
+import type { AppLanguage } from "../context/LanguageContext";
+
 export interface Bilingual {
   ta: string;
   en: string;
+}
+
+export function pickBilingual({ ta, en }: Bilingual, language: AppLanguage): string {
+  return language === "ta" ? ta : en;
 }
 
 export function bi(ta: string, en: string): Bilingual {
@@ -36,6 +42,7 @@ export const UI = {
   menu: bi("பட்டியல்", "Menu"),
   openMenu: bi("மெனு திறக்க", "Open menu"),
   closeMenu: bi("மெனு மூடு", "Close menu"),
+  close: bi("மூடு", "Close"),
   appMenu: bi("பயன்பாட்டு மெனு", "App menu"),
   date: bi("தேதி", "Date"),
   time: bi("நேரம்", "Time"),
@@ -79,6 +86,7 @@ export const UI = {
   currentJamamLabel: bi("தற்போதைய ஜாமம்", "Current jamam"),
   timeTableTitle: bi("நேர அட்டவணை", "Time table"),
   daysTitle: bi("நாட்கள்", "Days"),
+  segmentStartTime: bi("தொடக்க நேரம்", "Start time"),
 } as const;
 
 /** Pancha Patchi day groups in display order (Tamil → English). */
@@ -196,7 +204,7 @@ export const PATCHI_EN: Record<string, string> = {
 
 /** Bird emojis for the five Pancha Pakshi birds. */
 export const PATCHI_SYMBOL: Record<string, string> = {
-  காகம்: "🐦‍⬛",
+  காகம்: "🐦",
   வல்லூறு: "🦅",
   கோழி: "🐔",
   ஆந்தை: "🦉",
@@ -205,7 +213,7 @@ export const PATCHI_SYMBOL: Record<string, string> = {
 
 export function patchiBaseName(name: string): string {
   return name
-    .replace(/[\s\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}]+/gu, "")
+    .replace(/[\s\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}\u{2B1B}]+/gu, "")
     .trim();
 }
 
@@ -219,7 +227,8 @@ export function patchiBilingual(name: string): Bilingual {
   const base = patchiBaseName(name) || name.trim();
   const symbol = PATCHI_SYMBOL[base];
   const ta = symbol ? `${base} ${symbol}` : name.trim();
-  const en = PATCHI_EN[base] ?? base;
+  const enName = PATCHI_EN[base] ?? base;
+  const en = symbol ? `${enName} ${symbol}` : enName;
   return bi(ta, en);
 }
 
