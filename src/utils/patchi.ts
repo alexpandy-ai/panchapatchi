@@ -1,4 +1,4 @@
-import type { PakshaData, YamaRow } from "../types";
+import type { ActivitySlot, PakshaData, YamaRow } from "../types";
 import { displayActivity } from "./activityLabel";
 import { getDayGroupKey, getDayGroupLabel, getDisplayWeekdayLabel } from "./dayGroup";
 import type { GeoCoords } from "./location";
@@ -110,6 +110,21 @@ export function extractPatchiNames(...sheets: (PakshaData | null)[]): string[] {
   }
 
   return names;
+}
+
+export function getPatchiSlotAtJamam(
+  paksha: PakshaData,
+  groupKey: string,
+  yamaIndex: number,
+  period: PeriodId,
+  patchiName: string,
+): ActivitySlot | null {
+  const group = paksha.groups.find((g) => g.key === groupKey);
+  const yamaRow = group?.yamas.find((y) => y.yama === yamaIndex);
+  if (!yamaRow) return null;
+
+  const slots = period === "day" ? yamaRow.day : yamaRow.night;
+  return slots.find((slot) => normalizeBird(slot.bird) === normalizeBird(patchiName)) ?? null;
 }
 
 function jamamSlotsForYama(

@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { BilingualText } from "./BilingualText";
 import { useLocation } from "../context/LocationContext";
-import type { ActivitySlot, PakshaData } from "../types";
+import type { PakshaData } from "../types";
 import { displayActivityBi } from "../utils/activityLabel";
-import { getDayGroupKey, getDayGroupMembersBilingual } from "../utils/dayGroup";
+import { getDayGroupKey } from "../utils/dayGroup";
 import {
   bi,
   jamamBilingual,
@@ -11,17 +11,15 @@ import {
   patchiBilingual,
   PERIOD_BI,
   UI,
-  weekdayBilingual,
 } from "../utils/bilingual";
 import {
   formatCountdown,
   formatJamamDuration,
   formatTime,
-  getDayCycleBounds,
   getJamamState,
 } from "../utils/jamam";
-import { locationLabelBilingual } from "../utils/location";
 import { getPakshaFromDate, type PakshaId } from "../utils/paksha";
+import { extractPatchiNames, getPatchiSlotAtJamam } from "../utils/patchi";
 
 interface PatchiStatusViewProps {
   selectedDateTime: Date;
@@ -39,30 +37,38 @@ function jamamDurationBilingual(start: Date, end: Date) {
 }
 
 export function PatchiStatusView({ selectedDateTime, data }: PatchiStatusViewProps) {
-  const { coords, locationDisplay } = useLocation();
+  const { coords } = useLocation();
   const autoPaksha = getPakshaFromDate(selectedDateTime);
   const [pakshaId, setPakshaId] = useState<PakshaId>(autoPaksha);
+  const patchiNames = useMemo(
+    () => extractPatchiNames(data.valarpirai, data.theipirai),
+    [data],
+  );
+  const [selectedPatchi, setSelectedPatchi] = useState("");
 
   useEffect(() => {
     setPakshaId(autoPaksha);
   }, [autoPaksha]);
 
+  useEffect(() => {
+    if (patchiNames.length === 0) return;
+    if (!selectedPatchi || !patchiNames.includes(selectedPatchi)) {
+      setSelectedPatchi(patchiNames[0]);
+    }
+  }, [patchiNames, selectedPatchi]);
+
   const weekday = selectedDateTime.getDay();
   const paksha = data[pakshaId];
   const groupKey = getDayGroupKey(weekday);
-  const group = paksha?.groups.find((g) => g.key === groupKey);
   const jamam = getJamamState(selectedDateTime, coords);
   const activeSlot = jamam.slots.find((s) => s.isActive) ?? jamam.slots[0];
-  const yamaRow = group?.yamas.find((y) => y.yama === jamam.yamaIndex);
-  const activities: ActivitySlot[] =
-    jamam.period === "day" ? (yamaRow?.day ?? []) : (yamaRow?.night ?? []);
-
-  const weekdayBi = useMemo(() => weekdayBilingual(weekday), [weekday]);
-  const { sunrise, nextSunrise } = useMemo(
-    () => getDayCycleBounds(selectedDateTime, coords),
-    [selectedDateTime, coords],
-  );
   const periodBi = jamam.period === "day" ? PERIOD_BI.day : PERIOD_BI.night;
+  const selectedPatchiBi = selectedPatchi ? patchiBilingual(selectedPatchi) : null;
+
+  const activePatchiSlot = useMemo(() => {
+    if (!paksha || !selectedPatchi) return null;
+    return getPatchiSlotAtJamam(paksha, groupKey, jamam.yamaIndex, jamam.period, selectedPatchi);
+  }, [paksha, groupKey, jamam.yamaIndex, jamam.period, selectedPatchi]);
 
   if (!paksha) {
     return (
@@ -74,18 +80,35 @@ export function PatchiStatusView({ selectedDateTime, data }: PatchiStatusViewPro
 
   return (
     <div className="now-view">
+      <nav className="patchi-submenu" aria-label={`${UI.patchiSubmenu.ta} ${UI.patchiSubmenu.en}`}>
+        {patchiNames.map((name) => (
+          <button
+            key={name}
+            type="button"
+            className={
+              selectedPatchi === name
+                ? "patchi-submenu__btn patchi-submenu__btn--active"
+                : "patchi-submenu__btn"
+            }
+            onClick={() => setSelectedPatchi(name)}
+          >
+            <BilingualText text={patchiBilingual(name)} />
+          </button>
+        ))}
+      </nav>
+
       <section className="context-card">
         <div className="context-row">
           <span className="context-label">
-            <BilingualText text={UI.day} />
+            <BilingualText text={UI.patchi} block={false} />
           </span>
           <span className="context-value">
-            <BilingualText text={weekdayBi} />
+            {selectedPatchiBi ? <BilingualText text={selectedPatchiBi} block={false} /> : "—"}
           </span>
         </div>
         <div className="context-row">
           <span className="context-label">
-            <BilingualText text={UI.paksha} />
+            <BilingualText text={UI.paksha} block={false} />
           </span>
           <div className="paksha-toggle">
             <button
@@ -104,21 +127,6 @@ export function PatchiStatusView({ selectedDateTime, data }: PatchiStatusViewPro
             </button>
           </div>
         </div>
-        <div className="context-row">
-          <span className="context-label">
-            <BilingualText text={UI.dayGroup} />
-          </span>
-          <span className="context-value">
-            <BilingualText text={getDayGroupMembersBilingual(groupKey)} />
-          </span>
-        </div>
-        <p className="context-hint">
-          <BilingualText text={UI.sunrise} block={false} /> {formatTime(sunrise)} –{" "}
-          <BilingualText text={UI.nextSunrise} block={false} /> {formatTime(nextSunrise)}
-        </p>
-        <p className="context-hint context-hint--location">
-          <BilingualText text={locationLabelBilingual(locationDisplay)} />
-        </p>
       </section>
 
       <section className="active-jamam-card">
@@ -144,7 +152,7 @@ export function PatchiStatusView({ selectedDateTime, data }: PatchiStatusViewPro
         )}
       </section>
 
-      {activities.length > 0 ? (
+      {activePatchiSlot ? (
         <section className="activity-card">
           <h2 className="activity-card__title">
             <BilingualText text={jamamBilingual(activeSlot.index)} /> —{" "}
@@ -162,19 +170,21 @@ export function PatchiStatusView({ selectedDateTime, data }: PatchiStatusViewPro
               </tr>
             </thead>
             <tbody>
-              {activities.map((slot, idx) => (
-                <tr key={`${slot.activity}-${idx}`} className="activity-table__row--current">
-                  <td className="schedule-grid-table__cell--current">
-                    <BilingualText text={displayActivityBi(slot.activity)} />
-                  </td>
-                  <td className="schedule-grid-table__cell--current">
-                    {slot.bird ? <BilingualText text={patchiBilingual(slot.bird)} /> : "—"}
-                    <span className="schedule-table__badge schedule-table__badge--cell">
-                      <BilingualText text={UI.now} />
-                    </span>
-                  </td>
-                </tr>
-              ))}
+              <tr className="activity-table__row--current">
+                <td className="schedule-grid-table__cell--current">
+                  <BilingualText text={displayActivityBi(activePatchiSlot.activity)} />
+                </td>
+                <td className="schedule-grid-table__cell--current">
+                  {activePatchiSlot.bird ? (
+                    <BilingualText text={patchiBilingual(activePatchiSlot.bird)} />
+                  ) : (
+                    "—"
+                  )}
+                  <span className="schedule-table__badge schedule-table__badge--cell">
+                    <BilingualText text={UI.now} />
+                  </span>
+                </td>
+              </tr>
             </tbody>
           </table>
         </section>
