@@ -5,6 +5,7 @@ import { DateTimeCard } from "./components/DateTimeCard";
 import { DaysView } from "./components/DaysView";
 import { FindPatchiView } from "./components/FindPatchiView";
 import { PatchiStatusView } from "./components/PatchiStatusView";
+import { ScheduleSummary } from "./components/ScheduleSummary";
 import { TimeTableView } from "./components/TimeTableView";
 import { UI } from "./utils/bilingual";
 import type { PakshaData } from "./types";
@@ -72,6 +73,8 @@ export default function App() {
           <BilingualText text={UI.appTitle} />
         </h1>
       </header>
+
+      <ScheduleSummary selectedDateTime={selectedDateTime} />
 
       <DateTimeCard value={selectedDateTime} onChange={setSelectedDateTime} />
 

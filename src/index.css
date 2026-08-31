@@ -261,6 +261,12 @@ body {
   padding: 0.85rem 0.75rem;
 }
 
+.schedule-summary--global {
+  margin-bottom: 1rem;
+  background: var(--bg-card);
+  box-shadow: 0 2px 12px rgba(45, 35, 25, 0.06);
+}
+
 .schedule-summary__date {
   font-size: 1rem;
   font-weight: 700;
