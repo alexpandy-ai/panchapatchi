@@ -1,4 +1,6 @@
+import { bi, pakshaLabelBilingual, type Bilingual } from "./bilingual";
 import type { GeoCoords } from "./location";
+import type { PakshaId } from "./paksha";
 import { getNextSunrise, getSunrise } from "./sunrise";
 
 export const JAMAM_COUNT = 5;
@@ -171,4 +173,19 @@ export function formatJamamDuration(start: Date, end: Date): string {
   if (h === 0) return `${m} நிமிடம்`;
   if (m === 0) return `${h} மணி`;
   return `${h} மணி ${m} நிமிடம்`;
+}
+
+export interface JamamSummaryParts {
+  label: Bilingual;
+  timeRange: string;
+  paksha: Bilingual;
+}
+
+/** Jamam number, time range, and paksha — shared datetime-card / status-card display. */
+export function getJamamSummaryParts(slot: JamamSlot, pakshaId: PakshaId): JamamSummaryParts {
+  return {
+    label: bi(slot.label, `Jamam ${slot.index}`),
+    timeRange: formatTimeRange(slot.start, slot.end),
+    paksha: pakshaLabelBilingual(pakshaId),
+  };
 }

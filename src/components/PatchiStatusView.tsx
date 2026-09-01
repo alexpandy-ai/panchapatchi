@@ -1,208 +1,509 @@
 import { useEffect, useMemo, useState } from "react";
+
 import { BilingualText } from "./BilingualText";
+
 import { JamamAntharaDialog } from "./JamamAntharaDialog";
+
 import { useLocation } from "../context/LocationContext";
-import type { ActivitySlot, PakshaData } from "../types";
-import { getCurrentAntharaSlot, getAntharaSlots } from "../utils/anthara";
+
+import type { PakshaData } from "../types";
+
+import { getCurrentAntharaSlot, getJamamAntharaRows, type AntharaSlot } from "../utils/anthara";
+
 import { displayActivityBi } from "../utils/activityLabel";
-import { getDayGroupKey } from "../utils/dayGroup";
+
 import {
+
   bi,
-  formatPatchiName,
+
   PAKSHA_BI,
+
+  PATCHI_ORDER,
+
   patchiBilingual,
+
   UI,
+
   type Bilingual,
+
 } from "../utils/bilingual";
-import { getJamamState } from "../utils/jamam";
+
+import { getJamamState, getJamamSummaryParts } from "../utils/jamam";
+
+import { derivePatchiStatusFromSchedule } from "../utils/patchi";
+
 import { getPakshaFromDate, type PakshaId } from "../utils/paksha";
-import { extractPatchiNames } from "../utils/patchi";
+
+
 
 interface PatchiStatusViewProps {
+
   selectedDateTime: Date;
+
   data: Record<PakshaId, PakshaData | null>;
+
+  athikaraPatchi?: (typeof PATCHI_ORDER)[number];
+
+  onAthikaraPatchiChange?: (patchi: (typeof PATCHI_ORDER)[number]) => void;
+
 }
+
+
 
 /** Status page only — not used in other menus. */
+
 const STATUS_UI = {
-  jamamPatchiActivity: bi("ஜாமம் பட்சி செயல்", "Jamam patchi activity"),
-  antharaPatchi: bi("அந்தர பட்சி", "Anthara patchi"),
+
+  antharaPatchi: bi("அந்தர பட்சி - தொழில்", "Anthara patchi - thozhil"),
+
 } as const satisfies Record<string, Bilingual>;
 
-function isSamePatchi(a: string, b: string): boolean {
-  return formatPatchiName(a) === formatPatchiName(b);
+
+
+function antharaSlotDisplay(slot: AntharaSlot): Bilingual {
+
+  const bird = patchiBilingual(slot.bird);
+
+  const activity = displayActivityBi(slot.activity);
+
+  return bi(`${bird.ta} — ${activity.ta}`, `${bird.en} — ${activity.en}`);
+
 }
 
-export function PatchiStatusView({ selectedDateTime, data }: PatchiStatusViewProps) {
+
+
+export function PatchiStatusView({
+
+  selectedDateTime,
+
+  data,
+
+  athikaraPatchi: athikaraPatchiProp,
+
+  onAthikaraPatchiChange,
+
+}: PatchiStatusViewProps) {
+
   const { coords } = useLocation();
+
   const autoPaksha = getPakshaFromDate(selectedDateTime);
+
   const [pakshaId, setPakshaId] = useState<PakshaId>(autoPaksha);
-  const patchiNames = useMemo(
-    () => extractPatchiNames(data.valarpirai, data.theipirai),
-    [data],
-  );
-  const [selectedPatchi, setSelectedPatchi] = useState("");
+
+  const [localAthikaraPatchi, setLocalAthikaraPatchi] =
+
+    useState<(typeof PATCHI_ORDER)[number]>(PATCHI_ORDER[0]);
+
+  const [myPatchi, setMyPatchi] =
+
+    useState<(typeof PATCHI_ORDER)[number]>(PATCHI_ORDER[0]);
+
   const [antharaDialogOpen, setAntharaDialogOpen] = useState(false);
 
+
+
+  const athikaraPatchi = athikaraPatchiProp ?? localAthikaraPatchi;
+
+  const setAthikaraPatchi = onAthikaraPatchiChange ?? setLocalAthikaraPatchi;
+
+
+
   useEffect(() => {
+
     setPakshaId(autoPaksha);
+
   }, [autoPaksha]);
 
-  useEffect(() => {
-    if (patchiNames.length === 0) return;
-    if (!selectedPatchi || !patchiNames.includes(selectedPatchi)) {
-      setSelectedPatchi(patchiNames[0]);
-    }
-  }, [patchiNames, selectedPatchi]);
+
 
   const weekday = selectedDateTime.getDay();
+
   const paksha = data[pakshaId];
-  const groupKey = getDayGroupKey(weekday);
+
   const jamam = getJamamState(selectedDateTime, coords);
+
   const activeSlot = jamam.slots.find((s) => s.isActive) ?? jamam.slots[0];
-  const selectedPatchiBi = selectedPatchi ? patchiBilingual(selectedPatchi) : null;
 
-  const jamamSlots = useMemo((): ActivitySlot[] => {
-    if (!paksha) return [];
-    const group = paksha.groups.find((g) => g.key === groupKey);
+
+
+  const derived = useMemo(() => {
+
+    if (!paksha) {
+
+      return {
+
+        athikaraGroupKey: null,
+
+        myPatchi: null,
+
+        myPatchiActivity: null,
+
+        jamamSlots: [],
+
+      };
+
+    }
+
+    return derivePatchiStatusFromSchedule(
+
+      paksha,
+
+      weekday,
+
+      athikaraPatchi,
+
+      jamam.yamaIndex,
+
+      jamam.period,
+
+      myPatchi,
+
+    );
+
+  }, [paksha, weekday, athikaraPatchi, myPatchi, jamam.yamaIndex, jamam.period]);
+
+
+
+  const jamamActivitySlots = useMemo(() => {
+
+    if (!paksha || !derived.athikaraGroupKey) return null;
+
+    const group = paksha.groups.find((g) => g.key === derived.athikaraGroupKey);
+
     const yamaRow = group?.yamas.find((y) => y.yama === jamam.yamaIndex);
-    if (!yamaRow) return [];
-    return jamam.period === "day" ? yamaRow.day : yamaRow.night;
-  }, [paksha, groupKey, jamam.yamaIndex, jamam.period]);
 
-  const selectedPatchiSlot = jamamSlots.find((slot) =>
-    isSamePatchi(slot.bird, selectedPatchi),
-  );
+    if (!yamaRow) return null;
+
+    return { day: yamaRow.day, night: yamaRow.night };
+
+  }, [paksha, derived.athikaraGroupKey, jamam.yamaIndex]);
+
+
 
   const antharaSlots = useMemo(
+
     () =>
-      selectedPatchi && activeSlot
-        ? getAntharaSlots(
-            jamamSlots,
-            selectedPatchi,
-            jamam.period,
+
+      derived.myPatchiActivity && activeSlot && jamamActivitySlots
+
+        ? getJamamAntharaRows(
+
             activeSlot.start,
+
             activeSlot.end,
+
+            derived.myPatchiActivity,
+
+            jamamActivitySlots.day,
+
+            jamamActivitySlots.night,
+
           )
+
         : [],
-    [jamamSlots, selectedPatchi, jamam.period, activeSlot],
+
+    [derived.myPatchiActivity, activeSlot, jamamActivitySlots],
+
   );
+
+
 
   const currentAnthara = useMemo(
+
     () => getCurrentAntharaSlot(antharaSlots, selectedDateTime),
+
     [antharaSlots, selectedDateTime],
+
   );
+
+  const jamamSummary = useMemo(
+
+    () => (activeSlot ? getJamamSummaryParts(activeSlot, pakshaId) : null),
+
+    [activeSlot, pakshaId],
+
+  );
+
+
 
   if (!paksha) {
+
     return (
+
       <p className="status">
+
         <BilingualText text={UI.loading} />
+
       </p>
+
     );
+
   }
 
+
+
   return (
+
     <div className="now-view">
-      <nav className="patchi-submenu" aria-label={`${UI.patchiSubmenu.ta} ${UI.patchiSubmenu.en}`}>
-        {patchiNames.map((name) => (
-          <button
-            key={name}
-            type="button"
-            className={
-              selectedPatchi === name
-                ? "patchi-submenu__btn patchi-submenu__btn--active"
-                : "patchi-submenu__btn"
-            }
-            onClick={() => setSelectedPatchi(name)}
-          >
-            <BilingualText text={patchiBilingual(name)} />
-          </button>
-        ))}
-      </nav>
 
       <section className="context-card">
-        <div className="context-row">
+
+        <div className="context-row athikara-row">
+
           <span className="context-label">
-            <BilingualText text={UI.patchi} block={false} />
+
+            <BilingualText text={UI.athikaraPatchi} block={false} />
+
           </span>
-          <span className="context-value">
-            {selectedPatchiBi ? <BilingualText text={selectedPatchiBi} block={false} /> : "—"}
-          </span>
+
+          <div
+
+            className="athikara-row__chips"
+
+            role="group"
+
+            aria-label={`${UI.athikaraPatchi.ta} ${UI.athikaraPatchi.en}`}
+
+          >
+
+            {PATCHI_ORDER.map((name) => (
+
+              <button
+
+                key={name}
+
+                type="button"
+
+                className={
+
+                  athikaraPatchi === name
+
+                    ? "patchi-submenu__btn patchi-submenu__btn--active"
+
+                    : "patchi-submenu__btn"
+
+                }
+
+                onClick={() => setAthikaraPatchi(name)}
+
+              >
+
+                <BilingualText text={patchiBilingual(name)} />
+
+              </button>
+
+            ))}
+
+          </div>
+
         </div>
-        <div className="context-row">
+
+        <div className="context-row athikara-row">
+
           <span className="context-label">
+
+            <BilingualText text={UI.myPatchi} block={false} />
+
+          </span>
+
+          <div
+
+            className="athikara-row__chips"
+
+            role="group"
+
+            aria-label={`${UI.myPatchi.ta} ${UI.myPatchi.en}`}
+
+          >
+
+            {PATCHI_ORDER.map((name) => (
+
+              <button
+
+                key={name}
+
+                type="button"
+
+                className={
+
+                  myPatchi === name
+
+                    ? "patchi-submenu__btn patchi-submenu__btn--active"
+
+                    : "patchi-submenu__btn"
+
+                }
+
+                onClick={() => setMyPatchi(name)}
+
+              >
+
+                <BilingualText text={patchiBilingual(name)} />
+
+              </button>
+
+            ))}
+
+          </div>
+
+        </div>
+
+        <div className="context-row">
+
+          <span className="context-label">
+
             <BilingualText text={UI.paksha} block={false} />
+
           </span>
+
           <div className="paksha-toggle">
+
             <button
+
               type="button"
+
               className={pakshaId === "valarpirai" ? "active" : ""}
+
               onClick={() => setPakshaId("valarpirai")}
+
             >
+
               <BilingualText text={PAKSHA_BI.valarpirai} />
+
             </button>
+
             <button
+
               type="button"
+
               className={pakshaId === "theipirai" ? "active" : ""}
+
               onClick={() => setPakshaId("theipirai")}
+
             >
+
               <BilingualText text={PAKSHA_BI.theipirai} />
+
             </button>
+
           </div>
+
         </div>
-        {selectedPatchiSlot ? (
+
+        {jamamSummary ? (
+          <div className="context-row context-row--jamam-summary">
+            <span className="context-label">
+              <BilingualText text={jamamSummary.label} block={false} />
+            </span>
+            <span className="context-value jamam-summary__value">
+              <span className="jamam-summary__time">{jamamSummary.timeRange}</span>
+              {" · "}
+              <BilingualText text={jamamSummary.paksha} block={false} />
+            </span>
+          </div>
+        ) : null}
+
+        {derived.myPatchiActivity ? (
+
           <div className="context-row context-row--action">
+
             <span className="context-label">
-              <BilingualText text={STATUS_UI.jamamPatchiActivity} block={false} />
+
+              <BilingualText text={UI.thozhil} block={false} />
+
             </span>
+
             <button
+
               type="button"
+
               className="context-value-btn"
+
               aria-expanded={antharaDialogOpen}
+
               onClick={() => setAntharaDialogOpen(true)}
+
             >
+
               <BilingualText
-                text={displayActivityBi(selectedPatchiSlot.activity)}
+
+                text={displayActivityBi(derived.myPatchiActivity)}
+
                 block={false}
+
               />
+
             </button>
+
           </div>
+
         ) : null}
+
         {currentAnthara ? (
-          <div className="context-row">
+
+          <div className="context-row context-row--anthara">
+
             <span className="context-label">
+
               <BilingualText text={STATUS_UI.antharaPatchi} block={false} />
+
             </span>
+
             <span className="context-value">
-              <BilingualText
-                text={displayActivityBi(currentAnthara.activity)}
-                block={false}
-              />
-              {" — "}
-              <BilingualText text={patchiBilingual(currentAnthara.bird)} block={false} />
+
+              <BilingualText text={antharaSlotDisplay(currentAnthara)} block={false} />
+
             </span>
+
           </div>
+
         ) : null}
+
       </section>
 
-      {!selectedPatchiSlot && (
+
+
+      {!derived.myPatchiActivity && (
+
         <section className="activity-card activity-card--empty">
+
           <p>
+
             <BilingualText text={UI.noDayData} />
+
           </p>
+
         </section>
+
       )}
 
-      {selectedPatchiSlot && activeSlot ? (
+
+
+      {derived.myPatchiActivity && activeSlot && jamamActivitySlots ? (
+
         <JamamAntharaDialog
+
           open={antharaDialogOpen}
+
           start={activeSlot.start}
+
           end={activeSlot.end}
-          activity={selectedPatchiSlot.activity}
-          bird={selectedPatchi}
+
+          activity={derived.myPatchiActivity}
+
+          dayJamamSlots={jamamActivitySlots.day}
+
+          nightJamamSlots={jamamActivitySlots.night}
+
           onClose={() => setAntharaDialogOpen(false)}
+
         />
+
       ) : null}
+
     </div>
+
   );
+
 }
+

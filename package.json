@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "node server/export-api.mjs && vite",
     "dev:server": "node server/index.mjs",
     "seed": "node server/seed.mjs",
     "export-api": "node server/export-api.mjs",

@@ -1,4 +1,5 @@
 import { bi, DAY_GROUP_EN, patchiBilingual, WEEKDAY_EN, type Bilingual } from "./bilingual";
+import type { DayGroup } from "../types";
 import type { PakshaId } from "./paksha";
 
 /** Weekday index: 0 = Sunday … 6 = Saturday */
@@ -105,6 +106,32 @@ export const PAKSHA_GROUP_ORDER: Record<PakshaId, readonly string[]> = {
   valarpirai: ["பு", "வெ", "செ", "வி", "ச"],
   theipirai: ["ச", "வி", "செ", "வெ", "பு"],
 };
+
+/** Know Patchi valarpirai table: Peacock → Owl → Hen → Vulture → Crow. */
+export const VALARPIRAI_SHEET_GROUP_ORDER: readonly string[] = PAKSHA_GROUP_ORDER.theipirai;
+
+/** Know Patchi theipirai table: Crow → Vulture → Hen → Owl → Peacock. */
+export const THEIPIRAI_SHEET_GROUP_ORDER: readonly string[] = [
+  "பு",
+  "வெ",
+  "செ",
+  "வி",
+  "ச",
+];
+
+const SHEET_GROUP_ORDER: Record<PakshaId, readonly string[]> = {
+  valarpirai: VALARPIRAI_SHEET_GROUP_ORDER,
+  theipirai: THEIPIRAI_SHEET_GROUP_ORDER,
+};
+
+export function sortGroupsForSheetDisplay(pakshaId: PakshaId, groups: readonly DayGroup[]): DayGroup[] {
+  const order = SHEET_GROUP_ORDER[pakshaId];
+  return [...groups].sort((a, b) => {
+    const ai = order.indexOf(a.key);
+    const bi = order.indexOf(b.key);
+    return (ai === -1 ? order.length : ai) - (bi === -1 ? order.length : bi);
+  });
+}
 
 /**
  * Single display weekday per schedule row (not combined group members).

@@ -61,6 +61,7 @@ export const UI = {
   period: bi("பகுதி", "Period"),
   action: bi("செயல்", "Activity"),
   patchi: bi("பட்சி", "Bird"),
+  myPatchi: bi("என் பட்சி", "My Patchi"),
   status: bi("நிலை", "Status"),
   dayTime: bi("பகல் நேரம்", "Day time"),
   nightTime: bi("இரவு நேரம்", "Night time"),
@@ -85,9 +86,21 @@ export const UI = {
   scheduleSheet: bi("அட்டவணை", "Sheet"),
   currentJamamLabel: bi("தற்போதைய ஜாமம்", "Current jamam"),
   timeTableTitle: bi("நேர அட்டவணை", "Time table"),
-  daysTitle: bi("நாட்கள்", "Days"),
+  daysTitle: bi("மற்றவை", "Others"),
+  patchiActivity: bi("பட்சி செயல்", "Patchi Activity"),
+  thozhil: bi("தொழில்", "Thozhil"),
+  athikaraPatchi: bi("அதிகார பட்சி", "Athikara Patchi"),
+  patchiRelations: bi("பட்சி உறவுகள்", "Patchi Relations"),
+  natpu: bi("நட்பு", "Friends"),
+  enemies: bi("பகை", "Enemies"),
   segmentStartTime: bi("தொடக்க நேரம்", "Start time"),
 } as const;
+
+/** Pancha Pakshi activity Tamil names in display order. */
+export const PANCHA_ACTIVITY_TA = ["ஊண்", "நடை", "அரசு", "துயில்", "சாவு"] as const;
+
+/** Pancha Pakshi activities in display order (Tamil → English). */
+export const PANCHA_ACTIVITIES: Bilingual[] = PANCHA_ACTIVITY_TA.map((ta) => activityBilingual(ta));
 
 /** Pancha Patchi day groups in display order (Tamil → English). */
 export const PANCHA_DAYS: Bilingual[] = [
@@ -96,6 +109,15 @@ export const PANCHA_DAYS: Bilingual[] = [
   bi("செவ்வாய்", "Tuesday"),
   bi("வெள்ளி", "Friday"),
   bi("புதன்", "Wednesday"),
+];
+
+/** Pancha bird for each day in PANCHA_DAYS order. */
+export const PANCHA_DAY_PATCHI: (typeof PATCHI_ORDER)[number][] = [
+  "மயில்",
+  "ஆந்தை",
+  "கோழி",
+  "வல்லூறு",
+  "காகம்",
 ];
 
 export const MENU_ITEMS: { id: string; label: Bilingual }[] = [
@@ -113,7 +135,7 @@ export const MENU_ITEMS: { id: string; label: Bilingual }[] = [
   },
   {
     id: "days",
-    label: bi("நாட்கள்", "Days"),
+    label: bi("மற்றவை", "Others"),
   },
 ];
 
@@ -223,6 +245,16 @@ export function formatPatchiName(name: string): string {
   return symbol ? `${base} ${symbol}` : name.trim();
 }
 
+export function patchiLabelBilingual(name: string): Bilingual {
+  const base = patchiBaseName(name) || name.trim();
+  const enName = PATCHI_EN[base] ?? base;
+  return bi(base, enName);
+}
+
+export function patchiEmoji(name: string): string | undefined {
+  return PATCHI_SYMBOL[patchiBaseName(name) || name.trim()];
+}
+
 export function patchiBilingual(name: string): Bilingual {
   const base = patchiBaseName(name) || name.trim();
   const symbol = PATCHI_SYMBOL[base];
@@ -230,6 +262,35 @@ export function patchiBilingual(name: string): Bilingual {
   const enName = PATCHI_EN[base] ?? base;
   const en = symbol ? `${enName} ${symbol}` : enName;
   return bi(ta, en);
+}
+
+/** Pancha Patchi birds in display order (Tamil keys). */
+export const PATCHI_ORDER = ["காகம்", "வல்லூறு", "கோழி", "ஆந்தை", "மயில்"] as const;
+
+/** Natpu (friends) — each bird maps to two allied birds. */
+export const PATCHI_NATPU: Record<(typeof PATCHI_ORDER)[number], readonly string[]> = {
+  காகம்: ["ஆந்தை", "கோழி"],
+  வல்லூறு: ["மயில்", "ஆந்தை"],
+  கோழி: ["மயில்", "காகம்"],
+  ஆந்தை: ["காகம்", "வல்லூறு"],
+  மயில்: ["கோழி", "வல்லூறு"],
+};
+
+/** Enemies — each bird maps to two opposing birds. */
+export const PATCHI_ENEMIES: Record<(typeof PATCHI_ORDER)[number], readonly string[]> = {
+  காகம்: ["மயில்", "வல்லூறு"],
+  வல்லூறு: ["கோழி", "காகம்"],
+  கோழி: ["ஆந்தை", "வல்லூறு"],
+  ஆந்தை: ["மயில்", "கோழி"],
+  மயில்: ["காகம்", "ஆந்தை"],
+};
+
+export function patchiListBilingual(taNames: readonly string[]): Bilingual {
+  const items = taNames.map((name) => patchiBilingual(name));
+  return bi(
+    items.map((item) => item.ta).join(", "),
+    items.map((item) => item.en).join(", "),
+  );
 }
 
 export function sectionLabelBilingual(label: string): Bilingual {

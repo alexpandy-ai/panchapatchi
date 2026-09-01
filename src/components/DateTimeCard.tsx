@@ -7,6 +7,7 @@ import { BilingualText } from "./BilingualText";
 
 import { bi, pickBilingual, UI, WEEKDAY_EN } from "../utils/bilingual";
 import { TAMIL_WEEKDAYS } from "../utils/dayGroup";
+import { formatTime, getDayCycleBounds } from "../utils/jamam";
 
 import { COUNTRIES } from "../data/countries";
 
@@ -200,21 +201,13 @@ export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
 
   const submitLabel = source === "manual" ? UI.updateLocation : UI.submitLocation;
 
-
+  const { sunrise, nextSunrise } = getDayCycleBounds(value, coords);
 
   return (
 
     <section className="datetime-card" aria-label={pickBilingual(UI.dateTime, language)}>
 
       <div className="datetime-card__row">
-
-        <span className="datetime-card__weekday">
-
-          <BilingualText text={weekdayBi} />
-
-        </span>
-
-
 
         <label className="datetime-field">
 
@@ -224,17 +217,27 @@ export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
 
           </span>
 
-          <input
+          <div className="datetime-field__date-row">
 
-            type="date"
+            <span className="datetime-card__weekday" aria-hidden="true">
 
-            className="datetime-field__input"
+              <BilingualText text={weekdayBi} />
 
-            value={toDateInputValue(value)}
+            </span>
 
-            onChange={(event) => onChange(applyDatePart(value, event.target.value))}
+            <input
 
-          />
+              type="date"
+
+              className="datetime-field__input"
+
+              value={toDateInputValue(value)}
+
+              onChange={(event) => onChange(applyDatePart(value, event.target.value))}
+
+            />
+
+          </div>
 
         </label>
 
@@ -327,12 +330,6 @@ export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
 
 
         <div className="datetime-field datetime-field--coords">
-
-          <span className="datetime-field__label">
-
-            <BilingualText text={UI.coordinates} />
-
-          </span>
 
           <div className="datetime-field__coords-row">
 
@@ -430,6 +427,13 @@ export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
 
         </button>
 
+      </div>
+
+      <div className="datetime-card__summary">
+        <p className="datetime-card__range">
+          <BilingualText text={UI.sunrise} block={false} /> {formatTime(sunrise)} –{" "}
+          <BilingualText text={UI.nextSunrise} block={false} /> {formatTime(nextSunrise)}
+        </p>
       </div>
 
     </section>

@@ -1,4 +1,4 @@
-import type { ActivitySlot, PakshaData, YamaRow } from "../types";
+import type { ActivitySlot, DayGroup, PakshaData, YamaRow } from "../types";
 import { displayActivity } from "./activityLabel";
 import { getDayGroupKey, getDayGroupLabel, getDisplayWeekdayLabel } from "./dayGroup";
 import type { GeoCoords } from "./location";
@@ -66,6 +66,15 @@ export interface PatchiScheduleDayRow {
   isCurrentDay: boolean;
 }
 
+export interface JamamActivitySlots {
+  day: ActivitySlot[];
+  night: ActivitySlot[];
+}
+
+export function jamamActivitySlotsKey(groupKey: string, yama: number): string {
+  return `${groupKey}:${yama}`;
+}
+
 export interface PatchiSchedule {
   patchiName: string;
   pakshaId: PakshaId;
@@ -78,6 +87,7 @@ export interface PatchiSchedule {
   nightSectionLabel: string;
   jamamColumns: JamamColumn[];
   dayRows: PatchiScheduleDayRow[];
+  jamamActivitySlots: Record<string, JamamActivitySlots>;
   activeCell: ActiveScheduleCell | null;
 }
 
@@ -93,6 +103,86 @@ export interface PatchiSchedulesBundle {
 
 function normalizeBird(bird: string): string {
   return formatPatchiName(bird);
+}
+
+function isSameBird(a: string, b: string): boolean {
+  return normalizeBird(a) === normalizeBird(b);
+}
+
+/** Eating bird for a schedule group (Patchi row label in Know Patchi table). */
+export function getEatingBirdForGroup(group: DayGroup): string | null {
+  const eatingSlot =
+    group.yamas[0]?.day.find((slot) => displayActivity(slot.activity) === "ஊண்") ??
+    group.yamas[0]?.day[0];
+  return eatingSlot?.bird ?? null;
+}
+
+/** Find the schedule group whose Patchi row label matches the given bird. */
+export function findGroupByEatingBird(
+  paksha: PakshaData,
+  athikaraPatchi: string,
+): DayGroup | null {
+  return (
+    paksha.groups.find((group) => {
+      const eatingBird = getEatingBirdForGroup(group);
+      return eatingBird && isSameBird(eatingBird, athikaraPatchi);
+    }) ?? null
+  );
+}
+
+export function getJamamSlotsForGroup(
+  group: DayGroup,
+  yamaIndex: number,
+  period: PeriodId,
+): ActivitySlot[] {
+  const yamaRow = group.yamas.find((y) => y.yama === yamaIndex);
+  if (!yamaRow) return [];
+  return period === "day" ? yamaRow.day : yamaRow.night;
+}
+
+export interface DerivedPatchiStatus {
+  athikaraGroupKey: string | null;
+  myPatchi: string | null;
+  myPatchiActivity: string | null;
+  jamamSlots: ActivitySlot[];
+}
+
+/**
+ * Know Patchi table semantics:
+ * 1. Athikara Patchi selects the schedule row (eating bird on that row).
+ * 2. My Patchi selects which bird's jamam-column cell to read for Thozhil.
+ */
+export function derivePatchiStatusFromSchedule(
+  paksha: PakshaData,
+  _weekday: number,
+  athikaraPatchi: string,
+  yamaIndex: number,
+  period: PeriodId,
+  myPatchi: string | null = null,
+): DerivedPatchiStatus {
+  const athikaraGroup = findGroupByEatingBird(paksha, athikaraPatchi);
+
+  if (!athikaraGroup) {
+    return {
+      athikaraGroupKey: null,
+      myPatchi: null,
+      myPatchiActivity: null,
+      jamamSlots: [],
+    };
+  }
+
+  const jamamSlots = getJamamSlotsForGroup(athikaraGroup, yamaIndex, period);
+  const mySlot =
+    myPatchi != null
+      ? jamamSlots.find((slot) => isSameBird(slot.bird, myPatchi))
+      : null;
+
+  return {
+    athikaraGroupKey: athikaraGroup.key,
+    myPatchi: mySlot ? normalizeBird(mySlot.bird) : null,
+    myPatchiActivity: mySlot?.activity ?? null,
+    jamamSlots,
+  };
 }
 
 export function extractPatchiNames(...sheets: (PakshaData | null)[]): string[] {
@@ -265,6 +355,16 @@ function buildPatchiScheduleForPaksha(
     isCurrentDay: group.key === currentGroupKey,
   }));
 
+  const jamamActivitySlots: Record<string, JamamActivitySlots> = {};
+  for (const group of paksha.groups) {
+    for (const yama of group.yamas) {
+      jamamActivitySlots[jamamActivitySlotsKey(group.key, yama.yama)] = {
+        day: yama.day,
+        night: yama.night,
+      };
+    }
+  }
+
   return {
     patchiName,
     pakshaId,
@@ -277,6 +377,7 @@ function buildPatchiScheduleForPaksha(
     nightSectionLabel: paksha.nightSectionLabel,
     jamamColumns,
     dayRows,
+    jamamActivitySlots,
     activeCell: isActivePaksha ? activeCell : null,
   };
 }

@@ -1,15 +1,16 @@
 import type { ActivitySlot } from "../types";
 import { displayActivity } from "./activityLabel";
-import { patchiBaseName } from "./bilingual";
+import { PANCHA_ACTIVITY_TA, PATCHI_ORDER, patchiBaseName } from "./bilingual";
 import type { PeriodId } from "./jamam";
+import { splitJamamStartTimes } from "./jamam";
 
 export const JAMAM_ANTHARA_SEGMENT_COUNT = 10;
 
-/** Birds cycle in this order within each jamam's anthara sub-periods. */
-const ANTHARA_BIRD_ORDER = ["காகம்", "ஆந்தை", "வல்லூறு", "கோழி", "மயில்"] as const;
+/** Birds cycle in Pancha display order (same as Others / Know Patchi). */
+const ANTHARA_BIRD_ORDER = PATCHI_ORDER;
 
-/** Activities cycle in this order across anthara sub-periods. */
-const ANTHARA_ACTIVITY_ORDER = ["சாவு", "துயில்", "அரசு", "நடை", "ஊண்"] as const;
+/** Activities cycle in Pancha display order (same as Others / Know Patchi). */
+const ANTHARA_ACTIVITY_ORDER = PANCHA_ACTIVITY_TA;
 
 /** Traditional duration weights (parts of 144) for day anthara sub-periods. */
 const DAY_ACTIVITY_WEIGHTS: Record<string, number> = {
@@ -56,10 +57,30 @@ export function antharaActivitiesFrom(startActivity: string, count = JAMAM_ANTHA
   return cycleFrom(ANTHARA_ACTIVITY_ORDER, activity as (typeof ANTHARA_ACTIVITY_ORDER)[number], count);
 }
 
-/** Ten anthara birds cycling from the schedule row's bird. */
-export function antharaBirdsFrom(startBird: string, count = JAMAM_ANTHARA_SEGMENT_COUNT): string[] {
-  const bird = patchiBaseName(startBird);
-  return cycleFrom(ANTHARA_BIRD_ORDER, bird as (typeof ANTHARA_BIRD_ORDER)[number], count);
+function findBirdForActivity(slots: ActivitySlot[], activity: string): string | null {
+  const normalized = displayActivity(activity);
+  const match = slots.find((slot) => displayActivity(slot.activity) === normalized);
+  return match ? patchiBaseName(match.bird) : null;
+}
+
+/**
+ * Ten anthara birds from schedule tables: first five from day jamam slots,
+ * next five from night jamam slots, each matched to the anthara activity sequence.
+ */
+export function antharaBirdsFromJamam(
+  daySlots: ActivitySlot[],
+  nightSlots: ActivitySlot[],
+  startActivity: string,
+  count = JAMAM_ANTHARA_SEGMENT_COUNT,
+): string[] {
+  const activities = antharaActivitiesFrom(startActivity, count);
+  const half = count / 2;
+
+  return activities.map((activity, index) => {
+    if (activity === "—") return "—";
+    const slots = index < half ? daySlots : nightSlots;
+    return findBirdForActivity(slots, activity) ?? "—";
+  });
 }
 
 function activityWeights(period: PeriodId): Record<string, number> {
@@ -114,4 +135,35 @@ export function getCurrentAntharaSlot(
     slots.find((slot) => time >= slot.start.getTime() && time < slot.end.getTime()) ??
     slots[slots.length - 1]
   );
+}
+
+/**
+ * Ten-row anthara table for a jamam: same rows as JamamSegmentsPanel / JamamAntharaDialog.
+ * Activities cycle from the Thozhil cell; birds come from day/night jamam schedule columns.
+ */
+export function getJamamAntharaRows(
+  jamamStart: Date,
+  jamamEnd: Date,
+  thozhilActivity: string,
+  dayJamamSlots: ActivitySlot[],
+  nightJamamSlots: ActivitySlot[],
+): AntharaSlot[] {
+  const segmentStarts = splitJamamStartTimes(jamamStart, jamamEnd);
+  const segmentCount = segmentStarts.length;
+  const hasActivity = thozhilActivity !== "—" && thozhilActivity !== "";
+
+  const activities = hasActivity
+    ? antharaActivitiesFrom(thozhilActivity, segmentCount)
+    : Array<string>(segmentCount).fill("—");
+  const birds = hasActivity
+    ? antharaBirdsFromJamam(dayJamamSlots, nightJamamSlots, thozhilActivity, segmentCount)
+    : Array<string>(segmentCount).fill("—");
+
+  return segmentStarts.map((start, index) => ({
+    index: index + 1,
+    bird: birds[index],
+    activity: activities[index],
+    start,
+    end: index < segmentCount - 1 ? segmentStarts[index + 1] : jamamEnd,
+  }));
 }

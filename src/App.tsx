@@ -6,18 +6,19 @@ import { DateTimeCard } from "./components/DateTimeCard";
 import { DaysView } from "./components/DaysView";
 import { FindPatchiView } from "./components/FindPatchiView";
 import { PatchiStatusView } from "./components/PatchiStatusView";
-import { ScheduleSummary } from "./components/ScheduleSummary";
 import { TimeTableView } from "./components/TimeTableView";
-import { UI } from "./utils/bilingual";
+import { PATCHI_ORDER, UI } from "./utils/bilingual";
 import type { PakshaData } from "./types";
 import "./index.css";
 
 type SheetTab = "valarpirai" | "theipirai";
+type PatchiName = (typeof PATCHI_ORDER)[number];
 
 export default function App() {
   const { language, setLanguage } = useLanguage();
   const [selectedDateTime, setSelectedDateTime] = useState(() => new Date());
   const [activeView, setActiveView] = useState<AppView>("status");
+  const [athikaraPatchi, setAthikaraPatchi] = useState<PatchiName>(PATCHI_ORDER[0]);
   const [data, setData] = useState<Record<SheetTab, PakshaData | null>>({
     valarpirai: null,
     theipirai: null,
@@ -70,41 +71,43 @@ export default function App() {
   return (
     <div className="app">
       <header className="header">
-        <AppMenu activeView={activeView} onNavigate={setActiveView} />
-        <h1>
-          <BilingualText text={UI.appTitle} />
-        </h1>
-        <nav className="language-toggle" role="tablist" aria-label="Language">
-          <button
-            type="button"
-            role="tab"
-            aria-selected={language === "ta"}
-            className={
-              language === "ta"
-                ? "language-toggle__btn language-toggle__btn--active"
-                : "language-toggle__btn"
-            }
-            onClick={() => setLanguage("ta")}
-          >
-            தமிழ்
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={language === "en"}
-            className={
-              language === "en"
-                ? "language-toggle__btn language-toggle__btn--active"
-                : "language-toggle__btn"
-            }
-            onClick={() => setLanguage("en")}
-          >
-            English
-          </button>
-        </nav>
+        <div className="header__toolbar">
+          <div className="header__actions">
+            <nav className="language-toggle" role="tablist" aria-label="Language">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={language === "ta"}
+                className={
+                  language === "ta"
+                    ? "language-toggle__btn language-toggle__btn--active"
+                    : "language-toggle__btn"
+                }
+                onClick={() => setLanguage("ta")}
+              >
+                தமிழ்
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={language === "en"}
+                className={
+                  language === "en"
+                    ? "language-toggle__btn language-toggle__btn--active"
+                    : "language-toggle__btn"
+                }
+                onClick={() => setLanguage("en")}
+              >
+                English
+              </button>
+            </nav>
+          </div>
+          <h1>
+            <BilingualText text={UI.appTitle} />
+          </h1>
+          <AppMenu activeView={activeView} onNavigate={setActiveView} />
+        </div>
       </header>
-
-      <ScheduleSummary selectedDateTime={selectedDateTime} />
 
       <DateTimeCard value={selectedDateTime} onChange={setSelectedDateTime} />
 
@@ -125,11 +128,20 @@ export default function App() {
         )}
 
         {!loading && !error && activeView === "status" && (
-          <PatchiStatusView selectedDateTime={selectedDateTime} data={data} />
+          <PatchiStatusView
+            selectedDateTime={selectedDateTime}
+            data={data}
+            athikaraPatchi={athikaraPatchi}
+            onAthikaraPatchiChange={setAthikaraPatchi}
+          />
         )}
 
         {!loading && !error && activeView === "find" && (
-          <FindPatchiView data={data} referenceDate={selectedDateTime} />
+          <FindPatchiView
+            data={data}
+            selectedDateTime={selectedDateTime}
+            highlightPatchi={athikaraPatchi}
+          />
         )}
 
         {!loading && !error && activeView === "schedule" && (
