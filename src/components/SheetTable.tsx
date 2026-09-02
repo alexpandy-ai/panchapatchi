@@ -58,7 +58,7 @@ export function SheetTable({ data, pakshaId, referenceDate, highlightPatchi }: S
   useEffect(() => {
     if (!highlightGroupKey || !highlightRef.current) return;
     highlightRef.current.scrollIntoView({ block: "center", behavior: "smooth" });
-  }, [highlightGroupKey, pakshaId]);
+  }, [highlightGroupKey, pakshaId, highlightPatchi]);
 
   const groupRowClass = (groupKey: string, base = ""): string => {
     const highlight =
@@ -86,7 +86,7 @@ export function SheetTable({ data, pakshaId, referenceDate, highlightPatchi }: S
         <thead>
           <tr>
             <th className="sheet-table__corner">
-              <BilingualText text={UI.patchi} />
+              <BilingualText text={UI.athikaraPatchi} />
             </th>
             <th>
               <BilingualText text={UI.jamam} />

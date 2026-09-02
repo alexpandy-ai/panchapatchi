@@ -63,10 +63,10 @@ export function FindPatchiView({
   const { coords } = useLocation();
   const pakshaFromDate = getPakshaFromDate(selectedDateTime);
   const [activeSheet, setActiveSheet] = useState<SheetTab>(pakshaFromDate);
-  const [selectedPatchi, setSelectedPatchi] = useState<PatchiName>(PATCHI_ORDER[0]);
-  const [tableHighlightPatchiLocal, setTableHighlightPatchi] = useState<PatchiName | null>(null);
+  const [selectedPatchi, setSelectedPatchi] = useState<PatchiName>(
+    highlightPatchiProp ?? PATCHI_ORDER[0],
+  );
   const sheet = data[activeSheet];
-  const tableHighlightPatchi = highlightPatchiProp ?? tableHighlightPatchiLocal;
 
   const paksha = data[pakshaFromDate];
   const weekday = selectedDateTime.getDay();
@@ -119,10 +119,7 @@ export function FindPatchiView({
                     ? "patchi-submenu__btn patchi-submenu__btn--active"
                     : "patchi-submenu__btn"
                 }
-                onClick={() => {
-                  setSelectedPatchi(name);
-                  setTableHighlightPatchi(name);
-                }}
+                onClick={() => setSelectedPatchi(name)}
               >
                 <BilingualText text={patchiBilingual(name)} />
               </button>
@@ -161,10 +158,7 @@ export function FindPatchiView({
                 ? "sheet-picker__btn sheet-picker__btn--active"
                 : "sheet-picker__btn"
             }
-            onClick={() => {
-              setActiveSheet(tab.id);
-              setTableHighlightPatchi(selectedPatchi);
-            }}
+            onClick={() => setActiveSheet(tab.id)}
             aria-selected={activeSheet === tab.id}
           >
             <span className="sheet-picker__label">
@@ -194,7 +188,7 @@ export function FindPatchiView({
           data={sheet}
           pakshaId={activeSheet}
           referenceDate={selectedDateTime}
-          highlightPatchi={tableHighlightPatchi}
+          highlightPatchi={selectedPatchi}
         />
       </div>
     </div>
