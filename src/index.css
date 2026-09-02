@@ -1430,6 +1430,12 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+.context-row--jamam-next-start {
+  border-top: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+  padding-top: 0.5rem;
+  margin-top: 0.15rem;
+}
+
 .context-row--action {
   align-items: stretch;
 }

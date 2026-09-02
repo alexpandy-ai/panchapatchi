@@ -25,6 +25,31 @@ export function yamaFromJamamIndex(jamamIndex: number): { yama: number; period: 
   return { yama: jamamIndex - NIGHT_JAMAM_OFFSET, period: "night" };
 }
 
+/** Next continuous jamam index (1–10); after jamam 10 wraps to jamam 6. */
+export function getNextJamamIndex(currentIndex: number): number {
+  if (currentIndex >= FULL_JAMAM_COUNT) return NIGHT_JAMAM_OFFSET + 1;
+  return currentIndex + 1;
+}
+
+/**
+ * Resolve a jamam slot by continuous index.
+ * When the target index wraps backward (10 → 6), uses the next sunrise cycle.
+ */
+export function getJamamSlotByIndex(
+  slots: JamamSlot[],
+  currentIndex: number,
+  targetIndex: number,
+  cycleStart: Date,
+  coords: GeoCoords | null,
+): JamamSlot | null {
+  if (targetIndex > currentIndex) {
+    return slots.find((slot) => slot.index === targetIndex) ?? null;
+  }
+  const nextCycleStart = getNextSunrise(cycleStart, coords);
+  const nextCycleSlots = buildFullDaySlots(nextCycleStart, nextCycleStart, coords);
+  return nextCycleSlots.find((slot) => slot.index === targetIndex) ?? null;
+}
+
 export function jamamLabel(index: number): string {
   return `ஜாமம் ${index}`;
 }

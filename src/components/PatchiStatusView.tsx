@@ -28,7 +28,14 @@ import {
 
 } from "../utils/bilingual";
 
-import { getJamamState, getJamamSummaryParts } from "../utils/jamam";
+import {
+  cycleStartFor,
+  getJamamSlotByIndex,
+  getJamamState,
+  getJamamSummaryParts,
+  getNextJamamIndex,
+  yamaFromJamamIndex,
+} from "../utils/jamam";
 
 import { derivePatchiStatusFromSchedule } from "../utils/patchi";
 
@@ -124,6 +131,24 @@ export function PatchiStatusView({
 
   const activeSlot = jamam.slots.find((s) => s.isActive) ?? jamam.slots[0];
 
+  const cycleStart = cycleStartFor(selectedDateTime, coords);
+
+  const nextJamamIndex = getNextJamamIndex(jamam.jamamIndex);
+
+  const nextSlot = getJamamSlotByIndex(
+
+    jamam.slots,
+
+    jamam.jamamIndex,
+
+    nextJamamIndex,
+
+    cycleStart,
+
+    coords,
+
+  );
+
 
 
   const derived = useMemo(() => {
@@ -161,6 +186,36 @@ export function PatchiStatusView({
     );
 
   }, [paksha, weekday, athikaraPatchi, myPatchi, jamam.yamaIndex, jamam.period]);
+
+
+
+  const derivedNext = useMemo(() => {
+
+    if (!paksha || !nextSlot) {
+
+      return { myPatchiActivity: null };
+
+    }
+
+    const { yama, period } = yamaFromJamamIndex(nextSlot.index);
+
+    return derivePatchiStatusFromSchedule(
+
+      paksha,
+
+      weekday,
+
+      athikaraPatchi,
+
+      yama,
+
+      period,
+
+      myPatchi,
+
+    );
+
+  }, [paksha, weekday, athikaraPatchi, myPatchi, nextSlot]);
 
 
 
@@ -221,6 +276,14 @@ export function PatchiStatusView({
     () => (activeSlot ? getJamamSummaryParts(activeSlot, pakshaId) : null),
 
     [activeSlot, pakshaId],
+
+  );
+
+  const nextJamamSummary = useMemo(
+
+    () => (nextSlot ? getJamamSummaryParts(nextSlot, pakshaId) : null),
+
+    [nextSlot, pakshaId],
 
   );
 
@@ -391,52 +454,70 @@ export function PatchiStatusView({
         </div>
 
         {jamamSummary ? (
-          <div className="context-row context-row--jamam-summary">
-            <span className="context-label">
-              <BilingualText text={jamamSummary.label} block={false} />
-            </span>
-            <span className="context-value jamam-summary__value">
-              <span className="jamam-summary__time">{jamamSummary.timeRange}</span>
-              {" · "}
-              <BilingualText text={jamamSummary.paksha} block={false} />
-            </span>
-          </div>
+          <>
+            <div className="context-row context-row--jamam-summary">
+              <span className="context-label">
+                <BilingualText text={UI.currentJamam} block={false} />
+              </span>
+              <span className="context-value jamam-summary__value">
+                <BilingualText text={jamamSummary.label} block={false} />
+                {" · "}
+                <span className="jamam-summary__time">{jamamSummary.timeRange}</span>
+                {" · "}
+                <BilingualText text={jamamSummary.paksha} block={false} />
+              </span>
+            </div>
+
+            {derived.myPatchiActivity ? (
+              <div className="context-row context-row--action">
+                <span className="context-label">
+                  <BilingualText text={UI.thozhil} block={false} />
+                </span>
+                <button
+                  type="button"
+                  className="context-value-btn"
+                  aria-expanded={antharaDialogOpen}
+                  onClick={() => setAntharaDialogOpen(true)}
+                >
+                  <BilingualText
+                    text={displayActivityBi(derived.myPatchiActivity)}
+                    block={false}
+                  />
+                </button>
+              </div>
+            ) : null}
+          </>
         ) : null}
 
-        {derived.myPatchiActivity ? (
+        {nextJamamSummary ? (
+          <>
+            <div className="context-row context-row--jamam-summary context-row--jamam-next-start">
+              <span className="context-label">
+                <BilingualText text={UI.nextJamam} block={false} />
+              </span>
+              <span className="context-value jamam-summary__value">
+                <BilingualText text={nextJamamSummary.label} block={false} />
+                {" · "}
+                <span className="jamam-summary__time">{nextJamamSummary.timeRange}</span>
+                {" · "}
+                <BilingualText text={nextJamamSummary.paksha} block={false} />
+              </span>
+            </div>
 
-          <div className="context-row context-row--action">
-
-            <span className="context-label">
-
-              <BilingualText text={UI.thozhil} block={false} />
-
-            </span>
-
-            <button
-
-              type="button"
-
-              className="context-value-btn"
-
-              aria-expanded={antharaDialogOpen}
-
-              onClick={() => setAntharaDialogOpen(true)}
-
-            >
-
-              <BilingualText
-
-                text={displayActivityBi(derived.myPatchiActivity)}
-
-                block={false}
-
-              />
-
-            </button>
-
-          </div>
-
+            {derivedNext.myPatchiActivity ? (
+              <div className="context-row context-row--action">
+                <span className="context-label">
+                  <BilingualText text={UI.thozhil} block={false} />
+                </span>
+                <span className="context-value">
+                  <BilingualText
+                    text={displayActivityBi(derivedNext.myPatchiActivity)}
+                    block={false}
+                  />
+                </span>
+              </div>
+            ) : null}
+          </>
         ) : null}
 
         {currentAnthara ? (

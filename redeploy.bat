@@ -5,8 +5,7 @@ cd /D "D:\alex\apps\pancha-patchi"
 call npm run build
 echo Deploying to Harvis...
 set NPM_CONFIG_CACHE=D:\alex\apps\velliastro\npm-cache
-cd /D "D:\alex\apps\pancha-patchi\dist"
-call npx --yes harvis
+call npx --yes harvis deploy dist
 echo.
-echo Done. Open https://nifty-custard-939.harvis.page and press Ctrl+Shift+R to hard refresh.
+echo Done. Open https://panchapatchi.harvis.page and press Ctrl+Shift+R to hard refresh.
 pause
