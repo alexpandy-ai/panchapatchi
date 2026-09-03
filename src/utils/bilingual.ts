@@ -59,7 +59,6 @@ export const UI = {
   paksha: bi("பக்ஷம்", "Paksha"),
   dayGroup: bi("நாள் குழு", "Day group"),
   period: bi("பகுதி", "Period"),
-  action: bi("செயல்", "Activity"),
   patchi: bi("பட்சி", "Bird"),
   myPatchi: bi("என் பட்சி", "My Patchi"),
   status: bi("நிலை", "Status"),
@@ -68,6 +67,7 @@ export const UI = {
   today: bi("இன்று", "Today"),
   now: bi("நடப்பில்", "Now"),
   nextJamam: bi("அடுத்த ஜாமம்", "Next jamam"),
+  previousJamamTime: bi("முந்தைய ஜாமம் நேரம்", "Previous jamam time"),
   currentJamam: bi("தற்போதைய ஜாமம்", "Current jamam"),
   selectedDate: bi("தேர்ந்தெடுக்கப்பட்ட தேதி", "Selected date"),
   sunrise: bi("சூரியோதயம்", "Sunrise"),
@@ -93,8 +93,25 @@ export const UI = {
   patchiRelations: bi("பட்சி உறவுகள்", "Patchi Relations"),
   natpu: bi("நட்பு", "Friends"),
   enemies: bi("பகை", "Enemies"),
-  segmentStartTime: bi("தொடக்க நேரம்", "Start time"),
+  jamamTime: bi("ஜாமம் நேரம்", "Jamam time"),
+  segmentStartTime: bi("அந்தர தொடக்க நேரம்", "Anthara start time"),
 } as const;
+
+export function previousJamamTimeHeader(jamamIndex: number): Bilingual {
+  return bi(`ஜாமம் ${jamamIndex} — நேரம்`, `Jamam ${jamamIndex} — time`);
+}
+
+export function antharaStartTimeHeader(jamamIndex: number): Bilingual {
+  return bi(`ஜாமம் ${jamamIndex} — நேரம்`, `Jamam ${jamamIndex} — time`);
+}
+
+export function thozhilHeader(jamamIndex: number): Bilingual {
+  return bi(`ஜாமம் ${jamamIndex} — தொழில்`, `Jamam ${jamamIndex} — thozhil`);
+}
+
+export function patchiHeader(jamamIndex: number): Bilingual {
+  return bi(`ஜாமம் ${jamamIndex} — பட்சி`, `Jamam ${jamamIndex} — patchi`);
+}
 
 /** Pancha Pakshi activity Tamil names in display order. */
 export const PANCHA_ACTIVITY_TA = ["ஊண்", "நடை", "அரசு", "துயில்", "சாவு"] as const;

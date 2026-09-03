@@ -658,6 +658,33 @@ body {
   margin-bottom: 0.15rem;
 }
 
+.jamam-segments-panel__previous {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2rem 0.35rem;
+  margin-bottom: 0.2rem;
+  padding: 0.12rem 0.14rem;
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+  background: rgba(196, 92, 38, 0.04);
+  font-size: 0.68rem;
+  line-height: 1.15;
+}
+
+.jamam-segments-panel__previous-label {
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.jamam-segments-panel__previous-value {
+  font-variant-numeric: tabular-nums;
+}
+
+.jamam-segments-panel__previous-time {
+  white-space: nowrap;
+}
+
 .jamam-segments-panel__close {
   font-family: inherit;
   font-size: 0.68rem;
@@ -731,7 +758,7 @@ body {
 
 .jamam-segments-table--anthara th:nth-child(1),
 .jamam-segments-table--anthara td:nth-child(1) {
-  width: 6.75rem;
+  width: 7.25rem;
 }
 
 .jamam-segments-table--anthara th:nth-child(2),
@@ -744,8 +771,36 @@ body {
   width: 5rem;
 }
 
+.jamam-segments-table--anthara td:nth-child(1),
 .jamam-segments-table--anthara td:nth-child(2),
 .jamam-segments-table--anthara td:nth-child(3) {
+  white-space: nowrap;
+}
+
+.jamam-segments-table--anthara-with-previous th:nth-child(1),
+.jamam-segments-table--anthara-with-previous td:nth-child(1) {
+  width: 6.75rem;
+}
+
+.jamam-segments-table--anthara-with-previous th:nth-child(2),
+.jamam-segments-table--anthara-with-previous td:nth-child(2) {
+  width: 7.25rem;
+}
+
+.jamam-segments-table--anthara-with-previous th:nth-child(3),
+.jamam-segments-table--anthara-with-previous td:nth-child(3) {
+  width: 4.25rem;
+}
+
+.jamam-segments-table--anthara-with-previous th:nth-child(4),
+.jamam-segments-table--anthara-with-previous td:nth-child(4) {
+  width: 5rem;
+}
+
+.jamam-segments-table--anthara-with-previous td:nth-child(1),
+.jamam-segments-table--anthara-with-previous td:nth-child(2),
+.jamam-segments-table--anthara-with-previous td:nth-child(3),
+.jamam-segments-table--anthara-with-previous td:nth-child(4) {
   white-space: nowrap;
 }
 
@@ -777,7 +832,20 @@ body {
   line-height: 1.05;
 }
 
-.jamam-segments-table--anthara td:first-child {
+.jamam-segments-table--anthara-with-previous th:first-child,
+.jamam-segments-table--anthara-with-previous th:nth-child(2) {
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.05;
+}
+
+.jamam-segments-table--anthara td:nth-child(1) {
+  white-space: nowrap;
+  font-size: 0.7rem;
+}
+
+.jamam-segments-table--anthara-with-previous td:nth-child(1),
+.jamam-segments-table--anthara-with-previous td:nth-child(2) {
   white-space: nowrap;
   font-size: 0.7rem;
 }

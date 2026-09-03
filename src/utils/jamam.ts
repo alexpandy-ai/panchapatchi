@@ -31,6 +31,44 @@ export function getNextJamamIndex(currentIndex: number): number {
   return currentIndex + 1;
 }
 
+/** Previous continuous jamam index (1–10); before jamam 1 wraps to jamam 10. */
+export function getPreviousJamamIndex(currentIndex: number): number {
+  if (currentIndex <= 1) return FULL_JAMAM_COUNT;
+  return currentIndex - 1;
+}
+
+/**
+ * Resolve the previous jamam slot.
+ * When the target index wraps backward (6 → 10), uses the previous sunrise cycle.
+ */
+export function getPreviousJamamSlot(
+  slots: JamamSlot[],
+  currentIndex: number,
+  cycleStart: Date,
+  coords: GeoCoords | null,
+): JamamSlot | null {
+  const targetIndex = getPreviousJamamIndex(currentIndex);
+  if (targetIndex < currentIndex) {
+    return slots.find((slot) => slot.index === targetIndex) ?? null;
+  }
+  const prevDay = new Date(cycleStart);
+  prevDay.setDate(prevDay.getDate() - 1);
+  const prevCycleStart = getSunrise(prevDay, coords);
+  const prevCycleSlots = buildFullDaySlots(prevCycleStart, prevCycleStart, coords);
+  return prevCycleSlots.find((slot) => slot.index === targetIndex) ?? null;
+}
+
+/** Previous jamam slot for a continuous index within the cycle containing `referenceMoment`. */
+export function getPreviousJamamSlotForIndex(
+  currentIndex: number,
+  referenceMoment: Date,
+  coords: GeoCoords | null,
+): JamamSlot | null {
+  const cycleStart = cycleStartFor(referenceMoment, coords);
+  const slots = buildFullDaySlots(cycleStart, referenceMoment, coords);
+  return getPreviousJamamSlot(slots, currentIndex, cycleStart, coords);
+}
+
 /**
  * Resolve a jamam slot by continuous index.
  * When the target index wraps backward (10 → 6), uses the next sunrise cycle.

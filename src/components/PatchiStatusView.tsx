@@ -34,6 +34,7 @@ import {
   getJamamState,
   getJamamSummaryParts,
   getNextJamamIndex,
+  getPreviousJamamSlotForIndex,
   yamaFromJamamIndex,
 } from "../utils/jamam";
 
@@ -105,7 +106,9 @@ export function PatchiStatusView({
 
     useState<(typeof PATCHI_ORDER)[number]>(PATCHI_ORDER[0]);
 
-  const [antharaDialogOpen, setAntharaDialogOpen] = useState(false);
+  const [antharaDialogTarget, setAntharaDialogTarget] = useState<"current" | "next" | null>(
+    null,
+  );
 
 
 
@@ -235,6 +238,24 @@ export function PatchiStatusView({
 
 
 
+  const nextJamamActivitySlots = useMemo(() => {
+
+    if (!paksha || !derived.athikaraGroupKey || !nextSlot) return null;
+
+    const group = paksha.groups.find((g) => g.key === derived.athikaraGroupKey);
+
+    const { yama } = yamaFromJamamIndex(nextSlot.index);
+
+    const yamaRow = group?.yamas.find((y) => y.yama === yama);
+
+    if (!yamaRow) return null;
+
+    return { day: yamaRow.day, night: yamaRow.night };
+
+  }, [paksha, derived.athikaraGroupKey, nextSlot]);
+
+
+
   const antharaSlots = useMemo(
 
     () =>
@@ -286,6 +307,100 @@ export function PatchiStatusView({
     [nextSlot, pakshaId],
 
   );
+
+
+
+  const antharaDialogProps = useMemo(() => {
+
+    if (antharaDialogTarget === "current") {
+
+      if (!derived.myPatchiActivity || !activeSlot || !jamamActivitySlots) return null;
+
+      const previousSlot = getPreviousJamamSlotForIndex(
+        activeSlot.index,
+        activeSlot.start,
+        coords,
+      );
+
+      return {
+
+        start: activeSlot.start,
+
+        end: activeSlot.end,
+
+        activity: derived.myPatchiActivity,
+
+        dayJamamSlots: jamamActivitySlots.day,
+
+        nightJamamSlots: jamamActivitySlots.night,
+
+        previousJamamStart: previousSlot?.start,
+
+        previousJamamEnd: previousSlot?.end,
+
+        previousJamamIndex: previousSlot?.index,
+
+        jamamIndex: activeSlot.index,
+
+      };
+
+    }
+
+    if (antharaDialogTarget === "next") {
+
+      if (!derivedNext.myPatchiActivity || !nextSlot || !nextJamamActivitySlots) return null;
+
+      const previousSlot = getPreviousJamamSlotForIndex(
+        nextSlot.index,
+        nextSlot.start,
+        coords,
+      );
+
+      return {
+
+        start: nextSlot.start,
+
+        end: nextSlot.end,
+
+        activity: derivedNext.myPatchiActivity,
+
+        dayJamamSlots: nextJamamActivitySlots.day,
+
+        nightJamamSlots: nextJamamActivitySlots.night,
+
+        previousJamamStart: previousSlot?.start,
+
+        previousJamamEnd: previousSlot?.end,
+
+        previousJamamIndex: previousSlot?.index,
+
+        jamamIndex: nextSlot.index,
+
+      };
+
+    }
+
+    return null;
+
+  }, [
+
+    antharaDialogTarget,
+
+    derived.myPatchiActivity,
+
+    activeSlot,
+
+    jamamActivitySlots,
+
+    derivedNext.myPatchiActivity,
+
+    nextSlot,
+
+    nextJamamActivitySlots,
+
+    coords,
+
+  ]);
 
 
 
@@ -476,8 +591,8 @@ export function PatchiStatusView({
                 <button
                   type="button"
                   className="context-value-btn"
-                  aria-expanded={antharaDialogOpen}
-                  onClick={() => setAntharaDialogOpen(true)}
+                  aria-expanded={antharaDialogTarget === "current"}
+                  onClick={() => setAntharaDialogTarget("current")}
                 >
                   <BilingualText
                     text={displayActivityBi(derived.myPatchiActivity)}
@@ -509,12 +624,17 @@ export function PatchiStatusView({
                 <span className="context-label">
                   <BilingualText text={UI.thozhil} block={false} />
                 </span>
-                <span className="context-value">
+                <button
+                  type="button"
+                  className="context-value-btn"
+                  aria-expanded={antharaDialogTarget === "next"}
+                  onClick={() => setAntharaDialogTarget("next")}
+                >
                   <BilingualText
                     text={displayActivityBi(derivedNext.myPatchiActivity)}
                     block={false}
                   />
-                </span>
+                </button>
               </div>
             ) : null}
           </>
@@ -560,23 +680,31 @@ export function PatchiStatusView({
 
 
 
-      {derived.myPatchiActivity && activeSlot && jamamActivitySlots ? (
+      {antharaDialogProps ? (
 
         <JamamAntharaDialog
 
-          open={antharaDialogOpen}
+          open={antharaDialogTarget !== null}
 
-          start={activeSlot.start}
+          start={antharaDialogProps.start}
 
-          end={activeSlot.end}
+          end={antharaDialogProps.end}
 
-          activity={derived.myPatchiActivity}
+          activity={antharaDialogProps.activity}
 
-          dayJamamSlots={jamamActivitySlots.day}
+          dayJamamSlots={antharaDialogProps.dayJamamSlots}
 
-          nightJamamSlots={jamamActivitySlots.night}
+          nightJamamSlots={antharaDialogProps.nightJamamSlots}
 
-          onClose={() => setAntharaDialogOpen(false)}
+          previousJamamStart={antharaDialogProps.previousJamamStart}
+
+          previousJamamEnd={antharaDialogProps.previousJamamEnd}
+
+          previousJamamIndex={antharaDialogProps.previousJamamIndex}
+
+          jamamIndex={antharaDialogProps.jamamIndex}
+
+          onClose={() => setAntharaDialogTarget(null)}
 
         />
 

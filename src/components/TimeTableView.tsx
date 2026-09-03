@@ -63,7 +63,12 @@ export function TimeTableView({ selectedDateTime, data }: TimeTableViewProps) {
       </nav>
 
       {scheduleBundle && (
-        <PatchiScheduleTable bundle={scheduleBundle} title={titleBi} subtitle={subtitleBi} />
+        <PatchiScheduleTable
+          bundle={scheduleBundle}
+          title={titleBi}
+          subtitle={subtitleBi}
+          coords={coords}
+        />
       )}
 
       {!scheduleBundle && (

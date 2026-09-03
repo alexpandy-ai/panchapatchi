@@ -4,9 +4,17 @@ import { getJamamAntharaRows } from "../utils/anthara";
 
 import { displayActivityBi } from "../utils/activityLabel";
 
-import { patchiEmoji, patchiLabelBilingual, UI } from "../utils/bilingual";
+import {
+  antharaStartTimeHeader,
+  patchiEmoji,
+  patchiHeader,
+  patchiLabelBilingual,
+  previousJamamTimeHeader,
+  thozhilHeader,
+  UI,
+} from "../utils/bilingual";
 
-import { formatTimeWithSeconds } from "../utils/jamam";
+import { formatTimeWithSeconds, getPreviousJamamIndex, splitJamamStartTimes } from "../utils/jamam";
 
 import { BilingualText } from "./BilingualText";
 import { InlineEmojiLabel } from "./InlineEmojiLabel";
@@ -24,6 +32,14 @@ export interface JamamSegmentsPanelProps {
   dayJamamSlots: ActivitySlot[];
 
   nightJamamSlots: ActivitySlot[];
+
+  previousJamamStart?: Date;
+
+  previousJamamEnd?: Date;
+
+  previousJamamIndex?: number;
+
+  jamamIndex: number;
 
   onClose: () => void;
 
@@ -43,11 +59,25 @@ export function JamamSegmentsPanel({
 
   nightJamamSlots,
 
+  previousJamamStart,
+
+  previousJamamEnd,
+
+  previousJamamIndex,
+
+  jamamIndex,
+
   onClose,
 
 }: JamamSegmentsPanelProps) {
 
   const antharaRows = getJamamAntharaRows(start, end, activity, dayJamamSlots, nightJamamSlots);
+
+  const showPreviousJamam = !!(previousJamamStart && previousJamamEnd);
+  const previousIndex = previousJamamIndex ?? getPreviousJamamIndex(jamamIndex);
+  const previousSegmentStarts = showPreviousJamam
+    ? splitJamamStartTimes(previousJamamStart, previousJamamEnd)
+    : [];
 
 
 
@@ -75,28 +105,36 @@ export function JamamSegmentsPanel({
 
       </div>
 
-      <table className="jamam-segments-table jamam-segments-table--anthara">
+      <table
+        className={[
+          "jamam-segments-table",
+          "jamam-segments-table--anthara",
+          showPreviousJamam ? "jamam-segments-table--anthara-with-previous" : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+      >
 
         <thead>
 
           <tr>
 
+            {showPreviousJamam ? (
+              <th scope="col">
+                <BilingualText text={previousJamamTimeHeader(previousIndex)} />
+              </th>
+            ) : null}
+
             <th scope="col">
-
-              <BilingualText text={UI.segmentStartTime} />
-
+              <BilingualText text={antharaStartTimeHeader(jamamIndex)} />
             </th>
 
             <th scope="col">
-
-              <BilingualText text={UI.action} />
-
+              <BilingualText text={thozhilHeader(jamamIndex)} />
             </th>
 
             <th scope="col">
-
-              <BilingualText text={UI.patchi} />
-
+              <BilingualText text={patchiHeader(jamamIndex)} />
             </th>
 
           </tr>
@@ -105,9 +143,13 @@ export function JamamSegmentsPanel({
 
         <tbody>
 
-          {antharaRows.map((row) => (
+          {antharaRows.map((row, rowIndex) => (
 
             <tr key={row.index}>
+
+              {showPreviousJamam ? (
+                <td>{formatTimeWithSeconds(previousSegmentStarts[rowIndex])}</td>
+              ) : null}
 
               <td>{formatTimeWithSeconds(row.start)}</td>
 

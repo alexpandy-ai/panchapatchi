@@ -9,7 +9,9 @@ import { isActiveJamamColumn, isActivePeriodCell, jamamActivitySlotsKey } from "
 
 import type { PeriodId } from "../utils/jamam";
 
-import { jamamIndexForYama } from "../utils/jamam";
+import { jamamIndexForYama, getPreviousJamamSlotForIndex } from "../utils/jamam";
+
+import type { GeoCoords } from "../utils/location";
 
 import { displayActivityBi } from "../utils/activityLabel";
 
@@ -27,6 +29,7 @@ interface PatchiScheduleTableProps {
   bundle: PatchiSchedulesBundle;
   title: Bilingual;
   subtitle?: Bilingual;
+  coords: GeoCoords | null;
 }
 
 interface SelectedJamamCell {
@@ -34,7 +37,12 @@ interface SelectedJamamCell {
   yama: number;
 }
 
-export function PatchiScheduleTable({ bundle, title, subtitle }: PatchiScheduleTableProps) {
+export function PatchiScheduleTable({
+  bundle,
+  title,
+  subtitle,
+  coords,
+}: PatchiScheduleTableProps) {
   return (
     <section className="schedule-table-card">
       <div className="patchi-schedule-head">
@@ -67,11 +75,13 @@ export function PatchiScheduleTable({ bundle, title, subtitle }: PatchiScheduleT
                 schedule={schedule}
                 period="day"
                 title={sectionLabelBilingual(schedule.daySectionLabel)}
+                coords={coords}
               />
               <PeriodPivotTable
                 schedule={schedule}
                 period="night"
                 title={sectionLabelBilingual(schedule.nightSectionLabel)}
+                coords={coords}
               />
             </div>
           </div>
@@ -85,10 +95,12 @@ function PeriodPivotTable({
   schedule,
   period,
   title,
+  coords,
 }: {
   schedule: PatchiSchedule;
   period: PeriodId;
   title: Bilingual;
+  coords: GeoCoords | null;
 }) {
   const [selectedCell, setSelectedCell] = useState<SelectedJamamCell | null>(null);
   const timeKey = period === "day" ? "dayTimeRange" : "nightTimeRange";
@@ -112,6 +124,15 @@ function PeriodPivotTable({
       : "—";
 
   const openDialog = !!(selectedCell && selectedColumn && selectedJamamSlots);
+
+  const previousJamamSlot =
+    selectedCell && selectedColumn
+      ? getPreviousJamamSlotForIndex(
+          jamamIndexForYama(selectedCell.yama, period),
+          selectedColumn[period === "day" ? "dayStart" : "nightStart"],
+          coords,
+        )
+      : null;
 
   const openCell = (groupKey: string, yama: number) => {
     setSelectedCell({ groupKey, yama });
@@ -214,6 +235,10 @@ function PeriodPivotTable({
           activity={selectedActivity}
           dayJamamSlots={selectedJamamSlots.day}
           nightJamamSlots={selectedJamamSlots.night}
+          previousJamamStart={previousJamamSlot?.start}
+          previousJamamEnd={previousJamamSlot?.end}
+          previousJamamIndex={previousJamamSlot?.index}
+          jamamIndex={jamamIndexForYama(selectedCell.yama, period)}
           onClose={() => setSelectedCell(null)}
         />
       ) : null}
