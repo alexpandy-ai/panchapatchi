@@ -1994,6 +1994,274 @@ body {
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.22);
 }
 
+/* Anthara dialog — mobile: fit viewport, wrap headers, no horizontal scroll */
+@media (max-width: 720px) {
+  .anthara-dialog-overlay {
+    padding: 0.4rem;
+    align-items: center;
+  }
+
+  .anthara-dialog {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .anthara-dialog .jamam-segments-panel {
+    width: 100%;
+    max-width: 100%;
+    padding: 0.15rem 0.12rem 0.2rem;
+  }
+
+  .anthara-dialog .jamam-segments-panel__head {
+    padding: 0.18rem 0.2rem;
+    margin-bottom: 0.12rem;
+  }
+
+  .anthara-dialog .jamam-segments-panel__title {
+    font-size: 0.68rem;
+    line-height: 1.2;
+  }
+
+  .anthara-dialog .jamam-segments-panel__close {
+    font-size: 0.62rem;
+    padding: 0.14rem 0.32rem;
+  }
+
+  .anthara-dialog .jamam-segments-panel__scroll {
+    overflow-x: hidden;
+    max-width: 100%;
+  }
+
+  .anthara-dialog .jamam-segments-table {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    table-layout: fixed;
+    font-size: 0.6rem;
+    line-height: 1.12;
+  }
+
+  .anthara-dialog .jamam-segments-table--matrix {
+    min-width: 0;
+  }
+
+  .anthara-dialog .jamam-segments-table th,
+  .anthara-dialog .jamam-segments-table td {
+    padding: 0.1rem 0.06rem;
+  }
+
+  .anthara-dialog .jamam-segments-table th {
+    font-size: 0.58rem;
+    line-height: 1.12;
+    padding: 0.12rem 0.06rem;
+  }
+
+  /* Percentage column widths — 3 sticky cols + 5 patchi cols */
+  .anthara-dialog
+    .jamam-segments-table--matrix:not(.jamam-segments-table--matrix-with-previous)
+    .jamam-segments-table__col-segment-number {
+    width: 13%;
+  }
+
+  .anthara-dialog
+    .jamam-segments-table--matrix:not(.jamam-segments-table--matrix-with-previous)
+    .jamam-segments-table__col-segment-time {
+    width: 17%;
+  }
+
+  .anthara-dialog
+    .jamam-segments-table--matrix:not(.jamam-segments-table--matrix-with-previous)
+    .jamam-segments-table__col-patchi {
+    width: 14%;
+  }
+
+  .anthara-dialog .jamam-segments-table--matrix-with-previous .jamam-segments-table__col-segment-number {
+    width: 11%;
+  }
+
+  .anthara-dialog .jamam-segments-table--matrix-with-previous .jamam-segments-table__col-segment-previous {
+    width: 14%;
+  }
+
+  .anthara-dialog .jamam-segments-table--matrix-with-previous .jamam-segments-table__col-segment-time {
+    width: 14%;
+  }
+
+  .anthara-dialog .jamam-segments-table--matrix-with-previous .jamam-segments-table__col-patchi {
+    width: 12.2%;
+  }
+
+  /* Drop sticky positioning so all columns share the fixed grid */
+  .anthara-dialog .jamam-segments-table__segment-number-col,
+  .anthara-dialog .jamam-segments-table__segment-previous-col,
+  .anthara-dialog .jamam-segments-table__segment-time-col,
+  .anthara-dialog .jamam-segments-table__patchi-col {
+    position: static;
+    left: auto;
+    width: auto;
+    white-space: normal;
+  }
+
+  /* Header cells: two-line wrap (Tamil + English stacked) */
+  .anthara-dialog .jamam-segments-table--matrix thead th {
+    white-space: normal;
+    word-break: break-word;
+    hyphens: auto;
+    line-height: 1.12;
+    min-height: 2.35em;
+    vertical-align: bottom;
+    text-align: center;
+  }
+
+  .anthara-dialog .jamam-segments-table--matrix .jamam-segments-table__segment-number-col .bi-en,
+  .anthara-dialog .jamam-segments-table--matrix .jamam-segments-table__segment-previous-col .bi-en,
+  .anthara-dialog .jamam-segments-table--matrix .jamam-segments-table__segment-time-col .bi-en {
+    display: block;
+    font-size: 0.62em;
+    line-height: 1.1;
+    margin-top: 0.06em;
+  }
+
+  .anthara-dialog .jamam-segments-panel .bilingual--inline {
+    align-items: center;
+    text-align: center;
+  }
+
+  /* Patchi column headers: emoji above abbreviated name */
+  .anthara-dialog .jamam-segments-table--matrix thead th:not(.jamam-segments-table__segment-number-col):not(
+      .jamam-segments-table__segment-previous-col
+    ):not(.jamam-segments-table__segment-time-col) {
+    width: auto;
+    white-space: normal;
+    line-height: 1.1;
+    min-height: 2.5em;
+  }
+
+  .anthara-dialog .jamam-segments-panel .inline-emoji-label {
+    flex-direction: column;
+    align-items: center;
+    white-space: normal;
+    gap: 0.08em;
+    line-height: 1.08;
+    max-width: 100%;
+  }
+
+  .anthara-dialog .jamam-segments-panel .inline-emoji-label__text {
+    font-size: 0.92em;
+    line-height: 1.08;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    text-align: center;
+  }
+
+  .anthara-dialog .jamam-segments-table--matrix th:not(.jamam-segments-table__patchi-col):not(
+      .jamam-segments-table__segment-col
+    ):not(.jamam-segments-table__segment-number-col):not(.jamam-segments-table__segment-time-col):not(
+      .jamam-segments-table__segment-previous-col
+    ),
+  .anthara-dialog .jamam-segments-table--matrix td:not(.jamam-segments-table__patchi-col):not(
+      .jamam-segments-table__segment-col
+    ):not(.jamam-segments-table__segment-number-col):not(.jamam-segments-table__segment-time-col):not(
+      .jamam-segments-table__segment-previous-col
+    ) {
+    width: auto;
+    white-space: normal;
+    line-height: 1.08;
+  }
+
+  .anthara-dialog .jamam-segments-table__jamam-label {
+    font-size: 0.62rem;
+    line-height: 1.1;
+  }
+
+  .anthara-dialog .jamam-segments-table__jamam-time {
+    font-size: 0.52rem;
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.1;
+  }
+
+  .anthara-dialog .jamam-segments-table__jamam-time--previous {
+    font-size: 0.5rem;
+  }
+
+  .anthara-dialog .jamam-segments-table--matrix tbody .inline-emoji-label {
+    flex-direction: column;
+    gap: 0.05em;
+  }
+
+  .anthara-dialog .jamam-segments-table--matrix tbody .inline-emoji-label__text {
+    font-size: 0.88em;
+    line-height: 1.05;
+    -webkit-line-clamp: 2;
+  }
+}
+
+@media (max-width: 480px) {
+  .anthara-dialog-overlay {
+    padding: 0.25rem;
+  }
+
+  .anthara-dialog .jamam-segments-panel {
+    padding: 0.1rem 0.06rem 0.15rem;
+  }
+
+  .anthara-dialog .jamam-segments-table {
+    font-size: 0.55rem;
+  }
+
+  .anthara-dialog .jamam-segments-table th {
+    font-size: 0.52rem;
+    padding: 0.08rem 0.04rem;
+  }
+
+  .anthara-dialog .jamam-segments-table th,
+  .anthara-dialog .jamam-segments-table td {
+    padding: 0.08rem 0.04rem;
+  }
+
+  .anthara-dialog
+    .jamam-segments-table--matrix:not(.jamam-segments-table--matrix-with-previous)
+    .jamam-segments-table__col-segment-number {
+    width: 12%;
+  }
+
+  .anthara-dialog
+    .jamam-segments-table--matrix:not(.jamam-segments-table--matrix-with-previous)
+    .jamam-segments-table__col-segment-time {
+    width: 16%;
+  }
+
+  .anthara-dialog
+    .jamam-segments-table--matrix:not(.jamam-segments-table--matrix-with-previous)
+    .jamam-segments-table__col-patchi {
+    width: 14.4%;
+  }
+
+  .anthara-dialog .jamam-segments-table--matrix-with-previous .jamam-segments-table__col-segment-number {
+    width: 10%;
+  }
+
+  .anthara-dialog .jamam-segments-table--matrix-with-previous .jamam-segments-table__col-segment-previous {
+    width: 13%;
+  }
+
+  .anthara-dialog .jamam-segments-table--matrix-with-previous .jamam-segments-table__col-segment-time {
+    width: 13%;
+  }
+
+  .anthara-dialog .jamam-segments-table--matrix-with-previous .jamam-segments-table__col-patchi {
+    width: 12.8%;
+  }
+
+  .anthara-dialog .jamam-segments-table__jamam-time {
+    font-size: 0.48rem;
+  }
+}
+
 .context-hint {
   margin-top: 0.5rem;
   font-size: 0.82rem;
