@@ -84,7 +84,9 @@ export function locationDisplayLabel(
   countryName: Bilingual | null,
   geoPending = false,
   activeCoords: GeoCoords | null = null,
+  placeName: Bilingual | null = null,
 ): Bilingual {
+  if (placeName) return placeName;
   if (source === "manual") {
     if (countryName) return countryName;
     if (activeCoords) return coordsDisplayBilingual(activeCoords);

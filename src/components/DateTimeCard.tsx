@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 
 import { useLocation } from "../context/LocationContext";
 import { useLanguage } from "../context/LanguageContext";
@@ -12,18 +12,14 @@ import { formatTime, getDayCycleBounds } from "../utils/jamam";
 import { COUNTRIES } from "../data/countries";
 
 import {
-
   coordsToInputValues,
-
   countryOptionLabel,
-
   formatCoord,
-
+  isValidCoords,
   parseCoordInput,
-
   resolveCountryInput,
-
 } from "../utils/location";
+import { formatPlaceLabel, geocodePlace, PLACE_PRESETS } from "../utils/geocode";
 
 
 
@@ -122,8 +118,17 @@ export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
 
   const listId = useId();
 
-  const weekdayIndex = value.getDay();
-  const weekdayBi = bi(TAMIL_WEEKDAYS[weekdayIndex] ?? "", WEEKDAY_EN[weekdayIndex] ?? "");
+  const [dateInput, setDateInput] = useState(() => toDateInputValue(value));
+  const [timeInput, setTimeInput] = useState(() => toTimeInputValue(value));
+
+  const previewWeekdayIndex = useMemo(
+    () => applyDatePart(new Date(value), dateInput).getDay(),
+    [value, dateInput],
+  );
+  const weekdayBi = bi(
+    TAMIL_WEEKDAYS[previewWeekdayIndex] ?? "",
+    WEEKDAY_EN[previewWeekdayIndex] ?? "",
+  );
 
   const [locationInput, setLocationInput] = useState(() => pickBilingual(locationDisplay, "ta"));
 
@@ -137,9 +142,23 @@ export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
 
   useEffect(() => {
 
+    if (draftDirtyRef.current) return;
+
     setLocationInput(pickBilingual(locationDisplay, language));
 
   }, [locationDisplay, language]);
+
+
+
+  useEffect(() => {
+
+    if (draftDirtyRef.current) return;
+
+    setDateInput(toDateInputValue(value));
+
+    setTimeInput(toTimeInputValue(value));
+
+  }, [value]);
 
 
 
@@ -157,44 +176,87 @@ export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
 
 
 
-  const previewCountryCoords = (nextValue: string) => {
-
+  const previewCountryCoords = async (nextValue: string) => {
     const resolved = resolveCountryInput(nextValue);
+    if (resolved) {
+      setLocationInput(countryOptionLabel(resolved));
+      setLatInput(formatCoord(resolved.lat));
+      setLngInput(formatCoord(resolved.lng));
+      draftDirtyRef.current = true;
+      return;
+    }
 
-    if (!resolved) return;
+    const geocoded = await geocodePlace(nextValue);
+    if (!geocoded) return;
 
-    setLocationInput(countryOptionLabel(resolved));
-
-    setLatInput(formatCoord(resolved.lat));
-
-    setLngInput(formatCoord(resolved.lng));
-
+    const placeName = formatPlaceLabel(geocoded.placeName);
+    setLocationInput(placeName);
+    setLatInput(formatCoord(geocoded.latitude));
+    setLngInput(formatCoord(geocoded.longitude));
     draftDirtyRef.current = true;
-
   };
 
 
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    const nextDateTime = applyTimePart(
+      applyDatePart(new Date(value), dateInput),
+      timeInput,
+    );
+    onChange(nextDateTime);
 
     const resolved = resolveCountryInput(locationInput);
+    let lat = parseCoordInput(latInput);
+    let lng = parseCoordInput(lngInput);
+    let placeName: string | null = null;
+    let countryId: string | null = null;
 
-    const lat = parseCoordInput(latInput);
-
-    const lng = parseCoordInput(lngInput);
+    if (resolved) {
+      countryId = resolved.id;
+      lat = resolved.lat;
+      lng = resolved.lng;
+      placeName = countryOptionLabel(resolved);
+    } else {
+      const trimmedLocation = locationInput.trim();
+      if (trimmedLocation) {
+        const geocoded = await geocodePlace(trimmedLocation);
+        if (geocoded) {
+          placeName = formatPlaceLabel(geocoded.placeName);
+          const manualLat = parseCoordInput(latInput);
+          const manualLng = parseCoordInput(lngInput);
+          if (
+            manualLat !== null &&
+            manualLng !== null &&
+            isValidCoords(manualLat, manualLng)
+          ) {
+            lat = manualLat;
+            lng = manualLng;
+          } else {
+            lat = geocoded.latitude;
+            lng = geocoded.longitude;
+          }
+        } else {
+          placeName = trimmedLocation;
+        }
+      }
+    }
 
     applyLocation({
-
-      countryId: resolved?.id ?? null,
-
+      countryId,
       lat,
-
       lng,
-
+      placeName,
     });
 
-    draftDirtyRef.current = false;
+    if (lat !== null && lng !== null && isValidCoords(lat, lng)) {
+      setLatInput(formatCoord(lat));
+      setLngInput(formatCoord(lng));
+    }
+    if (placeName) {
+      setLocationInput(placeName);
+    }
 
+    draftDirtyRef.current = false;
   };
 
 
@@ -231,9 +293,12 @@ export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
 
               className="datetime-field__input"
 
-              value={toDateInputValue(value)}
+              value={dateInput}
 
-              onChange={(event) => onChange(applyDatePart(value, event.target.value))}
+              onChange={(event) => {
+                draftDirtyRef.current = true;
+                setDateInput(event.target.value);
+              }}
 
             />
 
@@ -257,9 +322,12 @@ export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
 
             className="datetime-field__input"
 
-            value={toTimeInputValue(value)}
+            value={timeInput}
 
-            onChange={(event) => onChange(applyTimePart(value, event.target.value))}
+            onChange={(event) => {
+              draftDirtyRef.current = true;
+              setTimeInput(event.target.value);
+            }}
 
           />
 
@@ -293,7 +361,9 @@ export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
 
             }}
 
-            onBlur={(event) => previewCountryCoords(event.target.value)}
+            onBlur={(event) => {
+              void previewCountryCoords(event.target.value);
+            }}
 
             onKeyDown={(event) => {
 
@@ -301,7 +371,7 @@ export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
 
                 event.preventDefault();
 
-                previewCountryCoords(locationInput);
+                void previewCountryCoords(locationInput);
 
               }
 
@@ -316,6 +386,12 @@ export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
           />
 
           <datalist id={listId}>
+
+            {PLACE_PRESETS.map((preset) => (
+
+              <option key={preset.placeName} value={preset.placeName} />
+
+            ))}
 
             {COUNTRIES.map((country) => (
 
@@ -417,7 +493,9 @@ export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
 
           className="datetime-card__submit"
 
-          onClick={handleSubmit}
+          onClick={() => {
+            void handleSubmit();
+          }}
 
           aria-label={pickBilingual(submitLabel, language)}
 

@@ -7,14 +7,20 @@ import {
   type GeoCoords,
   type LocationSource,
 } from "../utils/location";
+import {
+  formatPlaceLabel,
+  placeNameBilingual,
+  reverseGeocodeCoordinates,
+} from "../utils/geocode";
 import type { Bilingual } from "../utils/bilingual";
 
-const GEO_TIMEOUT_MS = 10_000;
+const GEO_TIMEOUT_MS = 15_000;
 
 export interface ApplyLocationInput {
   countryId?: string | null;
   lat?: number | null;
   lng?: number | null;
+  placeName?: string | null;
 }
 
 export interface LocationContextValue {
@@ -25,6 +31,7 @@ export interface LocationContextValue {
   source: LocationSource;
   countryId: string | null;
   countryName: Bilingual | null;
+  placeName: Bilingual | null;
   locationDisplay: Bilingual;
   applyLocation: (input: ApplyLocationInput) => void;
 }
@@ -37,6 +44,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
   const [manualCoords, setManualCoords] = useState<GeoCoords | null>(null);
   const [source, setSource] = useState<LocationSource>("fallback");
   const [countryId, setCountryIdState] = useState<string | null>(null);
+  const [resolvedPlaceName, setResolvedPlaceName] = useState<string | null>(null);
   const [geoPending, setGeoPending] = useState(true);
 
   const requestGeolocation = useCallback(() => {
@@ -52,7 +60,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
 
     setGeoPending(true);
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      async (position) => {
         const nextCoords = {
           lat: position.coords.latitude,
           lng: position.coords.longitude,
@@ -62,6 +70,10 @@ export function LocationProvider({ children }: { children: ReactNode }) {
         setSource("geolocation");
         setCountryIdState(null);
         setManualCoords(null);
+        setResolvedPlaceName(null);
+
+        const placeName = await reverseGeocodeCoordinates(nextCoords.lat, nextCoords.lng);
+        setResolvedPlaceName(formatPlaceLabel(placeName));
         setGeoPending(false);
       },
       () => {
@@ -70,9 +82,10 @@ export function LocationProvider({ children }: { children: ReactNode }) {
         setSource("fallback");
         setCountryIdState(null);
         setManualCoords(null);
+        setResolvedPlaceName(null);
         setGeoPending(false);
       },
-      { enableHighAccuracy: false, timeout: GEO_TIMEOUT_MS, maximumAge: 60_000 },
+      { enableHighAccuracy: true, timeout: GEO_TIMEOUT_MS, maximumAge: 60_000 },
     );
   }, []);
 
@@ -80,13 +93,19 @@ export function LocationProvider({ children }: { children: ReactNode }) {
     requestGeolocation();
   }, [requestGeolocation]);
 
-  const applyLocation = useCallback(({ countryId: nextCountryId = null, lat = null, lng = null }: ApplyLocationInput) => {
+  const applyLocation = useCallback(({
+    countryId: nextCountryId = null,
+    lat = null,
+    lng = null,
+    placeName: nextPlaceName = null,
+  }: ApplyLocationInput) => {
     if (lat !== null && lng !== null && isValidCoords(lat, lng)) {
       const nextCoords = { lat, lng };
       setCoords(nextCoords);
       setManualCoords(nextCoords);
       setSource("manual");
       setCountryIdState(nextCountryId);
+      setResolvedPlaceName(nextPlaceName?.trim() || null);
       setGeoPending(false);
       return;
     }
@@ -95,6 +114,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
     setManualCoords(null);
     setSource("fallback");
     setCountryIdState(null);
+    setResolvedPlaceName(null);
     setGeoPending(false);
   }, []);
 
@@ -103,9 +123,14 @@ export function LocationProvider({ children }: { children: ReactNode }) {
     [countryId],
   );
 
+  const placeName = useMemo(
+    () => (resolvedPlaceName ? placeNameBilingual(resolvedPlaceName) : null),
+    [resolvedPlaceName],
+  );
+
   const locationDisplay = useMemo(
-    () => locationDisplayLabel(source, countryName, geoPending, coords),
-    [source, countryName, geoPending, coords],
+    () => locationDisplayLabel(source, countryName, geoPending, coords, placeName),
+    [source, countryName, geoPending, coords, placeName],
   );
 
   const value = useMemo(
@@ -116,10 +141,11 @@ export function LocationProvider({ children }: { children: ReactNode }) {
       source,
       countryId,
       countryName,
+      placeName,
       locationDisplay,
       applyLocation,
     }),
-    [coords, geoCoords, manualCoords, source, countryId, countryName, locationDisplay, applyLocation],
+    [coords, geoCoords, manualCoords, source, countryId, countryName, placeName, locationDisplay, applyLocation],
   );
 
   return <LocationContext.Provider value={value}>{children}</LocationContext.Provider>;
