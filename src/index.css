@@ -964,9 +964,11 @@ body {
 
 .language-toggle {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.45rem;
+  width: max-content;
+  max-width: 100%;
 }
 
 .language-toggle__btn {
@@ -1080,6 +1082,52 @@ body {
 .datetime-field--location {
   flex: 1 1 auto;
   min-width: 10rem;
+}
+
+.datetime-field__location-autocomplete {
+  position: relative;
+}
+
+.datetime-field__place-suggestions {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 0.25rem);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 0.35rem 0;
+  list-style: none;
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  box-shadow: 0 8px 24px rgba(26, 26, 46, 0.12);
+  max-height: 14rem;
+  overflow-y: auto;
+}
+
+.datetime-field__place-suggestions--loading {
+  padding: 0.65rem 0.85rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.datetime-field__place-suggestion {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  font-size: 0.86rem;
+  line-height: 1.35;
+  padding: 0.55rem 0.85rem;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.datetime-field__place-suggestion:hover,
+.datetime-field__place-suggestion.is-active {
+  background: rgba(167, 139, 250, 0.12);
 }
 
 .datetime-field--coords {
@@ -1226,18 +1274,12 @@ body {
 
 .days-table {
   min-width: 0;
-  max-width: 28rem;
+  max-width: 42rem;
   margin: 0 auto;
 }
 
 .days-activity-table {
   min-width: 0;
-}
-
-.days-relationship-table {
-  min-width: 0;
-  max-width: 36rem;
-  margin: 0 auto;
 }
 
 .days-table__day .bi-ta {
@@ -1357,6 +1399,28 @@ body {
   font-weight: 600;
 }
 
+@media (max-width: 720px) {
+  .language-toggle {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.35rem;
+  }
+
+  .header__actions {
+    top: 0;
+    transform: none;
+  }
+
+  .header__toolbar {
+    padding-inline: 4.75rem 2.75rem;
+    min-height: 3.35rem;
+  }
+
+  .header h1 {
+    max-width: 100%;
+  }
+}
+
 @media (max-width: 640px) {
   .app {
     padding: 1rem 0.5rem 2rem;
@@ -1364,7 +1428,6 @@ body {
 
   .header h1 {
     font-size: 1.45rem;
-    max-width: calc(100% - 10rem);
   }
 
   .datetime-card__row {

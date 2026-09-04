@@ -1,28 +1,17 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import { BilingualText } from "./BilingualText";
 
 import { SheetTable } from "./SheetTable";
 
-import { useLocation } from "../context/LocationContext";
-
 import type { PakshaData } from "../types";
 
-import { displayActivityBi } from "../utils/activityLabel";
-
 import {
-  bi,
-  formatPatchiName,
   PAKSHA_BI,
   PATCHI_ORDER,
   patchiBilingual,
   UI,
-  type Bilingual,
 } from "../utils/bilingual";
-
-import { getDayGroupKey } from "../utils/dayGroup";
-
-import { getJamamState } from "../utils/jamam";
 
 import { getPakshaFromDate } from "../utils/paksha";
 
@@ -41,14 +30,6 @@ const SHEET_TABS: { id: SheetTab; label: (typeof PAKSHA_BI)[SheetTab] }[] = [
   },
 ];
 
-const FIND_UI = {
-  jamamPatchiActivity: bi("ஜாமம் பட்சி செயல்", "Jamam patchi activity"),
-} as const satisfies Record<string, Bilingual>;
-
-function isSamePatchi(a: string, b: string): boolean {
-  return formatPatchiName(a) === formatPatchiName(b);
-}
-
 interface FindPatchiViewProps {
   data: Record<SheetTab, PakshaData | null>;
   selectedDateTime: Date;
@@ -60,31 +41,12 @@ export function FindPatchiView({
   selectedDateTime,
   highlightPatchi: highlightPatchiProp = null,
 }: FindPatchiViewProps) {
-  const { coords } = useLocation();
   const pakshaFromDate = getPakshaFromDate(selectedDateTime);
   const [activeSheet, setActiveSheet] = useState<SheetTab>(pakshaFromDate);
   const [selectedPatchi, setSelectedPatchi] = useState<PatchiName>(
     highlightPatchiProp ?? PATCHI_ORDER[0],
   );
   const sheet = data[activeSheet];
-
-  const paksha = data[pakshaFromDate];
-  const weekday = selectedDateTime.getDay();
-  const groupKey = getDayGroupKey(weekday);
-  const jamam = getJamamState(selectedDateTime, coords);
-
-  const jamamSlots = useMemo(() => {
-    if (!paksha) return [];
-    const group = paksha.groups.find((g) => g.key === groupKey);
-    const yamaRow = group?.yamas.find((y) => y.yama === jamam.yamaIndex);
-    if (!yamaRow) return [];
-    return jamam.period === "day" ? yamaRow.day : yamaRow.night;
-  }, [paksha, groupKey, jamam.yamaIndex, jamam.period]);
-
-  const selectedPatchiSlot = useMemo(
-    () => jamamSlots.find((slot) => isSamePatchi(slot.bird, selectedPatchi)),
-    [jamamSlots, selectedPatchi],
-  );
 
   if (!sheet) {
     return (
@@ -126,21 +88,6 @@ export function FindPatchiView({
             ))}
           </div>
         </div>
-
-        {selectedPatchiSlot ? (
-          <div className="context-row">
-            <span className="context-label">
-              <BilingualText text={FIND_UI.jamamPatchiActivity} block={false} />
-            </span>
-            <span className="context-value">
-              <BilingualText text={displayActivityBi(selectedPatchiSlot.activity)} block={false} />
-            </span>
-          </div>
-        ) : (
-          <p className="athikara-panel__empty">
-            <BilingualText text={UI.noDayData} />
-          </p>
-        )}
       </section>
 
       <div

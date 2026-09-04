@@ -149,6 +149,9 @@ function PeriodPivotTable({
             <tr>
               <th className="patchi-pivot-table__day-col">
                 <BilingualText text={UI.athikaraPatchi} />
+                <span className="patchi-pivot-table__time">
+                  <BilingualText text={UI.day} />
+                </span>
               </th>
               {schedule.jamamColumns.map((column) => (
                 <th

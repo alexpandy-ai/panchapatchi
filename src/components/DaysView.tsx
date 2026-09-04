@@ -1,4 +1,7 @@
+import { Fragment } from "react";
 import { BilingualText } from "./BilingualText";
+import { InlineEmojiLabel } from "./InlineEmojiLabel";
+import type { Bilingual } from "../utils/bilingual";
 import {
   PATCHI_ENEMIES,
   PATCHI_NATPU,
@@ -6,41 +9,36 @@ import {
   PANCHA_ACTIVITIES,
   PANCHA_DAY_PATCHI,
   PANCHA_DAYS,
-  patchiBilingual,
-  patchiListBilingual,
+  patchiEmoji,
+  patchiLabelBilingual,
   UI,
 } from "../utils/bilingual";
+
+function dayForBird(bird: (typeof PATCHI_ORDER)[number]): Bilingual {
+  const index = PANCHA_DAY_PATCHI.indexOf(bird);
+  return PANCHA_DAYS[index];
+}
+
+function PatchiCell({ bird }: { bird: string }) {
+  return <InlineEmojiLabel text={patchiLabelBilingual(bird)} emoji={patchiEmoji(bird)} />;
+}
+
+function PatchiListCell({ birds }: { birds: readonly string[] }) {
+  return (
+    <>
+      {birds.map((bird, index) => (
+        <Fragment key={bird}>
+          {index > 0 ? ", " : null}
+          <PatchiCell bird={bird} />
+        </Fragment>
+      ))}
+    </>
+  );
+}
 
 export function DaysView() {
   return (
     <div className="days-view">
-      <div className="sheet-table-wrap">
-        <table className="sheet-table days-table">
-          <thead>
-            <tr>
-              <th>
-                <BilingualText text={UI.day} />
-              </th>
-              <th>
-                <BilingualText text={UI.patchi} />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {PANCHA_DAYS.map((day, index) => (
-              <tr key={day.ta}>
-                <td className="days-table__day">
-                  <BilingualText text={day} />
-                </td>
-                <td>
-                  <BilingualText text={patchiBilingual(PANCHA_DAY_PATCHI[index])} />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
       <section className="schedule-table-card days-view__activity-card">
         <h3 className="schedule-table-card__title">
           <BilingualText text={UI.patchiActivity} />
@@ -60,14 +58,17 @@ export function DaysView() {
         </div>
       </section>
 
-      <section className="schedule-table-card days-view__relationship-card">
+      <section className="schedule-table-card days-view__relation-card">
         <h3 className="schedule-table-card__title">
-          <BilingualText text={UI.patchiRelations} />
+          <BilingualText text={UI.patchiRelation} />
         </h3>
         <div className="sheet-table-wrap">
-          <table className="sheet-table days-relationship-table">
+          <table className="sheet-table days-table">
             <thead>
               <tr>
+                <th>
+                  <BilingualText text={UI.day} />
+                </th>
                 <th>
                   <BilingualText text={UI.patchi} />
                 </th>
@@ -82,14 +83,17 @@ export function DaysView() {
             <tbody>
               {PATCHI_ORDER.map((bird) => (
                 <tr key={bird}>
-                  <td>
-                    <BilingualText text={patchiBilingual(bird)} />
+                  <td className="days-table__day">
+                    <BilingualText text={dayForBird(bird)} />
                   </td>
                   <td>
-                    <BilingualText text={patchiListBilingual(PATCHI_NATPU[bird])} />
+                    <PatchiCell bird={bird} />
                   </td>
                   <td>
-                    <BilingualText text={patchiListBilingual(PATCHI_ENEMIES[bird])} />
+                    <PatchiListCell birds={PATCHI_NATPU[bird]} />
+                  </td>
+                  <td>
+                    <PatchiListCell birds={PATCHI_ENEMIES[bird]} />
                   </td>
                 </tr>
               ))}

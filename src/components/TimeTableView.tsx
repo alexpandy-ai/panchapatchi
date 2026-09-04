@@ -1,11 +1,20 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { BilingualText } from "./BilingualText";
 import { useLocation } from "../context/LocationContext";
 import type { PakshaData } from "../types";
-import { bi, pakshaLabelBilingual, patchiBilingual, UI, weekdayBilingual } from "../utils/bilingual";
+import {
+  bi,
+  pakshaLabelBilingual,
+  PATCHI_ORDER,
+  patchiBilingual,
+  UI,
+  weekdayBilingual,
+} from "../utils/bilingual";
 import type { PakshaId } from "../utils/paksha";
-import { extractPatchiNames, getPatchiSchedulesForDate } from "../utils/patchi";
+import { getPatchiSchedulesForDate } from "../utils/patchi";
 import { PatchiScheduleTable } from "./PatchiScheduleTable";
+
+type PatchiName = (typeof PATCHI_ORDER)[number];
 
 interface TimeTableViewProps {
   selectedDateTime: Date;
@@ -14,22 +23,14 @@ interface TimeTableViewProps {
 
 export function TimeTableView({ selectedDateTime, data }: TimeTableViewProps) {
   const { coords } = useLocation();
-  const patchiNames = useMemo(
-    () => extractPatchiNames(data.valarpirai, data.theipirai),
-    [data],
+  const [selectedPatchi, setSelectedPatchi] = useState<PatchiName>(PATCHI_ORDER[0]);
+
+  const scheduleBundle = getPatchiSchedulesForDate(
+    selectedDateTime,
+    data,
+    selectedPatchi,
+    coords,
   );
-  const [selectedPatchi, setSelectedPatchi] = useState("");
-
-  useEffect(() => {
-    if (patchiNames.length === 0) return;
-    if (!selectedPatchi || !patchiNames.includes(selectedPatchi)) {
-      setSelectedPatchi(patchiNames[0]);
-    }
-  }, [patchiNames, selectedPatchi]);
-
-  const scheduleBundle = selectedPatchi
-    ? getPatchiSchedulesForDate(selectedDateTime, data, selectedPatchi, coords)
-    : null;
 
   const weekdayBi = useMemo(
     () => weekdayBilingual(selectedDateTime.getDay()),
@@ -49,29 +50,42 @@ export function TimeTableView({ selectedDateTime, data }: TimeTableViewProps) {
 
   return (
     <div className="time-table-view">
-      <nav className="patchi-submenu" aria-label={`${UI.patchiSubmenu.ta} ${UI.patchiSubmenu.en}`}>
-        {patchiNames.map((name) => (
-          <button
-            key={name}
-            type="button"
-            className={selectedPatchi === name ? "patchi-submenu__btn patchi-submenu__btn--active" : "patchi-submenu__btn"}
-            onClick={() => setSelectedPatchi(name)}
+      <section className="athikara-panel">
+        <div className="context-row athikara-row">
+          <span className="context-label">
+            <BilingualText text={UI.selectOurPatchi} block={false} />
+          </span>
+          <div
+            className="athikara-row__chips"
+            role="group"
+            aria-label={`${UI.selectOurPatchi.ta} ${UI.selectOurPatchi.en}`}
           >
-            <BilingualText text={patchiBilingual(name)} />
-          </button>
-        ))}
-      </nav>
+            {PATCHI_ORDER.map((name) => (
+              <button
+                key={name}
+                type="button"
+                className={
+                  selectedPatchi === name
+                    ? "patchi-submenu__btn patchi-submenu__btn--active"
+                    : "patchi-submenu__btn"
+                }
+                onClick={() => setSelectedPatchi(name)}
+              >
+                <BilingualText text={patchiBilingual(name)} />
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
 
-      {scheduleBundle && (
+      {scheduleBundle ? (
         <PatchiScheduleTable
           bundle={scheduleBundle}
           title={titleBi}
           subtitle={subtitleBi}
           coords={coords}
         />
-      )}
-
-      {!scheduleBundle && (
+      ) : (
         <p className="status">
           <BilingualText text={UI.noPatchiData} />
         </p>

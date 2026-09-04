@@ -47,6 +47,7 @@ export const UI = {
   date: bi("தேதி", "Date"),
   time: bi("நேரம்", "Time"),
   location: bi("இடம்", "Location"),
+  searchingPlaces: bi("தேடுகிறது…", "Searching…"),
   coordinates: bi("இடம் ஆயங்கள்", "Coordinates"),
   latitude: bi("அட்சரேகை", "Lat"),
   longitude: bi("தீர்க்கரேகை", "Lng"),
@@ -61,6 +62,7 @@ export const UI = {
   period: bi("பகுதி", "Period"),
   patchi: bi("பட்சி", "Bird"),
   myPatchi: bi("என் பட்சி", "My Patchi"),
+  selectOurPatchi: bi("எம் பட்சியைத் தேர்ந்தெடு", "Select Our Patchi"),
   status: bi("நிலை", "Status"),
   dayTime: bi("பகல் நேரம்", "Day time"),
   nightTime: bi("இரவு நேரம்", "Night time"),
@@ -90,6 +92,7 @@ export const UI = {
   patchiActivity: bi("பட்சி செயல்", "Patchi Activity"),
   thozhil: bi("தொழில்", "Thozhil"),
   athikaraPatchi: bi("அதிகார பட்சி", "Athikara Patchi"),
+  patchiRelation: bi("பட்சி உறவு", "Patchi Relation"),
   patchiRelations: bi("பட்சி உறவுகள்", "Patchi Relations"),
   natpu: bi("நட்பு", "Friends"),
   enemies: bi("பகை", "Enemies"),
@@ -136,6 +139,7 @@ export const PANCHA_DAY_PATCHI: (typeof PATCHI_ORDER)[number][] = [
   "வல்லூறு",
   "காகம்",
 ];
+
 
 export const MENU_ITEMS: { id: string; label: Bilingual }[] = [
   {

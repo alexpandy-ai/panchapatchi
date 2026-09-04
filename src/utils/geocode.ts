@@ -23,6 +23,7 @@ export const PLACE_PRESETS: PlaceCoords[] = [
   { placeName: "Trichy, Tamil Nadu, India", latitude: 10.7905, longitude: 78.7047 },
   { placeName: "Salem, Tamil Nadu, India", latitude: 11.6643, longitude: 78.146 },
   { placeName: "Tirunelveli, Tamil Nadu, India", latitude: 8.7139, longitude: 77.7567 },
+  { placeName: "Sattur, Tamil Nadu, India", latitude: 9.3516, longitude: 77.9211 },
   { placeName: "Erode, Tamil Nadu, India", latitude: 11.341, longitude: 77.7172 },
   { placeName: "Bengaluru, Karnataka, India", latitude: 12.9716, longitude: 77.5946 },
   { placeName: "Hyderabad, Telangana, India", latitude: 17.385, longitude: 78.4867 },
@@ -236,7 +237,13 @@ function rankPhotonFeature(feature: PhotonFeature, query: string): number {
   let nameRank = 2;
   if (name === normalized) nameRank = 0;
   else if (name.startsWith(normalized)) nameRank = 1;
-  return typeRank * 10 + nameRank;
+
+  let regionRank = 0;
+  if (props.countrycode === "IN") regionRank -= 5;
+  else if (props.countrycode) regionRank += 5;
+  if (props.state?.trim().toLowerCase() === "tamil nadu") regionRank -= 2;
+
+  return typeRank * 10 + nameRank + regionRank;
 }
 
 function photonFeatureToSuggestion(feature: PhotonFeature): PlaceSuggestion | null {
@@ -290,7 +297,19 @@ export async function searchPlaces(
     url.searchParams.set("limit", String(Math.max(limit, 10)));
     url.searchParams.set("lang", "en");
 
-    const features = await fetchPhotonFeatures(url);
+    let features = await fetchPhotonFeatures(url);
+    if (
+      features.length === 0 &&
+      !/\bindia\b/i.test(trimmed) &&
+      !/\btamil\s+nadu\b/i.test(trimmed)
+    ) {
+      const indiaUrl = new URL(PHOTON_SEARCH_URL);
+      indiaUrl.searchParams.set("q", `${trimmed}, India`);
+      indiaUrl.searchParams.set("limit", String(Math.max(limit, 10)));
+      indiaUrl.searchParams.set("lang", "en");
+      features = await fetchPhotonFeatures(indiaUrl);
+    }
+
     const ranked = features
       .slice()
       .sort((a, b) => rankPhotonFeature(a, trimmed) - rankPhotonFeature(b, trimmed))

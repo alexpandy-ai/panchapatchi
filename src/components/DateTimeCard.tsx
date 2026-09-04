@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 
 import { useLocation } from "../context/LocationContext";
 import { useLanguage } from "../context/LanguageContext";
@@ -19,7 +19,7 @@ import {
   parseCoordInput,
   resolveCountryInput,
 } from "../utils/location";
-import { formatPlaceLabel, geocodePlace, PLACE_PRESETS } from "../utils/geocode";
+import { formatPlaceLabel, geocodePlace, searchPlaces, type PlaceSuggestion } from "../utils/geocode";
 
 
 
@@ -131,12 +131,65 @@ export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
   );
 
   const [locationInput, setLocationInput] = useState(() => pickBilingual(locationDisplay, "ta"));
+  const [placeSuggestions, setPlaceSuggestions] = useState<PlaceSuggestion[]>([]);
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
+  const [isSearchingPlaces, setIsSearchingPlaces] = useState(false);
 
   const [latInput, setLatInput] = useState("");
 
   const [lngInput, setLngInput] = useState("");
 
   const draftDirtyRef = useRef(false);
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const searchRequestRef = useRef(0);
+  const skipNextSearchRef = useRef(false);
+
+  const clearPlaceSuggestions = useCallback(() => {
+    setPlaceSuggestions([]);
+    setActiveSuggestionIndex(-1);
+  }, []);
+
+  const schedulePlaceSearch = useCallback((query: string) => {
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+
+    const trimmed = query.trim();
+    if (trimmed.length < 2) {
+      clearPlaceSuggestions();
+      setIsSearchingPlaces(false);
+      return;
+    }
+
+    searchDebounceRef.current = setTimeout(() => {
+      const requestId = ++searchRequestRef.current;
+      setIsSearchingPlaces(true);
+      void searchPlaces(trimmed)
+        .then((suggestions) => {
+          if (requestId !== searchRequestRef.current) return;
+          setPlaceSuggestions(suggestions);
+          setActiveSuggestionIndex(suggestions.length ? 0 : -1);
+        })
+        .finally(() => {
+          if (requestId === searchRequestRef.current) {
+            setIsSearchingPlaces(false);
+          }
+        });
+    }, 280);
+  }, [clearPlaceSuggestions]);
+
+  useEffect(() => {
+    return () => {
+      if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    };
+  }, []);
+
+  const selectPlaceSuggestion = useCallback((suggestion: PlaceSuggestion) => {
+    skipNextSearchRef.current = true;
+    setLocationInput(formatPlaceLabel(suggestion.placeName));
+    setLatInput(formatCoord(suggestion.latitude));
+    setLngInput(formatCoord(suggestion.longitude));
+    draftDirtyRef.current = true;
+    clearPlaceSuggestions();
+  }, [clearPlaceSuggestions]);
 
 
 
@@ -177,12 +230,20 @@ export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
 
 
   const previewCountryCoords = async (nextValue: string) => {
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+
     const resolved = resolveCountryInput(nextValue);
     if (resolved) {
       setLocationInput(countryOptionLabel(resolved));
       setLatInput(formatCoord(resolved.lat));
       setLngInput(formatCoord(resolved.lng));
       draftDirtyRef.current = true;
+      clearPlaceSuggestions();
+      return;
+    }
+
+    if (placeSuggestions.length) {
+      selectPlaceSuggestion(placeSuggestions[Math.max(activeSuggestionIndex, 0)]);
       return;
     }
 
@@ -194,11 +255,58 @@ export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
     setLatInput(formatCoord(geocoded.latitude));
     setLngInput(formatCoord(geocoded.longitude));
     draftDirtyRef.current = true;
+    clearPlaceSuggestions();
+  };
+
+  const handleLocationBlur = () => {
+    window.setTimeout(() => clearPlaceSuggestions(), 150);
+  };
+
+  const handleLocationKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (placeSuggestions.length) {
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        setActiveSuggestionIndex((index) =>
+          index < placeSuggestions.length - 1 ? index + 1 : 0,
+        );
+        return;
+      }
+
+      if (event.key === "ArrowUp") {
+        event.preventDefault();
+        setActiveSuggestionIndex((index) =>
+          index > 0 ? index - 1 : placeSuggestions.length - 1,
+        );
+        return;
+      }
+
+      if (event.key === "Enter") {
+        event.preventDefault();
+        const selected =
+          placeSuggestions[Math.max(activeSuggestionIndex, 0)] ?? placeSuggestions[0];
+        if (selected) selectPlaceSuggestion(selected);
+        return;
+      }
+
+      if (event.key === "Escape") {
+        event.preventDefault();
+        clearPlaceSuggestions();
+        return;
+      }
+    }
+
+    if (event.key === "Enter") {
+      event.preventDefault();
+      void previewCountryCoords(locationInput);
+    }
   };
 
 
 
   const handleSubmit = async () => {
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    clearPlaceSuggestions();
+
     const nextDateTime = applyTimePart(
       applyDatePart(new Date(value), dateInput),
       timeInput,
@@ -263,7 +371,7 @@ export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
 
   const submitLabel = source === "manual" ? UI.updateLocation : UI.submitLocation;
 
-  const { sunrise, nextSunrise } = getDayCycleBounds(value, coords);
+  const { sunrise } = getDayCycleBounds(value, coords);
 
   return (
 
@@ -343,55 +451,120 @@ export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
 
           </span>
 
-          <input
+          <div className="datetime-field__location-autocomplete">
 
-            type="text"
+            <input
 
-            className="datetime-field__input datetime-field__combobox"
+              type="text"
 
-            list={listId}
+              className="datetime-field__input datetime-field__combobox"
 
-            value={locationInput}
+              list={listId}
 
-            onChange={(event) => {
+              value={locationInput}
 
-              draftDirtyRef.current = true;
+              onChange={(event) => {
 
-              setLocationInput(event.target.value);
+                draftDirtyRef.current = true;
 
-            }}
+                const nextValue = event.target.value;
 
-            onBlur={(event) => {
-              void previewCountryCoords(event.target.value);
-            }}
+                setLocationInput(nextValue);
 
-            onKeyDown={(event) => {
+                if (skipNextSearchRef.current) {
 
-              if (event.key === "Enter") {
+                  skipNextSearchRef.current = false;
 
-                event.preventDefault();
+                  return;
 
+                }
+
+                schedulePlaceSearch(nextValue);
+
+              }}
+
+              onBlur={() => {
+                handleLocationBlur();
                 void previewCountryCoords(locationInput);
+              }}
 
-              }
+              onKeyDown={handleLocationKeyDown}
 
-            }}
+              placeholder={pickBilingual(UI.location, language)}
 
-            placeholder={pickBilingual(UI.location, language)}
+              aria-label={pickBilingual(UI.location, language)}
 
-            aria-label={pickBilingual(UI.location, language)}
+              autoComplete="off"
 
-            autoComplete="off"
+              role="combobox"
 
-          />
+              aria-expanded={placeSuggestions.length > 0}
+
+              aria-controls="datetimeLocationSuggestions"
+
+              aria-autocomplete="list"
+
+            />
+
+            {placeSuggestions.length > 0 && (
+
+              <ul
+
+                id="datetimeLocationSuggestions"
+
+                className="datetime-field__place-suggestions"
+
+                role="listbox"
+
+              >
+
+                {placeSuggestions.map((suggestion, index) => (
+
+                  <li key={suggestion.id} role="option" aria-selected={index === activeSuggestionIndex}>
+
+                    <button
+
+                      type="button"
+
+                      className={`datetime-field__place-suggestion${index === activeSuggestionIndex ? " is-active" : ""}`}
+
+                      onMouseDown={(event) => event.preventDefault()}
+
+                      onClick={() => selectPlaceSuggestion(suggestion)}
+
+                    >
+
+                      {formatPlaceLabel(suggestion.placeName)}
+
+                    </button>
+
+                  </li>
+
+                ))}
+
+              </ul>
+
+            )}
+
+            {isSearchingPlaces && placeSuggestions.length === 0 && locationInput.trim().length >= 2 && (
+
+              <div
+
+                className="datetime-field__place-suggestions datetime-field__place-suggestions--loading"
+
+                aria-live="polite"
+
+              >
+
+                <BilingualText text={UI.searchingPlaces} />
+
+              </div>
+
+            )}
+
+          </div>
 
           <datalist id={listId}>
-
-            {PLACE_PRESETS.map((preset) => (
-
-              <option key={preset.placeName} value={preset.placeName} />
-
-            ))}
 
             {COUNTRIES.map((country) => (
 
@@ -509,8 +682,7 @@ export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
 
       <div className="datetime-card__summary">
         <p className="datetime-card__range">
-          <BilingualText text={UI.sunrise} block={false} /> {formatTime(sunrise)} –{" "}
-          <BilingualText text={UI.nextSunrise} block={false} /> {formatTime(nextSunrise)}
+          <BilingualText text={UI.sunrise} block={false} /> {formatTime(sunrise)}
         </p>
       </div>
 

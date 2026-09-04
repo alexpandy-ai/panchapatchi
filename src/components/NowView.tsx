@@ -41,7 +41,7 @@ export function NowView() {
   const groupKey = getDayGroupKey(weekday);
   const group = paksha.groups.find((g) => g.key === groupKey);
   const jamam = getJamamState(now, coords);
-  const { sunrise, nextSunrise } = useMemo(() => getDayCycleBounds(now, coords), [now, coords]);
+  const { sunrise } = useMemo(() => getDayCycleBounds(now, coords), [now, coords]);
   const sunset = useMemo(() => getSunset(now, coords), [now, coords]);
   const activeSlot = jamam.slots.find((s) => s.isActive) ?? jamam.slots[0];
   const yamaRow = group?.yamas.find((y) => y.yama === jamam.yamaIndex);
@@ -115,8 +115,7 @@ export function NowView() {
           </span>
         </div>
         <p className="context-hint">
-          சூரியோதயம் {formatTime(sunrise)} · சூரியாஸ்தமனம் {formatTime(sunset)} · அடுத்த சூரியோதயம்{" "}
-          {formatTime(nextSunrise)}
+          சூரியோதயம் {formatTime(sunrise)} · சூரியாஸ்தமனம் {formatTime(sunset)}
         </p>
       </section>
 
