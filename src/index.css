@@ -1130,7 +1130,74 @@ body {
 }
 
 .patchi-picker-sections {
-  display: contents;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.65rem;
+  margin-bottom: 0.35rem;
+}
+
+.patchi-picker-sections.athikara-row {
+  align-items: stretch;
+}
+
+.patchi-picker-block {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.55rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.65rem;
+  background: var(--bg-card);
+  box-shadow: 0 1px 0 rgba(45, 35, 25, 0.04);
+}
+
+.patchi-picker-block__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin: 0;
+  align-self: flex-start;
+  text-align: left;
+}
+
+.patchi-picker-block__title .bilingual {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.patchi-picker-block .athikara-row__chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-self: stretch;
+  gap: 0.45rem;
+  width: 100%;
+}
+
+.patchi-picker-block .patchi-submenu__btn {
+  flex: 0 1 auto;
+  max-width: 100%;
+  padding: 0.45rem 0.7rem;
+  white-space: nowrap;
+}
+
+.context-card:has(.patchi-picker-sections) .patchi-picker-sections + .context-row {
+  border-top: 1px solid var(--border);
+  padding-top: 0.75rem;
+  margin-top: 0.15rem;
+}
+
+.context-card:has(.patchi-picker-sections) .context-row:not(.patchi-picker-block) {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.45rem;
+}
+
+.context-card:has(.patchi-picker-sections) .context-row:not(.patchi-picker-block) .context-label {
+  align-self: flex-start;
 }
 
 .patchi-schedule-head {
@@ -1676,75 +1743,6 @@ body {
   .header h1 {
     max-width: 100%;
   }
-
-  /* Patchi Status — Athikara / My Patchi pickers */
-  .patchi-picker-sections {
-    display: flex;
-    flex-direction: column;
-    gap: 0.65rem;
-    margin-bottom: 0.35rem;
-  }
-
-  .context-card:has(.patchi-picker-sections) .patchi-picker-block {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.55rem;
-    padding: 0.75rem;
-    border: 1px solid var(--border);
-    border-radius: 0.65rem;
-    background: var(--bg-card);
-    box-shadow: 0 1px 0 rgba(45, 35, 25, 0.04);
-  }
-
-  .context-card:has(.patchi-picker-sections) .patchi-picker-block .context-label {
-    font-size: 0.88rem;
-    color: var(--text);
-    padding-bottom: 0.15rem;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .context-card:has(.patchi-picker-sections) .athikara-row__chips {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.5rem;
-    width: 100%;
-  }
-
-  .context-card:has(.patchi-picker-sections) .patchi-submenu__btn {
-    min-height: 2.75rem;
-    padding: 0.5rem 0.45rem;
-    font-size: 0.82rem;
-    white-space: normal;
-    text-align: center;
-    line-height: 1.25;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .context-card:has(.patchi-picker-sections) .athikara-row__chips .patchi-submenu__btn:last-child:nth-child(odd) {
-    grid-column: 1 / -1;
-    max-width: calc(50% - 0.25rem);
-    justify-self: center;
-  }
-
-  .context-card:has(.patchi-picker-sections) .patchi-picker-sections + .context-row {
-    border-top: 1px solid var(--border);
-    padding-top: 0.75rem;
-    margin-top: 0.15rem;
-  }
-
-  .context-card:has(.patchi-picker-sections) .context-row:not(.patchi-picker-block) {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.45rem;
-  }
-
-  .context-card:has(.patchi-picker-sections) .context-row:not(.patchi-picker-block) .context-label {
-    align-self: flex-start;
-  }
 }
 
 @media (max-width: 640px) {
@@ -1800,6 +1798,16 @@ body {
   .context-card:has(.athikara-row):not(:has(.patchi-picker-sections)) .context-row {
     grid-template-columns: minmax(6.75rem, 8.25rem) minmax(0, 1fr);
     column-gap: 0.5rem;
+  }
+
+  .jamam-pair__cell .thozhil-value-btn {
+    font-size: 0.64rem;
+    padding: 0.28rem 0.4rem;
+    gap: 0.25rem;
+  }
+
+  .jamam-pair__cell .thozhil-value-btn::after {
+    font-size: 0.6rem;
   }
 }
 
@@ -1887,10 +1895,118 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-.context-row--jamam-next-start {
-  border-top: 1px solid var(--border, rgba(0, 0, 0, 0.08));
-  padding-top: 0.5rem;
-  margin-top: 0.15rem;
+.context-row--jamam-pair {
+  padding-top: 0;
+}
+
+.jamam-pair {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.5rem 1rem;
+  width: 100%;
+}
+
+.jamam-pair__cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.45rem;
+  flex: 1 1 calc(50% - 0.5rem);
+  min-width: min(100%, 9.5rem);
+}
+
+.jamam-pair__cell .context-value-btn,
+.jamam-pair__cell .context-value {
+  width: 100%;
+  justify-self: start;
+}
+
+/* Patchi Status — clickable thozhil values (opens anthara dialog) */
+.jamam-pair__cell .thozhil-value-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid rgba(196, 92, 38, 0.32);
+  border-radius: 0.5rem;
+  background: var(--accent-soft);
+  color: var(--accent);
+  box-shadow: 0 1px 2px rgba(196, 92, 38, 0.1);
+  font-size: 0.72rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-align: left;
+  max-width: 100%;
+  min-width: 0;
+  text-decoration: underline;
+  text-decoration-color: rgba(196, 92, 38, 0.45);
+  text-underline-offset: 2px;
+}
+
+.jamam-pair__cell .thozhil-value-btn > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.jamam-pair__cell .thozhil-value-btn::after {
+  content: "▸";
+  flex-shrink: 0;
+  margin-left: auto;
+  font-size: 0.75rem;
+  line-height: 1;
+  opacity: 0.65;
+  transition: transform 0.15s, opacity 0.15s;
+}
+
+.jamam-pair__cell .thozhil-value-btn:hover {
+  background: rgba(196, 92, 38, 0.16);
+  border-color: var(--accent);
+  box-shadow: 0 2px 5px rgba(196, 92, 38, 0.14);
+}
+
+.jamam-pair__cell .thozhil-value-btn:hover::after {
+  opacity: 1;
+  transform: translateX(2px);
+}
+
+.jamam-pair__cell .thozhil-value-btn[aria-expanded="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(196, 92, 38, 0.25);
+  text-decoration-color: rgba(255, 255, 255, 0.55);
+}
+
+.jamam-pair__cell .thozhil-value-btn[aria-expanded="true"]:hover {
+  background: #b8521f;
+  border-color: #b8521f;
+}
+
+.jamam-pair__cell .thozhil-value-btn[aria-expanded="true"]::after {
+  opacity: 0.9;
+}
+
+.jamam-pair__cell .thozhil-value-btn.jamam-summary__value {
+  color: var(--accent);
+}
+
+.jamam-pair__cell .thozhil-value-btn .bi-ta {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: rgba(196, 92, 38, 0.45);
+  text-underline-offset: 2px;
+}
+
+.jamam-pair__cell .thozhil-value-btn .bi-en {
+  color: rgba(196, 92, 38, 0.82);
+}
+
+.jamam-pair__cell .thozhil-value-btn[aria-expanded="true"] .bi-ta,
+.jamam-pair__cell .thozhil-value-btn[aria-expanded="true"] .bi-en {
+  color: #fff;
+  text-decoration-color: rgba(255, 255, 255, 0.55);
 }
 
 .context-row--action {
