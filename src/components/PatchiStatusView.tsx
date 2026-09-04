@@ -22,6 +22,10 @@ import {
 
   patchiBilingual,
 
+  thozhilHeader,
+
+  thozhilValueWithTime,
+
   UI,
 
   type Bilingual,
@@ -30,9 +34,9 @@ import {
 
 import {
   cycleStartFor,
+  formatTimeRange,
   getJamamSlotByIndex,
   getJamamState,
-  getJamamSummaryParts,
   getNextJamamIndex,
   getPreviousJamamSlotForIndex,
   yamaFromJamamIndex,
@@ -292,24 +296,6 @@ export function PatchiStatusView({
 
   );
 
-  const jamamSummary = useMemo(
-
-    () => (activeSlot ? getJamamSummaryParts(activeSlot, pakshaId) : null),
-
-    [activeSlot, pakshaId],
-
-  );
-
-  const nextJamamSummary = useMemo(
-
-    () => (nextSlot ? getJamamSummaryParts(nextSlot, pakshaId) : null),
-
-    [nextSlot, pakshaId],
-
-  );
-
-
-
   const antharaDialogProps = useMemo(() => {
 
     if (antharaDialogTarget === "current") {
@@ -568,76 +554,64 @@ export function PatchiStatusView({
 
         </div>
 
-        {jamamSummary ? (
-          <>
-            <div className="context-row context-row--jamam-summary">
-              <span className="context-label">
-                <BilingualText text={UI.currentJamam} block={false} />
-              </span>
-              <span className="context-value jamam-summary__value">
-                <BilingualText text={jamamSummary.label} block={false} />
-                {" · "}
-                <span className="jamam-summary__time">{jamamSummary.timeRange}</span>
-                {" · "}
-                <BilingualText text={jamamSummary.paksha} block={false} />
-              </span>
-            </div>
-
+        {activeSlot ? (
+          <div className="context-row context-row--jamam-summary">
+            <span className="context-label">
+              <BilingualText text={thozhilHeader(activeSlot.index)} block={false} />
+            </span>
             {derived.myPatchiActivity ? (
-              <div className="context-row context-row--action">
-                <span className="context-label">
-                  <BilingualText text={UI.thozhil} block={false} />
+              <button
+                type="button"
+                className="context-value-btn jamam-summary__value"
+                aria-expanded={antharaDialogTarget === "current"}
+                onClick={() => setAntharaDialogTarget("current")}
+              >
+                <BilingualText
+                  text={thozhilValueWithTime(
+                    displayActivityBi(derived.myPatchiActivity),
+                    formatTimeRange(activeSlot.start, activeSlot.end),
+                  )}
+                  block={false}
+                />
+              </button>
+            ) : (
+              <span className="context-value jamam-summary__value">
+                <span className="jamam-summary__time">
+                  {formatTimeRange(activeSlot.start, activeSlot.end)}
                 </span>
-                <button
-                  type="button"
-                  className="context-value-btn"
-                  aria-expanded={antharaDialogTarget === "current"}
-                  onClick={() => setAntharaDialogTarget("current")}
-                >
-                  <BilingualText
-                    text={displayActivityBi(derived.myPatchiActivity)}
-                    block={false}
-                  />
-                </button>
-              </div>
-            ) : null}
-          </>
+              </span>
+            )}
+          </div>
         ) : null}
 
-        {nextJamamSummary ? (
-          <>
-            <div className="context-row context-row--jamam-summary context-row--jamam-next-start">
-              <span className="context-label">
-                <BilingualText text={UI.nextJamam} block={false} />
-              </span>
-              <span className="context-value jamam-summary__value">
-                <BilingualText text={nextJamamSummary.label} block={false} />
-                {" · "}
-                <span className="jamam-summary__time">{nextJamamSummary.timeRange}</span>
-                {" · "}
-                <BilingualText text={nextJamamSummary.paksha} block={false} />
-              </span>
-            </div>
-
+        {nextSlot ? (
+          <div className="context-row context-row--jamam-summary context-row--jamam-next-start">
+            <span className="context-label">
+              <BilingualText text={thozhilHeader(nextSlot.index)} block={false} />
+            </span>
             {derivedNext.myPatchiActivity ? (
-              <div className="context-row context-row--action">
-                <span className="context-label">
-                  <BilingualText text={UI.thozhil} block={false} />
+              <button
+                type="button"
+                className="context-value-btn jamam-summary__value"
+                aria-expanded={antharaDialogTarget === "next"}
+                onClick={() => setAntharaDialogTarget("next")}
+              >
+                <BilingualText
+                  text={thozhilValueWithTime(
+                    displayActivityBi(derivedNext.myPatchiActivity),
+                    formatTimeRange(nextSlot.start, nextSlot.end),
+                  )}
+                  block={false}
+                />
+              </button>
+            ) : (
+              <span className="context-value jamam-summary__value">
+                <span className="jamam-summary__time">
+                  {formatTimeRange(nextSlot.start, nextSlot.end)}
                 </span>
-                <button
-                  type="button"
-                  className="context-value-btn"
-                  aria-expanded={antharaDialogTarget === "next"}
-                  onClick={() => setAntharaDialogTarget("next")}
-                >
-                  <BilingualText
-                    text={displayActivityBi(derivedNext.myPatchiActivity)}
-                    block={false}
-                  />
-                </button>
-              </div>
-            ) : null}
-          </>
+              </span>
+            )}
+          </div>
         ) : null}
 
         {currentAnthara ? (

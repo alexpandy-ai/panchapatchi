@@ -1,14 +1,12 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { BilingualText } from "./BilingualText";
 import { useLocation } from "../context/LocationContext";
 import type { PakshaData } from "../types";
 import {
   bi,
-  pakshaLabelBilingual,
   PATCHI_ORDER,
   patchiBilingual,
   UI,
-  weekdayBilingual,
 } from "../utils/bilingual";
 import type { PakshaId } from "../utils/paksha";
 import { getPatchiSchedulesForDate } from "../utils/patchi";
@@ -32,21 +30,9 @@ export function TimeTableView({ selectedDateTime, data }: TimeTableViewProps) {
     coords,
   );
 
-  const weekdayBi = useMemo(
-    () => weekdayBilingual(selectedDateTime.getDay()),
-    [selectedDateTime],
-  );
-
   const titleBi = scheduleBundle
     ? bi(`${scheduleBundle.patchiName} — ${UI.timeTableTitle.ta}`, `${patchiBilingual(scheduleBundle.patchiName).en} — ${UI.timeTableTitle.en}`)
     : UI.timeTableTitle;
-
-  const subtitleBi = scheduleBundle
-    ? bi(
-        `${weekdayBi.ta} · ${scheduleBundle.activePakshaLabel}`,
-        `${weekdayBi.en} · ${pakshaLabelBilingual(scheduleBundle.activePakshaId).en}`,
-      )
-    : undefined;
 
   return (
     <div className="time-table-view">
@@ -82,7 +68,6 @@ export function TimeTableView({ selectedDateTime, data }: TimeTableViewProps) {
         <PatchiScheduleTable
           bundle={scheduleBundle}
           title={titleBi}
-          subtitle={subtitleBi}
           coords={coords}
         />
       ) : (

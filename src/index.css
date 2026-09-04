@@ -918,6 +918,14 @@ body {
   color: var(--muted);
 }
 
+.patchi-schedule-sheet-picker {
+  padding: 0.85rem 0.85rem 0;
+}
+
+.schedule-table-card > .patchi-pivot-tables {
+  padding: 0 0.85rem 0.85rem;
+}
+
 .home-panel {
   text-align: center;
   padding: 2rem 1rem;

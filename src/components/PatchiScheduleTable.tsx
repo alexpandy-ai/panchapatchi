@@ -19,16 +19,21 @@ import { getPakshaGroupPatchiBilingual } from "../utils/dayGroup";
 
 import {
   jamamBilingual,
-  pakshaLabelBilingual,
+  PAKSHA_BI,
   sectionLabelBilingual,
   UI,
   type Bilingual,
 } from "../utils/bilingual";
+import type { PakshaId } from "../utils/paksha";
+
+const SHEET_TABS: { id: PakshaId; label: (typeof PAKSHA_BI)[PakshaId] }[] = [
+  { id: "valarpirai", label: PAKSHA_BI.valarpirai },
+  { id: "theipirai", label: PAKSHA_BI.theipirai },
+];
 
 interface PatchiScheduleTableProps {
   bundle: PatchiSchedulesBundle;
   title: Bilingual;
-  subtitle?: Bilingual;
   coords: GeoCoords | null;
 }
 
@@ -40,52 +45,60 @@ interface SelectedJamamCell {
 export function PatchiScheduleTable({
   bundle,
   title,
-  subtitle,
   coords,
 }: PatchiScheduleTableProps) {
+  const [activePaksha, setActivePaksha] = useState<PakshaId>(bundle.activePakshaId);
+  const schedule =
+    bundle.schedules.find((entry) => entry.pakshaId === activePaksha) ?? bundle.schedules[0];
+
+  if (!schedule) return null;
+
   return (
     <section className="schedule-table-card">
       <div className="patchi-schedule-head">
         <h3 className="schedule-table-card__title">
           <BilingualText text={title} />
         </h3>
-        {subtitle && (
-          <p className="patchi-schedule-head__meta">
-            <BilingualText text={subtitle} />
-          </p>
-        )}
       </div>
 
-      <div className="patchi-paksha-sections">
-        {bundle.schedules.map((schedule) => (
-          <div key={schedule.pakshaId} className="patchi-paksha-section">
-            <div className="patchi-paksha-section__head">
-              <h4 className="patchi-paksha-section__title">
-                <BilingualText text={pakshaLabelBilingual(schedule.pakshaId)} />
-              </h4>
-              {schedule.isActivePaksha && (
-                <span className="patchi-paksha-section__badge">
-                  <BilingualText text={UI.selectedDate} />
-                </span>
-              )}
-            </div>
-
-            <div className="patchi-pivot-tables">
-              <PeriodPivotTable
-                schedule={schedule}
-                period="day"
-                title={sectionLabelBilingual(schedule.daySectionLabel)}
-                coords={coords}
-              />
-              <PeriodPivotTable
-                schedule={schedule}
-                period="night"
-                title={sectionLabelBilingual(schedule.nightSectionLabel)}
-                coords={coords}
-              />
-            </div>
-          </div>
+      <div
+        className="sheet-picker patchi-schedule-sheet-picker"
+        role="tablist"
+        aria-label={`${UI.sheetPicker.ta} ${UI.sheetPicker.en}`}
+      >
+        {SHEET_TABS.map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            role="tab"
+            className={
+              activePaksha === tab.id
+                ? "sheet-picker__btn sheet-picker__btn--active"
+                : "sheet-picker__btn"
+            }
+            onClick={() => setActivePaksha(tab.id)}
+            aria-selected={activePaksha === tab.id}
+          >
+            <span className="sheet-picker__label">
+              <BilingualText text={tab.label} />
+            </span>
+          </button>
         ))}
+      </div>
+
+      <div className="patchi-pivot-tables">
+        <PeriodPivotTable
+          schedule={schedule}
+          period="day"
+          title={sectionLabelBilingual(schedule.daySectionLabel)}
+          coords={coords}
+        />
+        <PeriodPivotTable
+          schedule={schedule}
+          period="night"
+          title={sectionLabelBilingual(schedule.nightSectionLabel)}
+          coords={coords}
+        />
       </div>
     </section>
   );

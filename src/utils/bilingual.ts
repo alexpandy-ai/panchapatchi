@@ -62,7 +62,7 @@ export const UI = {
   period: bi("பகுதி", "Period"),
   patchi: bi("பட்சி", "Bird"),
   myPatchi: bi("என் பட்சி", "My Patchi"),
-  selectOurPatchi: bi("எம் பட்சியைத் தேர்ந்தெடு", "Select Our Patchi"),
+  selectOurPatchi: bi("பட்சியைத் தேர்ந்தெடு", "Select Patchi"),
   status: bi("நிலை", "Status"),
   dayTime: bi("பகல் நேரம்", "Day time"),
   nightTime: bi("இரவு நேரம்", "Night time"),
@@ -110,6 +110,10 @@ export function antharaStartTimeHeader(jamamIndex: number): Bilingual {
 
 export function thozhilHeader(jamamIndex: number): Bilingual {
   return bi(`ஜாமம் ${jamamIndex} — தொழில்`, `Jamam ${jamamIndex} — thozhil`);
+}
+
+export function thozhilValueWithTime(activity: Bilingual, timeRange: string): Bilingual {
+  return bi(`${activity.ta} (${timeRange})`, `${activity.en} (${timeRange})`);
 }
 
 export function patchiHeader(jamamIndex: number): Bilingual {
@@ -223,6 +227,14 @@ export function dayGroupBilingual(key: string, taLabel: string): Bilingual {
 
 export function jamamBilingual(index: number): Bilingual {
   return bi(`ஜாமம் ${index}`, `Jamam ${index}`);
+}
+
+export function currentJamamLabel(index: number): Bilingual {
+  return bi(`தற்போதைய ஜாமம் ${index}`, `Current jamam ${index}`);
+}
+
+export function nextJamamLabel(index: number): Bilingual {
+  return bi(`அடுத்த ஜாமம் ${index}`, `Next jamam ${index}`);
 }
 
 /** Display jamam label for an Excel yama (1–5) in the given period. */
