@@ -8,13 +8,11 @@ import { useLocation } from "../context/LocationContext";
 
 import type { PakshaData } from "../types";
 
-import { getAntharaSegmentIndex, getAntharaSlots, getCurrentAntharaSlot, type AntharaSlot } from "../utils/anthara";
+import { getAntharaSegmentIndex } from "../utils/anthara";
 
 import { displayActivityBi } from "../utils/activityLabel";
 
 import {
-
-  bi,
 
   PAKSHA_BI,
 
@@ -27,8 +25,6 @@ import {
   thozhilValueWithTime,
 
   UI,
-
-  type Bilingual,
 
 } from "../utils/bilingual";
 
@@ -57,28 +53,6 @@ interface PatchiStatusViewProps {
   athikaraPatchi?: (typeof PATCHI_ORDER)[number];
 
   onAthikaraPatchiChange?: (patchi: (typeof PATCHI_ORDER)[number]) => void;
-
-}
-
-
-
-/** Status page only — not used in other menus. */
-
-const STATUS_UI = {
-
-  antharaPatchi: bi("அந்தர பட்சி - தொழில்", "Anthara patchi - thozhil"),
-
-} as const satisfies Record<string, Bilingual>;
-
-
-
-function antharaSlotDisplay(slot: AntharaSlot): Bilingual {
-
-  const bird = patchiBilingual(slot.bird);
-
-  const activity = displayActivityBi(slot.activity);
-
-  return bi(`${bird.ta} — ${activity.ta}`, `${bird.en} — ${activity.en}`);
 
 }
 
@@ -226,42 +200,6 @@ export function PatchiStatusView({
 
 
 
-  const antharaSlots = useMemo(
-
-    () =>
-
-      derived.jamamSlots.length > 0 && activeSlot
-
-        ? getAntharaSlots(
-
-            derived.jamamSlots,
-
-            myPatchi,
-
-            jamam.period,
-
-            activeSlot.start,
-
-            activeSlot.end,
-
-          )
-
-        : [],
-
-    [derived.jamamSlots, myPatchi, jamam.period, activeSlot],
-
-  );
-
-
-
-  const currentAnthara = useMemo(
-
-    () => getCurrentAntharaSlot(antharaSlots, selectedDateTime),
-
-    [antharaSlots, selectedDateTime],
-
-  );
-
   const antharaGroup = useMemo(
     () => paksha?.groups.find((group) => group.key === derived.athikaraGroupKey) ?? null,
     [paksha, derived.athikaraGroupKey],
@@ -341,101 +279,105 @@ export function PatchiStatusView({
 
       <section className="context-card">
 
-        <div className="context-row athikara-row">
+        <div className="patchi-picker-sections">
 
-          <span className="context-label">
+          <div className="context-row athikara-row patchi-picker-block">
 
-            <BilingualText text={UI.athikaraPatchi} block={false} />
+            <span className="context-label">
 
-          </span>
+              <BilingualText text={UI.athikaraPatchi} block={false} />
 
-          <div
+            </span>
 
-            className="athikara-row__chips"
+            <div
 
-            role="group"
+              className="athikara-row__chips"
 
-            aria-label={`${UI.athikaraPatchi.ta} ${UI.athikaraPatchi.en}`}
+              role="group"
 
-          >
+              aria-label={`${UI.athikaraPatchi.ta} ${UI.athikaraPatchi.en}`}
 
-            {PATCHI_ORDER.map((name) => (
+            >
 
-              <button
+              {PATCHI_ORDER.map((name) => (
 
-                key={name}
+                <button
 
-                type="button"
+                  key={name}
 
-                className={
+                  type="button"
 
-                  athikaraPatchi === name
+                  className={
 
-                    ? "patchi-submenu__btn patchi-submenu__btn--active"
+                    athikaraPatchi === name
 
-                    : "patchi-submenu__btn"
+                      ? "patchi-submenu__btn patchi-submenu__btn--active"
 
-                }
+                      : "patchi-submenu__btn"
 
-                onClick={() => setAthikaraPatchi(name)}
+                  }
 
-              >
+                  onClick={() => setAthikaraPatchi(name)}
 
-                <BilingualText text={patchiBilingual(name)} />
+                >
 
-              </button>
+                  <BilingualText text={patchiBilingual(name)} />
 
-            ))}
+                </button>
+
+              ))}
+
+            </div>
 
           </div>
 
-        </div>
+          <div className="context-row athikara-row patchi-picker-block">
 
-        <div className="context-row athikara-row">
+            <span className="context-label">
 
-          <span className="context-label">
+              <BilingualText text={UI.myPatchi} block={false} />
 
-            <BilingualText text={UI.myPatchi} block={false} />
+            </span>
 
-          </span>
+            <div
 
-          <div
+              className="athikara-row__chips"
 
-            className="athikara-row__chips"
+              role="group"
 
-            role="group"
+              aria-label={`${UI.myPatchi.ta} ${UI.myPatchi.en}`}
 
-            aria-label={`${UI.myPatchi.ta} ${UI.myPatchi.en}`}
+            >
 
-          >
+              {PATCHI_ORDER.map((name) => (
 
-            {PATCHI_ORDER.map((name) => (
+                <button
 
-              <button
+                  key={name}
 
-                key={name}
+                  type="button"
 
-                type="button"
+                  className={
 
-                className={
+                    myPatchi === name
 
-                  myPatchi === name
+                      ? "patchi-submenu__btn patchi-submenu__btn--active"
 
-                    ? "patchi-submenu__btn patchi-submenu__btn--active"
+                      : "patchi-submenu__btn"
 
-                    : "patchi-submenu__btn"
+                  }
 
-                }
+                  onClick={() => setMyPatchi(name)}
 
-                onClick={() => setMyPatchi(name)}
+                >
 
-              >
+                  <BilingualText text={patchiBilingual(name)} />
 
-                <BilingualText text={patchiBilingual(name)} />
+                </button>
 
-              </button>
+              ))}
 
-            ))}
+            </div>
 
           </div>
 
@@ -541,26 +483,6 @@ export function PatchiStatusView({
               </span>
             )}
           </div>
-        ) : null}
-
-        {currentAnthara ? (
-
-          <div className="context-row context-row--anthara">
-
-            <span className="context-label">
-
-              <BilingualText text={STATUS_UI.antharaPatchi} block={false} />
-
-            </span>
-
-            <span className="context-value">
-
-              <BilingualText text={antharaSlotDisplay(currentAnthara)} block={false} />
-
-            </span>
-
-          </div>
-
         ) : null}
 
       </section>

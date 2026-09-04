@@ -98,6 +98,9 @@ export const UI = {
   enemies: bi("பகை", "Enemies"),
   jamamTime: bi("ஜாமம் நேரம்", "Jamam time"),
   segmentStartTime: bi("அந்தர தொடக்க நேரம்", "Anthara start time"),
+  antharaJamam: bi("அந்தர ஜாமம்", "Anthara Jamam"),
+  antharaPreviousTime: bi("முந்தைய நேரம்", "Previous time"),
+  antharaCurrentTime: bi("தற்போதைய நேரம்", "Current time"),
   patchiThozhilMatrix: bi("அனைத்து பட்சி — ஜாமம் தொழில்", "All patchi — jamam thozhil"),
   patchiColumn: bi("பட்சி", "Patchi"),
 } as const;

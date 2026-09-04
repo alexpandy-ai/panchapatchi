@@ -658,6 +658,9 @@ body {
   justify-content: space-between;
   gap: 0.35rem;
   margin-bottom: 0.15rem;
+  padding: 0.22rem 0.28rem;
+  border-radius: 0.35rem;
+  background: rgba(196, 92, 38, 0.1);
 }
 
 .jamam-segments-panel__title {
@@ -679,6 +682,26 @@ body {
 
 .jamam-segments-table__col-segment {
   width: 4.25rem;
+}
+
+.jamam-segments-table__col-segment-number {
+  width: 3.5rem;
+}
+
+.jamam-segments-table__col-segment-time {
+  width: 4.25rem;
+}
+
+.jamam-segments-table__col-segment-previous {
+  width: 4.25rem;
+}
+
+.jamam-segments-table__col-segment-label {
+  width: 5.25rem;
+}
+
+.jamam-segments-table--matrix-with-previous .jamam-segments-table__col-segment-label {
+  width: 5.75rem;
 }
 
 .jamam-segments-panel__previous {
@@ -753,9 +776,9 @@ body {
 }
 
 .jamam-segments-table th {
-  background: var(--bg-card);
+  background: rgba(196, 92, 38, 0.12);
   font-weight: 700;
-  color: var(--muted);
+  color: var(--text);
   font-size: 0.66rem;
   line-height: 1.1;
   padding: 0.1rem 0.22rem;
@@ -892,6 +915,7 @@ body {
 .jamam-segments-table--matrix td {
   text-align: center;
   vertical-align: middle;
+  font-weight: 700;
 }
 
 .jamam-segments-table__patchi-col {
@@ -904,8 +928,64 @@ body {
   white-space: nowrap;
 }
 
-.jamam-segments-table--matrix thead .jamam-segments-table__patchi-col {
+.jamam-segments-table__segment-number-col {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  text-align: center !important;
+  background: var(--bg-card);
+  width: 3.5rem;
+  white-space: nowrap;
+}
+
+.jamam-segments-table__segment-previous-col {
+  position: sticky;
+  left: 3.5rem;
+  z-index: 1;
+  text-align: center !important;
+  background: var(--bg-card);
+  width: 4.25rem;
+  white-space: nowrap;
+}
+
+.jamam-segments-table__segment-time-col {
+  position: sticky;
+  z-index: 1;
+  text-align: center !important;
+  background: var(--bg-card);
+  width: 4.25rem;
+  white-space: nowrap;
+}
+
+.jamam-segments-table--matrix:not(.jamam-segments-table--matrix-with-previous) .jamam-segments-table__segment-time-col {
+  left: 3.5rem;
+}
+
+.jamam-segments-table--matrix-with-previous .jamam-segments-table__segment-time-col {
+  left: 7.75rem;
+}
+
+.jamam-segments-table__segment-col {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  text-align: left !important;
+  background: var(--bg-card);
+  width: 5.25rem;
+  white-space: nowrap;
+}
+
+.jamam-segments-table--matrix-with-previous .jamam-segments-table__segment-col {
+  width: 5.75rem;
+}
+
+.jamam-segments-table--matrix thead .jamam-segments-table__patchi-col,
+.jamam-segments-table--matrix thead .jamam-segments-table__segment-col,
+.jamam-segments-table--matrix thead .jamam-segments-table__segment-number-col,
+.jamam-segments-table--matrix thead .jamam-segments-table__segment-time-col,
+.jamam-segments-table--matrix thead .jamam-segments-table__segment-previous-col {
   z-index: 2;
+  background: rgba(196, 92, 38, 0.12);
 }
 
 .jamam-segments-table__jamam-label {
@@ -916,16 +996,15 @@ body {
 
 .jamam-segments-table__jamam-time {
   display: block;
-  margin-top: 0.08rem;
   font-size: 0.62rem;
-  font-weight: 500;
-  color: var(--muted);
+  font-weight: 700;
+  color: var(--text);
   white-space: nowrap;
 }
 
-.jamam-segments-table--matrix th:not(.jamam-segments-table__patchi-col),
-.jamam-segments-table--matrix td:not(.jamam-segments-table__patchi-col) {
-  width: 4.25rem;
+.jamam-segments-table--matrix th:not(.jamam-segments-table__patchi-col):not(.jamam-segments-table__segment-col):not(.jamam-segments-table__segment-number-col):not(.jamam-segments-table__segment-time-col):not(.jamam-segments-table__segment-previous-col),
+.jamam-segments-table--matrix td:not(.jamam-segments-table__patchi-col):not(.jamam-segments-table__segment-col):not(.jamam-segments-table__segment-number-col):not(.jamam-segments-table__segment-time-col):not(.jamam-segments-table__segment-previous-col) {
+  width: 4.75rem;
   white-space: normal;
   line-height: 1.05;
 }
@@ -934,7 +1013,11 @@ body {
   background: rgba(196, 92, 38, 0.08);
 }
 
-.jamam-segments-table__row--highlight th.jamam-segments-table__patchi-col {
+.jamam-segments-table__row--highlight th.jamam-segments-table__patchi-col,
+.jamam-segments-table__row--highlight th.jamam-segments-table__segment-col,
+.jamam-segments-table__row--highlight th.jamam-segments-table__segment-number-col,
+.jamam-segments-table__row--highlight td.jamam-segments-table__segment-time-col,
+.jamam-segments-table__row--highlight td.jamam-segments-table__segment-previous-col {
   background: rgba(196, 92, 38, 0.1);
 }
 
@@ -954,6 +1037,22 @@ body {
   font-size: 0.6rem;
 }
 
+.jamam-segments-table__previous-header {
+  display: block;
+  margin-top: 0.12rem;
+  font-size: 0.58rem;
+  font-weight: 600;
+  color: var(--muted);
+  line-height: 1.05;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.jamam-segments-table__jamam-time--previous {
+  color: var(--muted);
+  font-size: 0.58rem;
+}
+
 .jamam-segments-table__cell--highlight {
   background: rgba(196, 92, 38, 0.18);
   font-weight: 700;
@@ -963,9 +1062,29 @@ body {
   display: none;
 }
 
-.jamam-segments-table--matrix .jamam-segments-table__patchi-col .bi-en {
+.jamam-segments-table--matrix .jamam-segments-table__patchi-col .bi-en,
+.jamam-segments-table--matrix .jamam-segments-table__segment-col .bi-en,
+.jamam-segments-table--matrix .jamam-segments-table__segment-number-col .bi-en,
+.jamam-segments-table--matrix .jamam-segments-table__segment-time-col .bi-en,
+.jamam-segments-table--matrix .jamam-segments-table__segment-previous-col .bi-en {
   display: block;
   font-size: 0.68em;
+}
+
+.jamam-segments-table--matrix thead .jamam-segments-table__segment-col,
+.jamam-segments-table--matrix thead .jamam-segments-table__segment-number-col,
+.jamam-segments-table--matrix thead .jamam-segments-table__segment-time-col,
+.jamam-segments-table--matrix thead .jamam-segments-table__segment-previous-col {
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.05;
+}
+
+.jamam-segments-table--matrix tbody .jamam-segments-table__segment-col,
+.jamam-segments-table--matrix tbody .jamam-segments-table__segment-number-col,
+.jamam-segments-table--matrix tbody .jamam-segments-table__segment-time-col,
+.jamam-segments-table--matrix tbody .jamam-segments-table__segment-previous-col {
+  font-size: 0.7rem;
 }
 
 .patchi-submenu {
@@ -1008,6 +1127,10 @@ body {
 
 .athikara-row__chips--derived .patchi-submenu__btn:not(.patchi-submenu__btn--active) {
   opacity: 0.45;
+}
+
+.patchi-picker-sections {
+  display: contents;
 }
 
 .patchi-schedule-head {
@@ -1243,6 +1366,25 @@ body {
 .datetime-field__place-suggestion:hover,
 .datetime-field__place-suggestion.is-active {
   background: rgba(167, 139, 250, 0.12);
+}
+
+.datetime-field--sunrise {
+  flex-shrink: 0;
+}
+
+.datetime-field__sunrise-value {
+  display: flex;
+  align-items: center;
+  min-height: 2.05rem;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  background: var(--bg);
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  white-space: nowrap;
 }
 
 .datetime-field--coords {
@@ -1534,6 +1676,75 @@ body {
   .header h1 {
     max-width: 100%;
   }
+
+  /* Patchi Status — Athikara / My Patchi pickers */
+  .patchi-picker-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .context-card:has(.patchi-picker-sections) .patchi-picker-block {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.55rem;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 0.65rem;
+    background: var(--bg-card);
+    box-shadow: 0 1px 0 rgba(45, 35, 25, 0.04);
+  }
+
+  .context-card:has(.patchi-picker-sections) .patchi-picker-block .context-label {
+    font-size: 0.88rem;
+    color: var(--text);
+    padding-bottom: 0.15rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .context-card:has(.patchi-picker-sections) .athikara-row__chips {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .context-card:has(.patchi-picker-sections) .patchi-submenu__btn {
+    min-height: 2.75rem;
+    padding: 0.5rem 0.45rem;
+    font-size: 0.82rem;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.25;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .context-card:has(.patchi-picker-sections) .athikara-row__chips .patchi-submenu__btn:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    max-width: calc(50% - 0.25rem);
+    justify-self: center;
+  }
+
+  .context-card:has(.patchi-picker-sections) .patchi-picker-sections + .context-row {
+    border-top: 1px solid var(--border);
+    padding-top: 0.75rem;
+    margin-top: 0.15rem;
+  }
+
+  .context-card:has(.patchi-picker-sections) .context-row:not(.patchi-picker-block) {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.45rem;
+  }
+
+  .context-card:has(.patchi-picker-sections) .context-row:not(.patchi-picker-block) .context-label {
+    align-self: flex-start;
+  }
 }
 
 @media (max-width: 640px) {
@@ -1586,7 +1797,7 @@ body {
     font-size: 0.78rem;
   }
 
-  .context-card:has(.athikara-row) .context-row {
+  .context-card:has(.athikara-row):not(:has(.patchi-picker-sections)) .context-row {
     grid-template-columns: minmax(6.75rem, 8.25rem) minmax(0, 1fr);
     column-gap: 0.5rem;
   }

@@ -578,6 +578,24 @@ export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
 
 
 
+        <div className="datetime-field datetime-field--sunrise">
+
+          <span className="datetime-field__label">
+
+            <BilingualText text={UI.sunrise} />
+
+          </span>
+
+          <span className="datetime-field__sunrise-value" aria-live="polite">
+
+            {formatTime(sunrise)}
+
+          </span>
+
+        </div>
+
+
+
         <div className="datetime-field datetime-field--coords">
 
           <div className="datetime-field__coords-row">
@@ -678,12 +696,6 @@ export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
 
         </button>
 
-      </div>
-
-      <div className="datetime-card__summary">
-        <p className="datetime-card__range">
-          <BilingualText text={UI.sunrise} block={false} /> {formatTime(sunrise)}
-        </p>
       </div>
 
     </section>
