@@ -2,16 +2,15 @@ import { useState } from "react";
 
 import { BilingualText } from "./BilingualText";
 import { JamamAntharaDialog } from "./JamamAntharaDialog";
+import { useLocation } from "../context/LocationContext";
 
 import type { PatchiSchedule, PatchiSchedulesBundle } from "../utils/patchi";
 
-import { isActiveJamamColumn, isActivePeriodCell, jamamActivitySlotsKey } from "../utils/patchi";
+import { isActiveJamamColumn, isActivePeriodCell, jamamActivitySlotsKey, jamamSlotsFromColumns } from "../utils/patchi";
 
 import type { PeriodId } from "../utils/jamam";
 
-import { jamamIndexForYama, getPreviousJamamSlotForIndex } from "../utils/jamam";
-
-import type { GeoCoords } from "../utils/location";
+import { jamamIndexForYama } from "../utils/jamam";
 
 import { displayActivityBi } from "../utils/activityLabel";
 
@@ -34,18 +33,17 @@ const SHEET_TABS: { id: PakshaId; label: (typeof PAKSHA_BI)[PakshaId] }[] = [
 interface PatchiScheduleTableProps {
   bundle: PatchiSchedulesBundle;
   title: Bilingual;
-  coords: GeoCoords | null;
 }
 
 interface SelectedJamamCell {
   groupKey: string;
   yama: number;
+  thozhil: string;
 }
 
 export function PatchiScheduleTable({
   bundle,
   title,
-  coords,
 }: PatchiScheduleTableProps) {
   const [activePaksha, setActivePaksha] = useState<PakshaId>(bundle.activePakshaId);
   const schedule =
@@ -91,13 +89,11 @@ export function PatchiScheduleTable({
           schedule={schedule}
           period="day"
           title={sectionLabelBilingual(schedule.daySectionLabel)}
-          coords={coords}
         />
         <PeriodPivotTable
           schedule={schedule}
           period="night"
           title={sectionLabelBilingual(schedule.nightSectionLabel)}
-          coords={coords}
         />
       </div>
     </section>
@@ -108,47 +104,28 @@ function PeriodPivotTable({
   schedule,
   period,
   title,
-  coords,
 }: {
   schedule: PatchiSchedule;
   period: PeriodId;
   title: Bilingual;
-  coords: GeoCoords | null;
 }) {
+  const { coords } = useLocation();
   const [selectedCell, setSelectedCell] = useState<SelectedJamamCell | null>(null);
   const timeKey = period === "day" ? "dayTimeRange" : "nightTimeRange";
-  const startKey = period === "day" ? "dayStart" : "nightStart";
-  const endKey = period === "day" ? "dayEnd" : "nightEnd";
 
   const selectedColumn = selectedCell
     ? schedule.jamamColumns.find((column) => column.yama === selectedCell.yama)
     : null;
-  const selectedJamamSlots = selectedCell
-    ? schedule.jamamActivitySlots[jamamActivitySlotsKey(selectedCell.groupKey, selectedCell.yama)]
-    : null;
-  const selectedRow = selectedCell
-    ? schedule.dayRows.find((row) => row.groupKey === selectedCell.groupKey)
-    : null;
-  const selectedActivity =
-    selectedRow && selectedColumn && selectedCell
-      ? (period === "day" ? selectedRow.dayCells : selectedRow.nightCells)[
-          schedule.jamamColumns.findIndex((column) => column.yama === selectedCell.yama)
-        ] ?? "—"
-      : "—";
 
-  const openDialog = !!(selectedCell && selectedColumn && selectedJamamSlots);
+  const openDialog = !!(selectedCell && selectedColumn);
+  const allJamamSlots = jamamSlotsFromColumns(schedule.jamamColumns);
+  const highlightJamamIndex = selectedCell
+    ? jamamIndexForYama(selectedCell.yama, period)
+    : 1;
+  const jamamSlot = allJamamSlots.find((slot) => slot.index === highlightJamamIndex) ?? null;
 
-  const previousJamamSlot =
-    selectedCell && selectedColumn
-      ? getPreviousJamamSlotForIndex(
-          jamamIndexForYama(selectedCell.yama, period),
-          selectedColumn[period === "day" ? "dayStart" : "nightStart"],
-          coords,
-        )
-      : null;
-
-  const openCell = (groupKey: string, yama: number) => {
-    setSelectedCell({ groupKey, yama });
+  const openCell = (groupKey: string, yama: number, thozhil: string) => {
+    setSelectedCell({ groupKey, yama, thozhil });
   };
 
   return (
@@ -219,7 +196,7 @@ function PeriodPivotTable({
                         type="button"
                         className="patchi-pivot-table__cell-btn"
                         aria-expanded={isSelected}
-                        onClick={() => openCell(row.groupKey, column.yama)}
+                        onClick={() => openCell(row.groupKey, column.yama, status)}
                       >
                         <span className="patchi-pivot-table__status">
                           {status === "—" ? (
@@ -243,19 +220,23 @@ function PeriodPivotTable({
         </table>
       </div>
 
-      {openDialog && selectedColumn && selectedJamamSlots ? (
+      {openDialog && selectedCell && jamamSlot ? (
         <JamamAntharaDialog
           open={openDialog}
-          start={selectedColumn[startKey]}
-          end={selectedColumn[endKey]}
-          activity={selectedActivity}
-          dayJamamSlots={selectedJamamSlots.day}
-          nightJamamSlots={selectedJamamSlots.night}
-          previousJamamStart={previousJamamSlot?.start}
-          previousJamamEnd={previousJamamSlot?.end}
-          previousJamamIndex={previousJamamSlot?.index}
-          jamamIndex={jamamIndexForYama(selectedCell.yama, period)}
+          jamamSlot={jamamSlot}
+          getActivitySlots={(yama, slotPeriod) => {
+            const entry =
+              schedule.jamamActivitySlots[
+                jamamActivitySlotsKey(selectedCell.groupKey, yama)
+              ];
+            if (!entry) return [];
+            return slotPeriod === "day" ? entry.day : entry.night;
+          }}
+          highlightPatchi={schedule.patchiName}
+          highlightThozhil={selectedCell.thozhil}
           onClose={() => setSelectedCell(null)}
+          coords={coords}
+          jamamSlots={allJamamSlots}
         />
       ) : null}
     </div>

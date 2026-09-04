@@ -9,10 +9,11 @@ import {
   jamamIndexForYama,
   jamamLabel,
   NIGHT_JAMAM_OFFSET,
+  yamaFromJamamIndex,
   type JamamSlot,
   type PeriodId,
 } from "./jamam";
-import { formatPatchiName } from "./bilingual";
+import { formatPatchiName, PATCHI_ORDER, patchiBaseName } from "./bilingual";
 import { getPakshaFromDate, PAKSHA_LABELS, type PakshaId } from "./paksha";
 
 export interface ActiveScheduleCell {
@@ -495,4 +496,68 @@ export function isActiveJamamRow(
 ): boolean {
   if (!activeCell) return false;
   return activeCell.groupKey === groupKey && activeCell.yama === yama;
+}
+
+export interface PatchiThozhilColumn {
+  jamamIndex: number;
+  timeRange: string;
+  period: PeriodId;
+}
+
+export interface PatchiThozhilRow {
+  patchi: (typeof PATCHI_ORDER)[number];
+  activities: string[];
+}
+
+export interface PatchiThozhilMatrix {
+  columns: PatchiThozhilColumn[];
+  rows: PatchiThozhilRow[];
+}
+
+/** All 5 patchi × 10 jamam thozhil matrix for the athikara schedule group. */
+export function getPatchiThozhilMatrix(
+  jamamSlots: JamamSlot[],
+  getActivitySlots: (yama: number, period: PeriodId) => ActivitySlot[],
+): PatchiThozhilMatrix {
+  const columns: PatchiThozhilColumn[] = jamamSlots.map((slot) => ({
+    jamamIndex: slot.index,
+    timeRange: formatTimeRange(slot.start, slot.end),
+    period: slot.period,
+  }));
+
+  const rows: PatchiThozhilRow[] = PATCHI_ORDER.map((patchi) => ({
+    patchi,
+    activities: jamamSlots.map((slot) => {
+      const { yama, period } = yamaFromJamamIndex(slot.index);
+      const slots = getActivitySlots(yama, period);
+      const match = slots.find((entry) => patchiBaseName(entry.bird) === patchi);
+      return match ? displayActivity(match.activity) : "—";
+    }),
+  }));
+
+  return { columns, rows };
+}
+
+/** Build continuous jamam slots (1–10) from schedule column times. */
+export function jamamSlotsFromColumns(columns: JamamColumn[]): JamamSlot[] {
+  return columns
+    .flatMap((column) => [
+      {
+        index: jamamIndexForYama(column.yama, "day"),
+        label: jamamLabel(jamamIndexForYama(column.yama, "day")),
+        period: "day" as const,
+        start: column.dayStart,
+        end: column.dayEnd,
+        isActive: column.dayJamamActive,
+      },
+      {
+        index: jamamIndexForYama(column.yama, "night"),
+        label: jamamLabel(jamamIndexForYama(column.yama, "night")),
+        period: "night" as const,
+        start: column.nightStart,
+        end: column.nightEnd,
+        isActive: column.nightJamamActive,
+      },
+    ])
+    .sort((a, b) => a.index - b.index);
 }

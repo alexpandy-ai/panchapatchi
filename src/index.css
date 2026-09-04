@@ -654,8 +654,31 @@ body {
 
 .jamam-segments-panel__head {
   display: flex;
-  justify-content: flex-end;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.35rem;
   margin-bottom: 0.15rem;
+}
+
+.jamam-segments-panel__title {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--text);
+}
+
+.jamam-segments-panel__scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.jamam-segments-table__col-patchi {
+  width: 4.75rem;
+}
+
+.jamam-segments-table__col-segment {
+  width: 4.25rem;
 }
 
 .jamam-segments-panel__previous {
@@ -859,6 +882,90 @@ body {
 
 .jamam-segments-panel .bilingual--inline .bi-sep {
   display: none;
+}
+
+.jamam-segments-table--matrix {
+  min-width: 100%;
+}
+
+.jamam-segments-table--matrix th,
+.jamam-segments-table--matrix td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.jamam-segments-table__patchi-col {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  text-align: left !important;
+  background: var(--bg-card);
+  width: 4.75rem;
+  white-space: nowrap;
+}
+
+.jamam-segments-table--matrix thead .jamam-segments-table__patchi-col {
+  z-index: 2;
+}
+
+.jamam-segments-table__jamam-label {
+  display: block;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.jamam-segments-table__jamam-time {
+  display: block;
+  margin-top: 0.08rem;
+  font-size: 0.62rem;
+  font-weight: 500;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.jamam-segments-table--matrix th:not(.jamam-segments-table__patchi-col),
+.jamam-segments-table--matrix td:not(.jamam-segments-table__patchi-col) {
+  width: 4.25rem;
+  white-space: normal;
+  line-height: 1.05;
+}
+
+.jamam-segments-table__col--highlight {
+  background: rgba(196, 92, 38, 0.08);
+}
+
+.jamam-segments-table__row--highlight th.jamam-segments-table__patchi-col {
+  background: rgba(196, 92, 38, 0.1);
+}
+
+.jamam-segments-table__row--previous th.jamam-segments-table__patchi-col,
+.jamam-segments-table__row--previous td {
+  background: rgba(196, 92, 38, 0.04);
+  border-bottom: 1px solid var(--border);
+}
+
+.jamam-segments-table__row--previous .jamam-segments-table__jamam-label {
+  font-size: 0.58rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.jamam-segments-table__row--previous .jamam-segments-table__jamam-time {
+  font-size: 0.6rem;
+}
+
+.jamam-segments-table__cell--highlight {
+  background: rgba(196, 92, 38, 0.18);
+  font-weight: 700;
+}
+
+.jamam-segments-table--matrix th .bi-en {
+  display: none;
+}
+
+.jamam-segments-table--matrix .jamam-segments-table__patchi-col .bi-en {
+  display: block;
+  font-size: 0.68em;
 }
 
 .patchi-submenu {
@@ -1667,7 +1774,7 @@ body {
 }
 
 .anthara-dialog {
-  max-width: min(100%, 24rem);
+  max-width: min(100%, 56rem);
   max-height: min(90vh, 100%);
   overflow: auto;
   border: 1px solid var(--border);

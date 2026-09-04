@@ -1,8 +1,16 @@
 import type { ActivitySlot } from "../types";
 import { displayActivity } from "./activityLabel";
-import { PANCHA_ACTIVITY_TA, PATCHI_ORDER, patchiBaseName } from "./bilingual";
+import {
+  activityBilingual,
+  bi,
+  PANCHA_ACTIVITY_TA,
+  PATCHI_ORDER,
+  patchiBaseName,
+  patchiLabelBilingual,
+  type Bilingual,
+} from "./bilingual";
 import type { PeriodId } from "./jamam";
-import { splitJamamStartTimes } from "./jamam";
+import { formatTimeWithSeconds, splitJamamStartTimes, yamaFromJamamIndex } from "./jamam";
 
 export const JAMAM_ANTHARA_SEGMENT_COUNT = 10;
 
@@ -166,4 +174,83 @@ export function getJamamAntharaRows(
     start,
     end: index < segmentCount - 1 ? segmentStarts[index + 1] : jamamEnd,
   }));
+}
+
+export interface PatchiAntharaColumn {
+  segmentIndex: number;
+  startTime: Date;
+  startTimeLabel: string;
+}
+
+export interface PatchiAntharaRow {
+  patchi: (typeof PATCHI_ORDER)[number];
+  activities: string[];
+}
+
+export interface PatchiAntharaMatrix {
+  columns: PatchiAntharaColumn[];
+  rows: PatchiAntharaRow[];
+}
+
+/** Ten anthara segment start columns for a jamam window. */
+export function getAntharaSegmentColumns(jamamStart: Date, jamamEnd: Date): PatchiAntharaColumn[] {
+  const segmentStarts = splitJamamStartTimes(jamamStart, jamamEnd);
+  return segmentStarts.map((start, index) => ({
+    segmentIndex: index,
+    startTime: start,
+    startTimeLabel: formatTimeWithSeconds(start),
+  }));
+}
+
+/** Five patchi × ten anthara segments for one jamam window. */
+export function getPatchiAntharaMatrix(
+  jamamStart: Date,
+  jamamEnd: Date,
+  getActivitySlots: (yama: number, period: PeriodId) => ActivitySlot[],
+  jamamIndex: number,
+): PatchiAntharaMatrix {
+  const columns = getAntharaSegmentColumns(jamamStart, jamamEnd);
+  const { yama, period } = yamaFromJamamIndex(jamamIndex);
+  const slots = getActivitySlots(yama, period);
+
+  const rows: PatchiAntharaRow[] = PATCHI_ORDER.map((patchi) => {
+    const match = slots.find((entry) => patchiBaseName(entry.bird) === patchi);
+    const thozhil = match ? displayActivity(match.activity) : "—";
+    const activities =
+      thozhil === "—"
+        ? Array<string>(columns.length).fill("—")
+        : antharaActivitiesFrom(thozhil, columns.length);
+    return { patchi, activities };
+  });
+
+  return { columns, rows };
+}
+
+/** Segment index (0–9) containing `moment` within a jamam window. */
+export function getAntharaSegmentIndex(
+  jamamStart: Date,
+  jamamEnd: Date,
+  moment: Date,
+  parts = JAMAM_ANTHARA_SEGMENT_COUNT,
+): number {
+  const starts = splitJamamStartTimes(jamamStart, jamamEnd, parts);
+  const time = moment.getTime();
+  for (let index = starts.length - 1; index >= 0; index -= 1) {
+    if (time >= starts[index]!.getTime()) return index;
+  }
+  return 0;
+}
+
+/** Dialog title: Anthara Patchi · Jamam N · patchi · thozhil. */
+export function antharaDialogTitle(
+  jamamIndex: number,
+  patchi: string,
+  thozhil: string,
+): Bilingual {
+  const patchiBi = patchiLabelBilingual(patchi);
+  const thozhilBi = activityBilingual(displayActivity(thozhil));
+  return bi(
+    `அந்தர பட்சி · ஜாமம் ${jamamIndex} · ${patchiBi.ta} · ${thozhilBi.ta}`,
+    `Anthara Patchi · Jamam ${jamamIndex} · ${patchiBi.en} · ${thozhilBi.en}`,
+  );
 }

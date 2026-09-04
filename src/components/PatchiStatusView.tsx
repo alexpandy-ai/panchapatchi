@@ -8,7 +8,7 @@ import { useLocation } from "../context/LocationContext";
 
 import type { PakshaData } from "../types";
 
-import { getCurrentAntharaSlot, getJamamAntharaRows, type AntharaSlot } from "../utils/anthara";
+import { getAntharaSegmentIndex, getAntharaSlots, getCurrentAntharaSlot, type AntharaSlot } from "../utils/anthara";
 
 import { displayActivityBi } from "../utils/activityLabel";
 
@@ -38,8 +38,8 @@ import {
   getJamamSlotByIndex,
   getJamamState,
   getNextJamamIndex,
-  getPreviousJamamSlotForIndex,
   yamaFromJamamIndex,
+  type PeriodId,
 } from "../utils/jamam";
 
 import { derivePatchiStatusFromSchedule } from "../utils/patchi";
@@ -226,63 +226,29 @@ export function PatchiStatusView({
 
 
 
-  const jamamActivitySlots = useMemo(() => {
-
-    if (!paksha || !derived.athikaraGroupKey) return null;
-
-    const group = paksha.groups.find((g) => g.key === derived.athikaraGroupKey);
-
-    const yamaRow = group?.yamas.find((y) => y.yama === jamam.yamaIndex);
-
-    if (!yamaRow) return null;
-
-    return { day: yamaRow.day, night: yamaRow.night };
-
-  }, [paksha, derived.athikaraGroupKey, jamam.yamaIndex]);
-
-
-
-  const nextJamamActivitySlots = useMemo(() => {
-
-    if (!paksha || !derived.athikaraGroupKey || !nextSlot) return null;
-
-    const group = paksha.groups.find((g) => g.key === derived.athikaraGroupKey);
-
-    const { yama } = yamaFromJamamIndex(nextSlot.index);
-
-    const yamaRow = group?.yamas.find((y) => y.yama === yama);
-
-    if (!yamaRow) return null;
-
-    return { day: yamaRow.day, night: yamaRow.night };
-
-  }, [paksha, derived.athikaraGroupKey, nextSlot]);
-
-
-
   const antharaSlots = useMemo(
 
     () =>
 
-      derived.myPatchiActivity && activeSlot && jamamActivitySlots
+      derived.jamamSlots.length > 0 && activeSlot
 
-        ? getJamamAntharaRows(
+        ? getAntharaSlots(
+
+            derived.jamamSlots,
+
+            myPatchi,
+
+            jamam.period,
 
             activeSlot.start,
 
             activeSlot.end,
 
-            derived.myPatchiActivity,
-
-            jamamActivitySlots.day,
-
-            jamamActivitySlots.night,
-
           )
 
         : [],
 
-    [derived.myPatchiActivity, activeSlot, jamamActivitySlots],
+    [derived.jamamSlots, myPatchi, jamam.period, activeSlot],
 
   );
 
@@ -296,96 +262,59 @@ export function PatchiStatusView({
 
   );
 
+  const antharaGroup = useMemo(
+    () => paksha?.groups.find((group) => group.key === derived.athikaraGroupKey) ?? null,
+    [paksha, derived.athikaraGroupKey],
+  );
+
   const antharaDialogProps = useMemo(() => {
+    if (!antharaGroup) return null;
 
     if (antharaDialogTarget === "current") {
-
-      if (!derived.myPatchiActivity || !activeSlot || !jamamActivitySlots) return null;
-
-      const previousSlot = getPreviousJamamSlotForIndex(
-        activeSlot.index,
-        activeSlot.start,
-        coords,
-      );
+      if (!activeSlot) return null;
 
       return {
-
-        start: activeSlot.start,
-
-        end: activeSlot.end,
-
-        activity: derived.myPatchiActivity,
-
-        dayJamamSlots: jamamActivitySlots.day,
-
-        nightJamamSlots: jamamActivitySlots.night,
-
-        previousJamamStart: previousSlot?.start,
-
-        previousJamamEnd: previousSlot?.end,
-
-        previousJamamIndex: previousSlot?.index,
-
-        jamamIndex: activeSlot.index,
-
+        jamamSlot: activeSlot,
+        getActivitySlots: (yama: number, period: PeriodId) => {
+          const yamaRow = antharaGroup.yamas.find((row) => row.yama === yama);
+          if (!yamaRow) return [];
+          return period === "day" ? yamaRow.day : yamaRow.night;
+        },
+        highlightPatchi: myPatchi,
+        highlightThozhil: derived.myPatchiActivity ?? "—",
+        highlightSegmentIndex: getAntharaSegmentIndex(
+          activeSlot.start,
+          activeSlot.end,
+          selectedDateTime,
+        ),
       };
-
     }
 
     if (antharaDialogTarget === "next") {
-
-      if (!derivedNext.myPatchiActivity || !nextSlot || !nextJamamActivitySlots) return null;
-
-      const previousSlot = getPreviousJamamSlotForIndex(
-        nextSlot.index,
-        nextSlot.start,
-        coords,
-      );
+      if (!nextSlot) return null;
 
       return {
-
-        start: nextSlot.start,
-
-        end: nextSlot.end,
-
-        activity: derivedNext.myPatchiActivity,
-
-        dayJamamSlots: nextJamamActivitySlots.day,
-
-        nightJamamSlots: nextJamamActivitySlots.night,
-
-        previousJamamStart: previousSlot?.start,
-
-        previousJamamEnd: previousSlot?.end,
-
-        previousJamamIndex: previousSlot?.index,
-
-        jamamIndex: nextSlot.index,
-
+        jamamSlot: nextSlot,
+        getActivitySlots: (yama: number, period: PeriodId) => {
+          const yamaRow = antharaGroup.yamas.find((row) => row.yama === yama);
+          if (!yamaRow) return [];
+          return period === "day" ? yamaRow.day : yamaRow.night;
+        },
+        highlightPatchi: myPatchi,
+        highlightThozhil: derivedNext.myPatchiActivity ?? "—",
       };
-
     }
 
     return null;
-
   }, [
-
     antharaDialogTarget,
-
-    derived.myPatchiActivity,
-
+    antharaGroup,
     activeSlot,
-
-    jamamActivitySlots,
-
-    derivedNext.myPatchiActivity,
-
     nextSlot,
-
-    nextJamamActivitySlots,
-
-    coords,
-
+    myPatchi,
+    derived.myPatchiActivity,
+    derivedNext.myPatchiActivity,
+    selectedDateTime,
   ]);
 
 
@@ -660,25 +589,23 @@ export function PatchiStatusView({
 
           open={antharaDialogTarget !== null}
 
-          start={antharaDialogProps.start}
+          jamamSlot={antharaDialogProps.jamamSlot}
 
-          end={antharaDialogProps.end}
+          getActivitySlots={antharaDialogProps.getActivitySlots}
 
-          activity={antharaDialogProps.activity}
+          highlightPatchi={antharaDialogProps.highlightPatchi}
 
-          dayJamamSlots={antharaDialogProps.dayJamamSlots}
+          highlightThozhil={antharaDialogProps.highlightThozhil}
 
-          nightJamamSlots={antharaDialogProps.nightJamamSlots}
-
-          previousJamamStart={antharaDialogProps.previousJamamStart}
-
-          previousJamamEnd={antharaDialogProps.previousJamamEnd}
-
-          previousJamamIndex={antharaDialogProps.previousJamamIndex}
-
-          jamamIndex={antharaDialogProps.jamamIndex}
+          highlightSegmentIndex={antharaDialogProps.highlightSegmentIndex}
 
           onClose={() => setAntharaDialogTarget(null)}
+
+          coords={coords}
+
+          jamamSlots={jamam.slots}
+
+          cycleStart={cycleStart}
 
         />
 

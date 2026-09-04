@@ -10,6 +10,7 @@ import {
   formatCountdown,
   formatJamamDuration,
   formatTime,
+  formatTimeWithSeconds,
   getDayCycleBounds,
   getJamamState,
 } from "../utils/jamam";
@@ -58,16 +59,7 @@ export function NowView() {
     [now],
   );
 
-  const timeLabel = useMemo(
-    () =>
-      now.toLocaleTimeString("ta-IN", {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: true,
-      }),
-    [now],
-  );
+  const timeLabel = useMemo(() => formatTimeWithSeconds(now), [now]);
 
   return (
     <div className="now-view">

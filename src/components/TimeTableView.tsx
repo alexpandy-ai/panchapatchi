@@ -68,7 +68,6 @@ export function TimeTableView({ selectedDateTime, data }: TimeTableViewProps) {
         <PatchiScheduleTable
           bundle={scheduleBundle}
           title={titleBi}
-          coords={coords}
         />
       ) : (
         <p className="status">

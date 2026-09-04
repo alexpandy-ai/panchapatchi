@@ -98,14 +98,25 @@ export const UI = {
   enemies: bi("பகை", "Enemies"),
   jamamTime: bi("ஜாமம் நேரம்", "Jamam time"),
   segmentStartTime: bi("அந்தர தொடக்க நேரம்", "Anthara start time"),
+  patchiThozhilMatrix: bi("அனைத்து பட்சி — ஜாமம் தொழில்", "All patchi — jamam thozhil"),
+  patchiColumn: bi("பட்சி", "Patchi"),
 } as const;
 
 export function previousJamamTimeHeader(jamamIndex: number): Bilingual {
   return bi(`ஜாமம் ${jamamIndex} — நேரம்`, `Jamam ${jamamIndex} — time`);
 }
 
+export function previousJamamRowLabel(jamamIndex: number): Bilingual {
+  return bi(`முந்தைய ஜாமம் ${jamamIndex}`, `Previous jamam ${jamamIndex}`);
+}
+
 export function antharaStartTimeHeader(jamamIndex: number): Bilingual {
   return bi(`ஜாமம் ${jamamIndex} — நேரம்`, `Jamam ${jamamIndex} — time`);
+}
+
+export function antharaJamamHeader(segmentNumber: number): Bilingual {
+  const label = String(segmentNumber);
+  return bi(label, label);
 }
 
 export function thozhilHeader(jamamIndex: number): Bilingual {

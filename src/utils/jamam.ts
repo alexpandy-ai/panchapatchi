@@ -10,6 +10,14 @@ export const FULL_JAMAM_COUNT = 10;
 /** Night jamams continue day numbering: yama 1 → jamam 6, etc. */
 export const NIGHT_JAMAM_OFFSET = 5;
 
+/** First night jamam index (6); previous-jamam row is shown from here through jamam 10. */
+export const FIRST_NIGHT_JAMAM_INDEX = NIGHT_JAMAM_OFFSET + 1;
+
+/** Anthara dialog: show previous jamam time row only for jamam 6–10. */
+export function shouldShowPreviousJamamRow(jamamIndex: number): boolean {
+  return jamamIndex >= FIRST_NIGHT_JAMAM_INDEX;
+}
+
 export type PeriodId = "day" | "night";
 
 /** Excel yama (1–5) + period → continuous jamam index (1–10). */
@@ -33,6 +41,7 @@ export function getNextJamamIndex(currentIndex: number): number {
 
 /** Previous continuous jamam index (1–10); before jamam 1 wraps to jamam 10. */
 export function getPreviousJamamIndex(currentIndex: number): number {
+  if (currentIndex === FIRST_NIGHT_JAMAM_INDEX) return FULL_JAMAM_COUNT;
   if (currentIndex <= 1) return FULL_JAMAM_COUNT;
   return currentIndex - 1;
 }
@@ -153,7 +162,7 @@ function buildFullDaySlots(cycleStart: Date, now: Date, coords: GeoCoords | null
   });
 }
 
-/** 10 equal jamams from selected date's sunrise to next sunrise. */
+/** 10 equal jamams for the sunrise-to-sunrise cycle containing `date`. */
 export function getFullDayJamamSchedule(
   date: Date,
   coords: GeoCoords | null,
@@ -162,8 +171,8 @@ export function getFullDayJamamSchedule(
   night: JamamSlot[];
   all: JamamSlot[];
 } {
-  const { sunrise } = getDayCycleBounds(date, coords);
-  const all = buildFullDaySlots(sunrise, date, coords);
+  const cycleStart = cycleStartFor(date, coords);
+  const all = buildFullDaySlots(cycleStart, date, coords);
   return {
     all,
     day: all.filter((slot) => slot.period === "day"),
@@ -193,7 +202,7 @@ export function formatTime(date: Date): string {
   return date.toLocaleTimeString("ta-IN", {
     hour: "2-digit",
     minute: "2-digit",
-    hour12: true,
+    hour12: false,
   });
 }
 
@@ -202,7 +211,7 @@ export function formatTimeWithSeconds(date: Date): string {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
-    hour12: true,
+    hour12: false,
   });
 }
 
