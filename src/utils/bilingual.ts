@@ -134,8 +134,11 @@ export function patchiHeader(jamamIndex: number): Bilingual {
   return bi(`ஜாமம் ${jamamIndex} — பட்சி`, `Jamam ${jamamIndex} — patchi`);
 }
 
-/** Pancha Pakshi activity Tamil names in display order. */
+/** Pancha Pakshi activity Tamil names in display order (Others / Know Patchi columns). */
 export const PANCHA_ACTIVITY_TA = ["ஊண்", "நடை", "அரசு", "துயில்", "சாவு"] as const;
+
+/** Jamam sheet activity cycle order (Eating → Dying → Sleeping → Ruling → Walking). */
+export const JAMAM_ACTIVITY_TA = ["ஊண்", "சாவு", "துயில்", "அரசு", "நடை"] as const;
 
 /** Pancha Pakshi activities in display order (Tamil → English). */
 export const PANCHA_ACTIVITIES: Bilingual[] = PANCHA_ACTIVITY_TA.map((ta) => activityBilingual(ta));

@@ -3,7 +3,7 @@ import { displayActivity } from "./activityLabel";
 import {
   activityBilingual,
   bi,
-  PANCHA_ACTIVITY_TA,
+  JAMAM_ACTIVITY_TA,
   PATCHI_ORDER,
   patchiBaseName,
   patchiLabelBilingual,
@@ -17,8 +17,8 @@ export const JAMAM_ANTHARA_SEGMENT_COUNT = 10;
 /** Birds cycle in Pancha display order (same as Others / Know Patchi). */
 const ANTHARA_BIRD_ORDER = PATCHI_ORDER;
 
-/** Activities cycle in Pancha display order (same as Others / Know Patchi). */
-const ANTHARA_ACTIVITY_ORDER = PANCHA_ACTIVITY_TA;
+/** Activities cycle in jamam sheet order (matches Excel valarpirai / theipirai columns). */
+const ANTHARA_ACTIVITY_ORDER = JAMAM_ACTIVITY_TA;
 
 /** Traditional duration weights (parts of 144) for day anthara sub-periods. */
 const DAY_ACTIVITY_WEIGHTS: Record<string, number> = {
@@ -60,9 +60,13 @@ function cycleFrom<T>(items: readonly T[], startValue: T, count: number): T[] {
 }
 
 /** Ten anthara activities cycling from the clicked cell's activity. */
-export function antharaActivitiesFrom(startActivity: string, count = JAMAM_ANTHARA_SEGMENT_COUNT): string[] {
+export function antharaActivitiesFrom(
+  startActivity: string,
+  count = JAMAM_ANTHARA_SEGMENT_COUNT,
+  activityOrder: readonly string[] = ANTHARA_ACTIVITY_ORDER,
+): string[] {
   const activity = displayActivity(startActivity);
-  return cycleFrom(ANTHARA_ACTIVITY_ORDER, activity as (typeof ANTHARA_ACTIVITY_ORDER)[number], count);
+  return cycleFrom(activityOrder, activity, count);
 }
 
 function findBirdForActivity(slots: ActivitySlot[], activity: string): string | null {
@@ -113,10 +117,7 @@ export function getAntharaSlots(
   if (!mainActivity || !mainBird) return [];
 
   const birds = rotateFrom(ANTHARA_BIRD_ORDER, mainBird as (typeof ANTHARA_BIRD_ORDER)[number]);
-  const activities = rotateFrom(
-    ANTHARA_ACTIVITY_ORDER,
-    mainActivity as (typeof ANTHARA_ACTIVITY_ORDER)[number],
-  );
+  const activities = rotateFrom(ANTHARA_ACTIVITY_ORDER, mainActivity);
   const weights = activityWeights(period);
   const jamamDurationMs = jamamEnd.getTime() - jamamStart.getTime();
   if (jamamDurationMs <= 0) return [];
