@@ -140,6 +140,9 @@ export const PANCHA_ACTIVITY_TA = ["ஊண்", "நடை", "அரசு", "�
 /** Jamam sheet activity cycle order (Eating → Dying → Sleeping → Ruling → Walking). */
 export const JAMAM_ACTIVITY_TA = ["ஊண்", "சாவு", "துயில்", "அரசு", "நடை"] as const;
 
+/** Night anthara sub-period cycle (Walking → Dying → Ruling → Eating → Sleeping). */
+export const NIGHT_JAMAM_ACTIVITY_TA = ["நடை", "சாவு", "அரசு", "ஊண்", "துயில்"] as const;
+
 /** Pancha Pakshi activities in display order (Tamil → English). */
 export const PANCHA_ACTIVITIES: Bilingual[] = PANCHA_ACTIVITY_TA.map((ta) => activityBilingual(ta));
 

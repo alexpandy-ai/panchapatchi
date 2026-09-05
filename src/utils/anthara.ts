@@ -4,6 +4,7 @@ import {
   activityBilingual,
   bi,
   JAMAM_ACTIVITY_TA,
+  PANCHA_ACTIVITY_TA,
   PATCHI_ORDER,
   patchiBaseName,
   patchiLabelBilingual,
@@ -17,8 +18,10 @@ export const JAMAM_ANTHARA_SEGMENT_COUNT = 10;
 /** Birds cycle in Pancha display order (same as Others / Know Patchi). */
 const ANTHARA_BIRD_ORDER = PATCHI_ORDER;
 
-/** Activities cycle in jamam sheet order (matches Excel valarpirai / theipirai columns). */
-const ANTHARA_ACTIVITY_ORDER = JAMAM_ACTIVITY_TA;
+/** Day: Pancha order; night: jamam sheet order — used for all anthara patchi views. */
+function antharaThozhilCycleOrder(period: PeriodId): readonly string[] {
+  return period === "day" ? PANCHA_ACTIVITY_TA : JAMAM_ACTIVITY_TA;
+}
 
 /** Traditional duration weights (parts of 144) for day anthara sub-periods. */
 const DAY_ACTIVITY_WEIGHTS: Record<string, number> = {
@@ -63,7 +66,7 @@ function cycleFrom<T>(items: readonly T[], startValue: T, count: number): T[] {
 export function antharaActivitiesFrom(
   startActivity: string,
   count = JAMAM_ANTHARA_SEGMENT_COUNT,
-  activityOrder: readonly string[] = ANTHARA_ACTIVITY_ORDER,
+  activityOrder: readonly string[] = JAMAM_ACTIVITY_TA,
 ): string[] {
   const activity = displayActivity(startActivity);
   return cycleFrom(activityOrder, activity, count);
@@ -84,8 +87,9 @@ export function antharaBirdsFromJamam(
   nightSlots: ActivitySlot[],
   startActivity: string,
   count = JAMAM_ANTHARA_SEGMENT_COUNT,
+  activityOrder: readonly string[] = JAMAM_ACTIVITY_TA,
 ): string[] {
-  const activities = antharaActivitiesFrom(startActivity, count);
+  const activities = antharaActivitiesFrom(startActivity, count, activityOrder);
   const half = count / 2;
 
   return activities.map((activity, index) => {
@@ -117,7 +121,7 @@ export function getAntharaSlots(
   if (!mainActivity || !mainBird) return [];
 
   const birds = rotateFrom(ANTHARA_BIRD_ORDER, mainBird as (typeof ANTHARA_BIRD_ORDER)[number]);
-  const activities = rotateFrom(ANTHARA_ACTIVITY_ORDER, mainActivity);
+  const activities = rotateFrom(antharaThozhilCycleOrder(period), mainActivity);
   const weights = activityWeights(period);
   const jamamDurationMs = jamamEnd.getTime() - jamamStart.getTime();
   if (jamamDurationMs <= 0) return [];
@@ -156,16 +160,24 @@ export function getJamamAntharaRows(
   thozhilActivity: string,
   dayJamamSlots: ActivitySlot[],
   nightJamamSlots: ActivitySlot[],
+  period: PeriodId,
 ): AntharaSlot[] {
   const segmentStarts = splitJamamStartTimes(jamamStart, jamamEnd);
   const segmentCount = segmentStarts.length;
   const hasActivity = thozhilActivity !== "—" && thozhilActivity !== "";
+  const activityOrder = antharaThozhilCycleOrder(period);
 
   const activities = hasActivity
-    ? antharaActivitiesFrom(thozhilActivity, segmentCount)
+    ? antharaActivitiesFrom(thozhilActivity, segmentCount, activityOrder)
     : Array<string>(segmentCount).fill("—");
   const birds = hasActivity
-    ? antharaBirdsFromJamam(dayJamamSlots, nightJamamSlots, thozhilActivity, segmentCount)
+    ? antharaBirdsFromJamam(
+        dayJamamSlots,
+        nightJamamSlots,
+        thozhilActivity,
+        segmentCount,
+        activityOrder,
+      )
     : Array<string>(segmentCount).fill("—");
 
   return segmentStarts.map((start, index) => ({
@@ -213,6 +225,7 @@ export function getPatchiAntharaMatrix(
   const columns = getAntharaSegmentColumns(jamamStart, jamamEnd);
   const { yama, period } = yamaFromJamamIndex(jamamIndex);
   const slots = getActivitySlots(yama, period);
+  const activityOrder = antharaThozhilCycleOrder(period);
 
   const rows: PatchiAntharaRow[] = PATCHI_ORDER.map((patchi) => {
     const match = slots.find((entry) => patchiBaseName(entry.bird) === patchi);
@@ -220,7 +233,7 @@ export function getPatchiAntharaMatrix(
     const activities =
       thozhil === "—"
         ? Array<string>(columns.length).fill("—")
-        : antharaActivitiesFrom(thozhil, columns.length);
+        : antharaActivitiesFrom(thozhil, columns.length, activityOrder);
     return { patchi, activities };
   });
 
