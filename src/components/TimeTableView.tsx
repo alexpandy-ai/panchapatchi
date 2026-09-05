@@ -1,13 +1,9 @@
 import { useState } from "react";
 import { BilingualText } from "./BilingualText";
+import { PatchiPickerBlock } from "./PatchiPickerBlock";
 import { useLocation } from "../context/LocationContext";
 import type { PakshaData } from "../types";
-import {
-  bi,
-  PATCHI_ORDER,
-  patchiBilingual,
-  UI,
-} from "../utils/bilingual";
+import { PATCHI_ORDER, UI } from "../utils/bilingual";
 import type { PakshaId } from "../utils/paksha";
 import { getPatchiSchedulesForDate } from "../utils/patchi";
 import { PatchiScheduleTable } from "./PatchiScheduleTable";
@@ -30,45 +26,17 @@ export function TimeTableView({ selectedDateTime, data }: TimeTableViewProps) {
     coords,
   );
 
-  const titleBi = scheduleBundle
-    ? bi(`${scheduleBundle.patchiName} — ${UI.timeTableTitle.ta}`, `${patchiBilingual(scheduleBundle.patchiName).en} — ${UI.timeTableTitle.en}`)
-    : UI.timeTableTitle;
-
   return (
     <div className="time-table-view">
-      <section className="athikara-panel">
-        <div className="context-row athikara-row">
-          <span className="context-label">
-            <BilingualText text={UI.selectOurPatchi} block={false} />
-          </span>
-          <div
-            className="athikara-row__chips"
-            role="group"
-            aria-label={`${UI.selectOurPatchi.ta} ${UI.selectOurPatchi.en}`}
-          >
-            {PATCHI_ORDER.map((name) => (
-              <button
-                key={name}
-                type="button"
-                className={
-                  selectedPatchi === name
-                    ? "patchi-submenu__btn patchi-submenu__btn--active"
-                    : "patchi-submenu__btn"
-                }
-                onClick={() => setSelectedPatchi(name)}
-              >
-                <BilingualText text={patchiBilingual(name)} />
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
+      <PatchiPickerBlock
+        title={UI.selectOurPatchi}
+        ariaLabel={`${UI.selectOurPatchi.ta} ${UI.selectOurPatchi.en}`}
+        selected={selectedPatchi}
+        onSelect={setSelectedPatchi}
+      />
 
       {scheduleBundle ? (
-        <PatchiScheduleTable
-          bundle={scheduleBundle}
-          title={titleBi}
-        />
+        <PatchiScheduleTable bundle={scheduleBundle} />
       ) : (
         <p className="status">
           <BilingualText text={UI.noPatchiData} />

@@ -19,9 +19,8 @@ import { getPakshaGroupPatchiBilingual } from "../utils/dayGroup";
 import {
   jamamBilingual,
   PAKSHA_BI,
-  sectionLabelBilingual,
+  periodAthikaraPatchiHeader,
   UI,
-  type Bilingual,
 } from "../utils/bilingual";
 import type { PakshaId } from "../utils/paksha";
 
@@ -32,7 +31,6 @@ const SHEET_TABS: { id: PakshaId; label: (typeof PAKSHA_BI)[PakshaId] }[] = [
 
 interface PatchiScheduleTableProps {
   bundle: PatchiSchedulesBundle;
-  title: Bilingual;
 }
 
 interface SelectedJamamCell {
@@ -43,7 +41,6 @@ interface SelectedJamamCell {
 
 export function PatchiScheduleTable({
   bundle,
-  title,
 }: PatchiScheduleTableProps) {
   const [activePaksha, setActivePaksha] = useState<PakshaId>(bundle.activePakshaId);
   const schedule =
@@ -53,12 +50,6 @@ export function PatchiScheduleTable({
 
   return (
     <section className="schedule-table-card">
-      <div className="patchi-schedule-head">
-        <h3 className="schedule-table-card__title">
-          <BilingualText text={title} />
-        </h3>
-      </div>
-
       <div
         className="sheet-picker patchi-schedule-sheet-picker"
         role="tablist"
@@ -85,16 +76,8 @@ export function PatchiScheduleTable({
       </div>
 
       <div className="patchi-pivot-tables">
-        <PeriodPivotTable
-          schedule={schedule}
-          period="day"
-          title={sectionLabelBilingual(schedule.daySectionLabel)}
-        />
-        <PeriodPivotTable
-          schedule={schedule}
-          period="night"
-          title={sectionLabelBilingual(schedule.nightSectionLabel)}
-        />
+        <PeriodPivotTable schedule={schedule} period="day" />
+        <PeriodPivotTable schedule={schedule} period="night" />
       </div>
     </section>
   );
@@ -103,11 +86,9 @@ export function PatchiScheduleTable({
 function PeriodPivotTable({
   schedule,
   period,
-  title,
 }: {
   schedule: PatchiSchedule;
   period: PeriodId;
-  title: Bilingual;
 }) {
   const { coords } = useLocation();
   const [selectedCell, setSelectedCell] = useState<SelectedJamamCell | null>(null);
@@ -128,19 +109,20 @@ function PeriodPivotTable({
     setSelectedCell({ groupKey, yama, thozhil });
   };
 
+  const periodHeader = periodAthikaraPatchiHeader(period);
+
   return (
     <div className="patchi-pivot-section">
-      <h5 className="patchi-pivot-section__title">
-        <BilingualText text={title} />
-      </h5>
       <div className="sheet-table-wrap patchi-pivot-wrap">
         <table className="sheet-table patchi-pivot-table">
           <thead>
             <tr>
               <th className="patchi-pivot-table__day-col">
-                <BilingualText text={UI.athikaraPatchi} />
+                <span className="patchi-pivot-table__jamam">
+                  <BilingualText text={periodHeader.title} />
+                </span>
                 <span className="patchi-pivot-table__time">
-                  <BilingualText text={UI.day} />
+                  <BilingualText text={periodHeader.period} />
                 </span>
               </th>
               {schedule.jamamColumns.map((column) => (

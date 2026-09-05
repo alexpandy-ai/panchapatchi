@@ -109,12 +109,16 @@ export default function App() {
         </div>
       </header>
 
-      <DateTimeCard value={selectedDateTime} onChange={setSelectedDateTime} />
+      {activeView !== "schedule" && (
+        <DateTimeCard value={selectedDateTime} onChange={setSelectedDateTime} />
+      )}
 
       <main className="content">
-        <h2 className="content__section-title">
-          <BilingualText text={viewTitle(activeView)} />
-        </h2>
+        {activeView !== "schedule" && activeView !== "find" && (
+          <h2 className="content__section-title">
+            <BilingualText text={viewTitle(activeView)} />
+          </h2>
+        )}
 
         {loading && (
           <p className="status">

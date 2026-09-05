@@ -2,6 +2,8 @@ import { useState } from "react";
 
 import { BilingualText } from "./BilingualText";
 
+import { PatchiPickerBlock } from "./PatchiPickerBlock";
+
 import { SheetTable } from "./SheetTable";
 
 import type { PakshaData } from "../types";
@@ -9,7 +11,6 @@ import type { PakshaData } from "../types";
 import {
   PAKSHA_BI,
   PATCHI_ORDER,
-  patchiBilingual,
   UI,
 } from "../utils/bilingual";
 
@@ -56,42 +57,17 @@ export function FindPatchiView({
     );
   }
 
-  const groupCount = sheet.groups.length;
-  const jamamCount = sheet.groups.reduce((total, group) => total + group.yamas.length * 2, 0);
-  const activeTab = SHEET_TABS.find((tab) => tab.id === activeSheet)!;
-
   return (
     <div className="find-patchi">
-      <section className="athikara-panel">
-        <div className="context-row athikara-row">
-          <span className="context-label">
-            <BilingualText text={UI.athikaraPatchi} block={false} />
-          </span>
-          <div
-            className="athikara-row__chips"
-            role="group"
-            aria-label={`${UI.athikaraPatchi.ta} ${UI.athikaraPatchi.en}`}
-          >
-            {PATCHI_ORDER.map((name) => (
-              <button
-                key={name}
-                type="button"
-                className={
-                  selectedPatchi === name
-                    ? "patchi-submenu__btn patchi-submenu__btn--active"
-                    : "patchi-submenu__btn"
-                }
-                onClick={() => setSelectedPatchi(name)}
-              >
-                <BilingualText text={patchiBilingual(name)} />
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
+      <PatchiPickerBlock
+        title={UI.athikaraPatchi}
+        ariaLabel={`${UI.athikaraPatchi.ta} ${UI.athikaraPatchi.en}`}
+        selected={selectedPatchi}
+        onSelect={setSelectedPatchi}
+      />
 
       <div
-        className="sheet-picker"
+        className="sheet-picker patchi-schedule-sheet-picker"
         role="tablist"
         aria-label={`${UI.sheetPicker.ta} ${UI.sheetPicker.en}`}
       >
@@ -113,21 +89,6 @@ export function FindPatchiView({
             </span>
           </button>
         ))}
-      </div>
-
-      <div className="sheet-meta">
-        <span>
-          <BilingualText text={activeTab.label} block={false} />{" "}
-          <BilingualText text={UI.scheduleSheet} block={false} />
-        </span>
-        <span className="sheet-meta__dot" aria-hidden="true">·</span>
-        <span>
-          {groupCount} <BilingualText text={UI.groups} block={false} />
-        </span>
-        <span className="sheet-meta__dot" aria-hidden="true">·</span>
-        <span>
-          {jamamCount} <BilingualText text={UI.jamams} block={false} />
-        </span>
       </div>
 
       <div className="sheet-table-panel">

@@ -4,6 +4,8 @@ import { BilingualText } from "./BilingualText";
 
 import { JamamAntharaDialog } from "./JamamAntharaDialog";
 
+import { PatchiPickerBlock } from "./PatchiPickerBlock";
+
 import { useLocation } from "../context/LocationContext";
 
 import type { PakshaData } from "../types";
@@ -17,8 +19,6 @@ import {
   PAKSHA_BI,
 
   PATCHI_ORDER,
-
-  patchiBilingual,
 
   thozhilHeader,
 
@@ -55,8 +55,6 @@ interface PatchiStatusViewProps {
   onAthikaraPatchiChange?: (patchi: (typeof PATCHI_ORDER)[number]) => void;
 
 }
-
-
 
 export function PatchiStatusView({
 
@@ -280,110 +278,21 @@ export function PatchiStatusView({
       <section className="context-card">
 
         <div className="patchi-picker-sections athikara-row">
-
-          <div className="patchi-picker-block">
-
-            <h3 className="patchi-picker-block__title">
-
-              <BilingualText text={UI.athikaraPatchi} />
-
-            </h3>
-
-            <div
-
-              className="athikara-row__chips"
-
-              role="group"
-
-              aria-label={`${UI.athikaraPatchi.ta} ${UI.athikaraPatchi.en}`}
-
-            >
-
-              {PATCHI_ORDER.map((name) => (
-
-                <button
-
-                  key={name}
-
-                  type="button"
-
-                  className={
-
-                    athikaraPatchi === name
-
-                      ? "patchi-submenu__btn patchi-submenu__btn--active"
-
-                      : "patchi-submenu__btn"
-
-                  }
-
-                  onClick={() => setAthikaraPatchi(name)}
-
-                >
-
-                  <BilingualText text={patchiBilingual(name)} />
-
-                </button>
-
-              ))}
-
-            </div>
-
-          </div>
-
-          <div className="patchi-picker-block">
-
-            <h3 className="patchi-picker-block__title">
-
-              <BilingualText text={UI.myPatchi} />
-
-            </h3>
-
-            <div
-
-              className="athikara-row__chips"
-
-              role="group"
-
-              aria-label={`${UI.myPatchi.ta} ${UI.myPatchi.en}`}
-
-            >
-
-              {PATCHI_ORDER.map((name) => (
-
-                <button
-
-                  key={name}
-
-                  type="button"
-
-                  className={
-
-                    myPatchi === name
-
-                      ? "patchi-submenu__btn patchi-submenu__btn--active"
-
-                      : "patchi-submenu__btn"
-
-                  }
-
-                  onClick={() => setMyPatchi(name)}
-
-                >
-
-                  <BilingualText text={patchiBilingual(name)} />
-
-                </button>
-
-              ))}
-
-            </div>
-
-          </div>
-
+          <PatchiPickerBlock
+            title={UI.athikaraPatchi}
+            ariaLabel={`${UI.athikaraPatchi.ta} ${UI.athikaraPatchi.en}`}
+            selected={athikaraPatchi}
+            onSelect={setAthikaraPatchi}
+          />
+          <PatchiPickerBlock
+            title={UI.myPatchi}
+            ariaLabel={`${UI.myPatchi.ta} ${UI.myPatchi.en}`}
+            selected={myPatchi}
+            onSelect={setMyPatchi}
+          />
         </div>
 
-        <div className="context-row">
+        <div className="context-row context-row--paksha">
 
           <span className="context-label">
 

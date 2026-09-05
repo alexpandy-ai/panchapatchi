@@ -83,21 +83,6 @@ export function SheetTable({ data, pakshaId, referenceDate, highlightPatchi }: S
   return (
     <div className="sheet-table-wrap">
       <table className="sheet-table">
-        <thead>
-          <tr>
-            <th className="sheet-table__corner">
-              <BilingualText text={UI.athikaraPatchi} />
-            </th>
-            <th>
-              <BilingualText text={UI.jamam} />
-            </th>
-            {PANCHA_ACTIVITIES.map((activity) => (
-              <th key={`day-${activity.ta}`}>
-                <BilingualText text={activity} />
-              </th>
-            ))}
-          </tr>
-        </thead>
         <tbody>
           {groups.map((group) => {
             const eatingBird = eatingBirdForYama(group.yamas[0]);
@@ -107,10 +92,13 @@ export function SheetTable({ data, pakshaId, referenceDate, highlightPatchi }: S
             return (
               <Fragment key={group.key}>
                 <tr
-                  className={groupRowClass(group.key, "sheet-table__period-label")}
+                  className={groupRowClass(group.key, "sheet-table__section-header-row")}
                   ref={isHighlightGroup ? highlightRef : undefined}
                 >
                   <td rowSpan={totalRows} className="sheet-table__group">
+                    <span className="sheet-table__group-label">
+                      <BilingualText text={UI.athikaraPatchi} />
+                    </span>
                     <BilingualText
                       text={
                         eatingBird
@@ -119,14 +107,13 @@ export function SheetTable({ data, pakshaId, referenceDate, highlightPatchi }: S
                       }
                     />
                   </td>
-                  <td className="sheet-table__period-label-cell">
+                  <th className="sheet-table__period-header">
                     <BilingualText text={sectionLabelBilingual(data.daySectionLabel)} />
-                  </td>
+                  </th>
                   {PANCHA_ACTIVITIES.map((activity) => (
-                    <td
-                      key={`${group.key}-day-label-${activity.ta}`}
-                      className="sheet-table__period-spacer"
-                    />
+                    <th key={`${group.key}-day-head-${activity.ta}`} className="sheet-table__activity-header">
+                      <BilingualText text={activity} />
+                    </th>
                   ))}
                 </tr>
 
@@ -158,15 +145,14 @@ export function SheetTable({ data, pakshaId, referenceDate, highlightPatchi }: S
                   );
                 })}
 
-                <tr className={groupRowClass(group.key, "sheet-table__period-label")}>
-                  <td className="sheet-table__period-label-cell">
+                <tr className={groupRowClass(group.key, "sheet-table__section-header-row")}>
+                  <th className="sheet-table__period-header">
                     <BilingualText text={sectionLabelBilingual(data.nightSectionLabel)} />
-                  </td>
+                  </th>
                   {PANCHA_ACTIVITIES.map((activity) => (
-                    <td
-                      key={`${group.key}-night-label-${activity.ta}`}
-                      className="sheet-table__period-spacer"
-                    />
+                    <th key={`${group.key}-night-head-${activity.ta}`} className="sheet-table__activity-header">
+                      <BilingualText text={activity} />
+                    </th>
                   ))}
                 </tr>
 

@@ -205,6 +205,13 @@ body {
   font-weight: 700;
 }
 
+.find-patchi {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  text-align: left;
+}
+
 .find-patchi .tabs {
   margin-bottom: 1rem;
 }
@@ -520,7 +527,7 @@ body {
   position: sticky;
   left: 0;
   z-index: 3;
-  min-width: 4.5rem;
+  min-width: 6.75rem;
 }
 
 .patchi-pivot-table__day {
@@ -1142,11 +1149,12 @@ body {
 }
 
 .patchi-picker-block {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0.55rem;
-  padding: 0.75rem;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: 0.45rem;
+  row-gap: 0.28rem;
+  padding: 0.55rem 0.65rem;
   border: 1px solid var(--border);
   border-radius: 0.65rem;
   background: var(--bg-card);
@@ -1154,33 +1162,65 @@ body {
 }
 
 .patchi-picker-block__title {
-  font-size: 1.1rem;
+  grid-column: 1;
+  grid-row: 1;
+  align-self: center;
+  font-size: 0.92rem;
   font-weight: 700;
   color: var(--accent);
   margin: 0;
-  align-self: flex-start;
+  line-height: 1.15;
   text-align: left;
+  white-space: nowrap;
 }
 
-.patchi-picker-block__title .bilingual {
-  align-items: flex-start;
-  text-align: left;
-}
-
-.patchi-picker-block .athikara-row__chips {
+.patchi-picker-block__chips {
+  grid-column: 2;
+  grid-row: 1;
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-start;
-  align-self: stretch;
-  gap: 0.45rem;
-  width: 100%;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
 }
 
 .patchi-picker-block .patchi-submenu__btn {
-  flex: 0 1 auto;
-  max-width: 100%;
-  padding: 0.45rem 0.7rem;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 4.25rem;
+  min-height: 1.55rem;
+  padding: 0.2rem 0.38rem;
+  font-size: 0.68rem;
+  line-height: 1.15;
   white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .patchi-picker-block {
+    column-gap: 0.35rem;
+    padding: 0.48rem 0.55rem;
+  }
+
+  .patchi-picker-block__title {
+    font-size: 0.76rem;
+    line-height: 1.12;
+    max-width: 4.85rem;
+    white-space: normal;
+  }
+
+  .patchi-picker-block__chips {
+    gap: 0.22rem;
+  }
+
+  .patchi-picker-block .patchi-submenu__btn {
+    min-width: 3.15rem;
+    min-height: 1.32rem;
+    padding: 0.12rem 0.24rem;
+    font-size: 0.58rem;
+    line-height: 1.1;
+  }
 }
 
 .context-card:has(.patchi-picker-sections) .patchi-picker-sections + .context-row {
@@ -1200,6 +1240,25 @@ body {
   align-self: flex-start;
 }
 
+.context-card:has(.patchi-picker-sections) .context-row.context-row--paksha {
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.45rem;
+}
+
+.context-card:has(.patchi-picker-sections) .context-row.context-row--paksha .context-label {
+  align-self: center;
+  flex: 0 0 auto;
+}
+
+.context-card:has(.patchi-picker-sections) .context-row.context-row--paksha .paksha-toggle {
+  flex: 0 0 auto;
+  width: auto;
+  margin-left: auto;
+}
+
 .patchi-schedule-head {
   border-bottom: 1px solid var(--border);
 }
@@ -1216,7 +1275,27 @@ body {
 }
 
 .patchi-schedule-sheet-picker {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 0.35rem;
   padding: 0.85rem 0.85rem 0;
+}
+
+.patchi-schedule-sheet-picker .sheet-picker__btn {
+  flex: 1 1 0;
+  min-width: 0;
+  text-align: center;
+  border-radius: 999px;
+  padding: 0.45rem 0.55rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.patchi-schedule-sheet-picker .sheet-picker__label {
+  display: inline;
+  font-size: inherit;
+  font-weight: inherit;
 }
 
 .schedule-table-card > .patchi-pivot-tables {
@@ -1360,6 +1439,20 @@ body {
   flex-shrink: 0;
 }
 
+.datetime-field--date {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.datetime-field--time {
+  flex: 0 0 auto;
+}
+
+.datetime-field--time .datetime-field__input {
+  min-width: 6.75rem;
+  width: auto;
+}
+
 .datetime-field__label {
   font-size: 0.78rem;
   font-weight: 700;
@@ -1435,10 +1528,6 @@ body {
   background: rgba(167, 139, 250, 0.12);
 }
 
-.datetime-field--sunrise {
-  flex-shrink: 0;
-}
-
 .datetime-field__sunrise-value {
   display: flex;
   align-items: center;
@@ -1467,6 +1556,10 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
+}
+
+.datetime-field__coord--sunrise {
+  flex-shrink: 0;
 }
 
 .datetime-field__coord-label {
@@ -1645,6 +1738,20 @@ body {
   font-size: 1.05rem;
   background: var(--accent-soft);
   color: var(--accent);
+  vertical-align: top;
+}
+
+.sheet-table__group-label {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 0.35rem;
+}
+
+.sheet-table__group-label .bi-en {
+  font-size: 0.72rem;
+  font-weight: 600;
 }
 
 .sheet-table__group-row--highlight td {
@@ -1679,19 +1786,27 @@ body {
   display: block;
 }
 
-.sheet-table__period-label-cell {
+.sheet-table__section-header-row th {
   background: var(--bg);
   font-weight: 700;
   color: var(--muted);
-  text-align: center;
   padding: 0.5pt;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.sheet-table__section-header-row .sheet-table__period-header {
+  background: rgba(45, 35, 25, 0.03);
+  white-space: nowrap;
+}
+
+.sheet-table__section-header-row .sheet-table__activity-header {
   border-top: 2px solid var(--border);
 }
 
-.sheet-table__period-spacer {
-  background: var(--bg);
-  border-top: 2px solid var(--border);
-  padding: 0;
+.sheet-table__section-header-row + tr .sheet-table__yama,
+.sheet-table__section-header-row + tr td {
+  border-top: none;
 }
 
 .sheet-table__jamam-time {
@@ -1765,12 +1880,52 @@ body {
     min-width: 9rem;
   }
 
+  .datetime-field--date {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .datetime-field--date .datetime-field__input {
+    min-width: 0;
+  }
+
+  .datetime-field--time {
+    flex: 0 0 auto;
+    min-width: 0;
+    width: auto;
+  }
+
+  .datetime-field--time .datetime-field__input {
+    min-width: 6.25rem;
+  }
+
   .datetime-field--location {
     flex: 1 1 100%;
   }
 
   .datetime-field--coords {
     flex: 1 1 100%;
+  }
+
+  .datetime-field__coords-row {
+    gap: 0.35rem;
+  }
+
+  .datetime-field__coord {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .datetime-field__coord-input {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .datetime-field__sunrise-value {
+    width: 100%;
+    min-width: 0;
+    justify-content: center;
+    padding-inline: 0.35rem;
   }
 
   .datetime-card__submit {
@@ -1782,8 +1937,14 @@ body {
     width: 100%;
   }
 
-  .sheet-picker {
+  .sheet-picker:not(.patchi-schedule-sheet-picker) {
     grid-template-columns: 1fr;
+  }
+
+  .sheet-picker.patchi-schedule-sheet-picker {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
   }
 
   .content {
@@ -1800,14 +1961,26 @@ body {
     column-gap: 0.5rem;
   }
 
+  .jamam-pair {
+    gap: 0.35rem 0.45rem;
+  }
+
+  .jamam-pair__cell {
+    gap: 0.28rem;
+  }
+
+  .jamam-pair__cell .context-label {
+    font-size: 0.68rem;
+  }
+
   .jamam-pair__cell .thozhil-value-btn {
-    font-size: 0.64rem;
-    padding: 0.28rem 0.4rem;
-    gap: 0.25rem;
+    font-size: 0.6rem;
+    padding: 0.24rem 0.32rem;
+    gap: 0.2rem;
   }
 
   .jamam-pair__cell .thozhil-value-btn::after {
-    font-size: 0.6rem;
+    font-size: 0.55rem;
   }
 }
 
@@ -1899,11 +2072,16 @@ body {
   padding-top: 0;
 }
 
+/* Full-width row — athikara grid would otherwise squeeze jamam-pair into label column */
+.context-card:has(.athikara-row) .context-row--jamam-pair {
+  display: block;
+}
+
 .jamam-pair {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: flex-start;
-  gap: 0.5rem 1rem;
+  gap: 0.5rem 0.65rem;
   width: 100%;
 }
 
@@ -1911,9 +2089,18 @@ body {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.45rem;
-  flex: 1 1 calc(50% - 0.5rem);
-  min-width: min(100%, 9.5rem);
+  gap: 0.35rem;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.jamam-pair__cell .context-label {
+  font-size: 0.78rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .jamam-pair__cell .context-value-btn,

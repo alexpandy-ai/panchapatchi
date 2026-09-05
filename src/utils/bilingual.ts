@@ -346,6 +346,16 @@ export function sectionLabelBilingual(label: string): Bilingual {
   return bi(label, label);
 }
 
+export function periodAthikaraPatchiHeader(period: "day" | "night"): {
+  title: Bilingual;
+  period: Bilingual;
+} {
+  return {
+    title: UI.athikaraPatchi,
+    period: PERIOD_BI[period],
+  };
+}
+
 export function pakshaLabelBilingual(pakshaId: "valarpirai" | "theipirai"): Bilingual {
   return PAKSHA_BI[pakshaId];
 }
