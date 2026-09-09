@@ -26,6 +26,8 @@ import {
   PAKSHA_BI,
 
   PATCHI_ORDER,
+  jamamBilingual,
+  patchiBilingual,
   patchiEmoji,
   patchiLabelBilingual,
   thozhilHeader,
@@ -46,10 +48,7 @@ import {
 import {
   getAlternateJamamActivitySlots,
   getAlternatePatchiJamamActivityForWeekday,
-  getNextPanchaWeekday,
 } from "../utils/alternateCalculation";
-
-import { getDayGroupKey, getPanchaDisplayWeekday } from "../utils/dayGroup";
 
 import { derivePatchiStatusFromSchedule } from "../utils/patchi";
 
@@ -207,20 +206,6 @@ export function PatchiStatusView({
     [paksha, derived.athikaraGroupKey],
   );
 
-  const nextScheduleWeekday = useMemo(
-    () =>
-      getNextPanchaWeekday(
-        isHome ? thithiScheduleWeekday : getPanchaDisplayWeekday(weekday),
-      ),
-    [isHome, thithiScheduleWeekday, weekday],
-  );
-
-  const nextDayGroup = useMemo(() => {
-    if (!paksha || nextScheduleWeekday == null) return null;
-    const nextGroupKey = getDayGroupKey(nextScheduleWeekday);
-    return paksha.groups.find((group) => group.key === nextGroupKey) ?? null;
-  }, [nextScheduleWeekday, paksha]);
-
   const antharaDialogProps = useMemo(() => {
     if (isHome) {
       if (antharaDialogTarget !== "current" || !activeSlot) return null;
@@ -236,7 +221,7 @@ export function PatchiStatusView({
           activeSlot.start,
           activeSlot.end,
           selectedDateTime,
-          jamam.period === "night" && nextScheduleWeekday == null
+          jamam.period === "night"
             ? ANTHARA_NIGHT_SEGMENT_COUNT
             : JAMAM_ANTHARA_SEGMENT_COUNT,
         ),
@@ -261,7 +246,7 @@ export function PatchiStatusView({
           activeSlot.start,
           activeSlot.end,
           selectedDateTime,
-          jamam.period === "night" && nextScheduleWeekday == null
+          jamam.period === "night"
             ? ANTHARA_NIGHT_SEGMENT_COUNT
             : JAMAM_ANTHARA_SEGMENT_COUNT,
         ),
@@ -296,8 +281,6 @@ export function PatchiStatusView({
     isHome,
     jamam.period,
     myPatchi,
-    nextDayGroup,
-    nextScheduleWeekday,
     nextSlot,
     pakshaId,
     selectedDateTime,
@@ -344,28 +327,31 @@ export function PatchiStatusView({
                   <BilingualText text={PAKSHA_BI[currentPakshaId]} block={false} />
                 </span>
               </span>
+              <span className="context-value context-value--home-day">
+                <BilingualText text={thithiPatchiEntry.day} block={false} />
+              </span>
             </div>
 
-            <div className="context-row context-row--home-day-athikara">
-              <span className="context-inline-item">
-                <span className="context-label">
-                  <BilingualText text={UI.day} block={false} />
-                </span>
-                <span className="context-value">
-                  <BilingualText text={thithiPatchiEntry.day} block={false} />
-                </span>
-              </span>
-              <span className="context-inline-item">
-                <span className="context-label">
+            <div className="context-row context-row--home-athikara">
+              <span className="context-inline-item context-inline-item--athikara">
+                <span className="context-label context-label--athikara">
                   <BilingualText text={UI.athikaraPatchi} block={false} />
                 </span>
-                <span className="context-value">
-                  <InlineEmojiLabel
-                    text={patchiLabelBilingual(athikaraPatchi)}
-                    emoji={patchiEmoji(athikaraPatchi)}
-                  />
+                <span
+                  className="patchi-submenu__btn patchi-submenu__btn--active patchi-submenu__btn--readonly"
+                  role="img"
+                  aria-label={`${UI.athikaraPatchi.ta}: ${athikaraPatchi}`}
+                >
+                  <BilingualText text={patchiBilingual(athikaraPatchi)} />
                 </span>
               </span>
+              <PatchiFilterChips
+                selected={homePatchi}
+                onSelect={setMyPatchiSelection}
+                includeAll={false}
+                mobileSplit
+                ariaLabel={`${UI.myPatchi.ta} ${UI.myPatchi.en}`}
+              />
             </div>
           </>
         ) : (
@@ -415,35 +401,41 @@ export function PatchiStatusView({
           </>
         )}
 
-        <div
-          className={[
-            "context-row",
-            "context-row--patchi-filter",
-            isHome ? "context-row--patchi-filter-home" : "",
-          ]
-            .filter(Boolean)
-            .join(" ")}
-        >
-          {!isHome ? (
+        {!isHome ? (
+          <div className="context-row context-row--patchi-filter">
             <span className="context-label">
               <BilingualText text={UI.myPatchi} block={false} />
             </span>
-          ) : null}
-          <PatchiFilterChips
-            selected={isHome ? homePatchi : myPatchiSelection}
-            onSelect={setMyPatchiSelection}
-            includeAll={!isHome}
-            ariaLabel={`${UI.myPatchi.ta} ${UI.myPatchi.en}`}
-          />
-        </div>
+            <PatchiFilterChips
+              selected={myPatchiSelection}
+              onSelect={setMyPatchiSelection}
+              includeAll
+              ariaLabel={`${UI.myPatchi.ta} ${UI.myPatchi.en}`}
+            />
+          </div>
+        ) : null}
 
         {activeSlot && (isHome || nextSlot) ? (
           <div className="context-row context-row--jamam-pair">
             <div className={isHome ? "jamam-pair jamam-pair--single" : "jamam-pair"}>
               {activeSlot ? (
-                <div className="jamam-pair__cell">
+                <div
+                  className={[
+                    "jamam-pair__cell",
+                    isHome ? "jamam-pair__cell--home-inline" : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                >
                   <span className="context-label">
-                    <BilingualText text={thozhilHeader(activeSlot.index)} block={false} />
+                    <BilingualText
+                      text={
+                        isHome
+                          ? jamamBilingual(activeSlot.index)
+                          : thozhilHeader(activeSlot.index)
+                      }
+                      block={false}
+                    />
                   </span>
                   {currentJamamActivity ? (
                     <button
@@ -535,32 +527,15 @@ export function PatchiStatusView({
           jamamSlots={jamam.slots}
           cycleStart={cycleStart}
           segmentCount={
-            yamaFromJamamIndex(antharaDialogProps.jamamSlot.index).period === "night" &&
-            nextScheduleWeekday == null
+            yamaFromJamamIndex(antharaDialogProps.jamamSlot.index).period === "night"
               ? ANTHARA_NIGHT_SEGMENT_COUNT
               : ANTHARA_DAY_SEGMENT_COUNT
           }
-          matrixOptions={(() => {
-            const { period } = yamaFromJamamIndex(antharaDialogProps.jamamSlot.index);
-            if (period === "day") {
-              return { appendNightJamamRows: true, allJamamSlots: jamam.slots };
-            }
-            if (period === "night" && nextScheduleWeekday != null) {
-              return {
-                appendNextDayMorningJamamRows: true,
-                getMorningJamamActivitySlots: (yama: number) =>
-                  isHome
-                    ? getAlternateJamamActivitySlots(
-                        pakshaId as "valarpirai" | "theipirai",
-                        nextScheduleWeekday,
-                        yama,
-                        "day",
-                      )
-                    : (nextDayGroup?.yamas.find((row) => row.yama === yama)?.day ?? []),
-              };
-            }
-            return undefined;
-          })()}
+          matrixOptions={
+            yamaFromJamamIndex(antharaDialogProps.jamamSlot.index).period === "day"
+              ? { appendNightJamamRows: true, allJamamSlots: jamam.slots }
+              : undefined
+          }
         />
       ) : null}
 

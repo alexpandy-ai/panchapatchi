@@ -403,9 +403,7 @@ function AlternatePakshaDayNightTables({
         <table className="sheet-table patchi-pivot-table alternate-all-chip-table">
           <thead ref={stickyHeadRef} className="alternate-all-chip-table__sticky-head">
             <tr ref={bannerRowRef} className="alternate-all-chip-table__banner-row">
-              <th rowSpan={2} className="patchi-pivot-table__day-col">
-                <BilingualText text={UI.patchiActivity} />
-              </th>
+              <th className="alternate-all-chip-table__corner-spacer" aria-hidden="true" />
               <th colSpan={jamamColumnCount} className="alternate-all-chip-table__jamam-group-header">
                 <span className="alternate-all-chip-table__active-period">
                   <BilingualText text={activePeriodHeader.period} />
@@ -420,6 +418,9 @@ function AlternatePakshaDayNightTables({
               className="alternate-all-chip-table__jamam-row"
               style={bannerRowHeight ? { ["--banner-row-height" as string]: `${bannerRowHeight}px` } : undefined}
             >
+              <th className="patchi-pivot-table__day-col alternate-all-chip-table__activity-col">
+                <BilingualText text={UI.patchiActivity} />
+              </th>
               {schedule.jamamColumns.map((column) => (
                 <th
                   key={`active-hdr-${column.yama}-${activeSection.period}`}

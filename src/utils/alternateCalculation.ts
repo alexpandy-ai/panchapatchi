@@ -327,8 +327,8 @@ export function getAlternateValarpiraiNextMorningWalkBird(
   return getAlternateValarpiraiNightBirdForActivity(weekday, jamam, NIGHT_EAT_ACTIVITY_INDEX);
 }
 
-/** Anthara dialog for alternate schedule uses five segments (day jamams 1–5 only). */
-export const ALTERNATE_ANTHARA_SEGMENT_COUNT = 5;
+/** Anthara dialog splits each jamam into ten weighted anthara time sections. */
+export const ALTERNATE_ANTHARA_SEGMENT_COUNT = 10;
 
 /** One patchi's activity for a Pancha weekday (Tue–Sat) from alternate-schedule rules. */
 export function getAlternatePatchiJamamActivityForWeekday(

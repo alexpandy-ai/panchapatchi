@@ -379,6 +379,8 @@ export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
 
       <div className="datetime-card__row">
 
+        <div className="datetime-card__datetime-row">
+
         <label className="datetime-field datetime-field--date">
 
           <span className="datetime-field__label">
@@ -440,6 +442,8 @@ export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
           />
 
         </label>
+
+        </div>
 
 
 

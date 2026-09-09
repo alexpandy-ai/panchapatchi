@@ -84,8 +84,8 @@ export const UI = {
   groups: bi("குழுக்கள்", "Groups"),
   jamams: bi("ஜாமங்கள்", "Jamams"),
   schedule: bi("அட்டவணை", "Schedule"),
-  alternateSchedule: bi("மாற்று அட்டவணை", "Alternate Schedule"),
-  alternateCalculation: bi("மாற்று கணக்கீடு", "Alternate calculation"),
+  alternateSchedule: bi("மாற்று கணிதம்", "Alternate Schedule"),
+  alternateCalculation: bi("மாற்று கணிதம்", "Alternate calculation"),
   sheetPicker: bi("அட்டவணை தேர்வு", "Sheet selection"),
   patchiSubmenu: bi("பட்சி துணை மெனு", "Bird submenu"),
   dayGroupSchedule: bi("நாள் குழு அட்டவணை", "Day group schedule"),
@@ -232,7 +232,7 @@ export const MENU_ITEMS: { id: string; label: Bilingual }[] = [
   },
   {
     id: "alternateSchedule",
-    label: bi("மாற்று அட்டவணை", "Alternate Schedule"),
+    label: bi("மாற்று கணிதம்", "Alternate Schedule"),
   },
   {
     id: "days",

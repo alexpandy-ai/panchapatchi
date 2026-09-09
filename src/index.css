@@ -6,6 +6,7 @@
   --muted: #6b5f52;
   --accent: #c45c26;
   --accent-soft: rgba(196, 92, 38, 0.12);
+  --app-header-offset: 3.5rem;
 }
 
 *,
@@ -36,9 +37,13 @@ body {
 }
 
 .header {
-  position: relative;
+  position: sticky;
+  top: 0;
+  z-index: 50;
   margin-bottom: 1.25rem;
   padding-top: 0.25rem;
+  padding-bottom: 0.35rem;
+  background: var(--bg);
 }
 
 .header__toolbar {
@@ -58,11 +63,10 @@ body {
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  z-index: 1;
+  z-index: 2;
 }
 
 .header__nav .app-menu {
-  position: static;
   display: flex;
   align-items: center;
 }
@@ -86,7 +90,8 @@ body {
 }
 
 .app-menu {
-  z-index: 20;
+  position: relative;
+  z-index: 60;
 }
 
 .app-menu__toggle {
@@ -122,7 +127,7 @@ body {
   border: none;
   background: rgba(45, 35, 25, 0.35);
   cursor: pointer;
-  z-index: 30;
+  z-index: 80;
 }
 
 .app-menu__panel {
@@ -134,7 +139,7 @@ body {
   background: var(--bg-card);
   border-left: 1px solid var(--border);
   box-shadow: -8px 0 24px rgba(45, 35, 25, 0.12);
-  z-index: 40;
+  z-index: 90;
   display: flex;
   flex-direction: column;
   animation: menu-slide-in 0.2s ease-out;
@@ -533,7 +538,7 @@ body {
 
 .patchi-pivot-table thead th {
   position: sticky;
-  top: 0;
+  top: var(--app-header-offset);
   z-index: 2;
   background: var(--bg-card);
   box-shadow: 0 1px 0 var(--border);
@@ -1367,19 +1372,45 @@ body {
 }
 
 .alternate-all-chip-table__banner-row th {
-  top: 0;
+  top: var(--app-header-offset);
   z-index: 6;
   box-shadow: 0 1px 0 var(--border);
 }
 
 .alternate-all-chip-table__jamam-row th {
-  top: var(--banner-row-height, 2.35rem);
+  top: calc(var(--app-header-offset) + var(--banner-row-height, 2.35rem));
   z-index: 5;
   box-shadow: 0 1px 0 var(--border);
 }
 
-.alternate-all-chip-table__sticky-head .patchi-pivot-table__day-col {
+.alternate-all-chip-table__corner-spacer {
+  left: auto;
+  min-width: 6.75rem;
+  padding: 0.65rem 0.5rem;
+}
+
+/* No rowSpan — sticky left on thead would cover tbody activity labels. */
+.alternate-all-chip-table__jamam-row .alternate-all-chip-table__activity-col {
+  left: auto;
   z-index: 7;
+  vertical-align: middle;
+  line-height: 1.2;
+  text-align: left;
+}
+
+.alternate-all-chip-table tbody .patchi-pivot-table__day,
+.alternate-all-chip-table tbody .alternate-all-chip-table__period-label {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+
+.alternate-all-chip-table tbody .patchi-pivot-table__day {
+  background: var(--bg-card);
+}
+
+.alternate-all-chip-table tbody .alternate-all-chip-table__period-label {
+  background: color-mix(in srgb, var(--border) 35%, transparent);
 }
 
 .alternate-all-chip-table__jamam-group-header {
@@ -1444,6 +1475,65 @@ body {
 .alternate-all-chip-table__night-start > th,
 .alternate-all-chip-table__night-start > td {
   border-top: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+}
+
+@media (max-width: 720px) {
+  .alternate-all-chip-table.patchi-pivot-table thead .alternate-all-chip-table__activity-col,
+  .alternate-all-chip-table.patchi-pivot-table tbody th.patchi-pivot-table__day,
+  .alternate-all-chip-table.patchi-pivot-table tbody th.alternate-all-chip-table__period-label {
+    text-align: left;
+    padding-left: 0.35rem;
+    padding-right: 0.2rem;
+  }
+
+  .alternate-all-chip-table tbody .patchi-pivot-table__day,
+  .alternate-all-chip-table tbody .alternate-all-chip-table__period-label {
+    min-width: 3.35rem;
+    max-width: 4.25rem;
+    width: 3.75rem;
+    white-space: normal;
+    line-height: 1.15;
+  }
+
+  .alternate-all-chip-table thead .alternate-all-chip-table__activity-col,
+  .alternate-all-chip-table thead .alternate-all-chip-table__corner-spacer {
+    min-width: 3.35rem;
+    max-width: 4.25rem;
+    width: 3.75rem;
+    white-space: normal;
+    line-height: 1.15;
+  }
+
+  .alternate-all-chip-table tbody .patchi-pivot-table__day .bi-ta,
+  .alternate-all-chip-table thead .alternate-all-chip-table__activity-col .bi-ta {
+    font-size: 0.72rem;
+  }
+
+  .alternate-all-chip-table tbody .patchi-pivot-table__day .bi-en,
+  .alternate-all-chip-table thead .alternate-all-chip-table__activity-col .bi-en {
+    display: none;
+  }
+
+  .alternate-all-chip-table .alternate-all-chip-table__period-label {
+    font-size: 0.68rem;
+  }
+
+  .alternate-all-chip-table .alternate-all-chip-table__header-sep {
+    margin: 0 0.15rem;
+  }
+
+  .alternate-all-chip-table .alternate-all-chip-table__active-day {
+    font-size: 0.72rem;
+  }
+
+  .alternate-all-chip-table thead th:not(.patchi-pivot-table__day-col) {
+    padding: 0.45rem 0.25rem;
+  }
+
+  .alternate-all-chip-table td:not(.alternate-all-chip-table__period-spacer) {
+    padding: 0.45rem 0.2rem;
+    min-width: 3.15rem;
+  }
 }
 
 .alternate-valarpirai-day-group + .alternate-valarpirai-day-group {
@@ -1595,6 +1685,10 @@ body {
   text-align: left;
 }
 
+.datetime-card__datetime-row {
+  display: contents;
+}
+
 .datetime-field__date-row {
   display: flex;
   align-items: center;
@@ -1724,7 +1818,9 @@ body {
 .datetime-field__sunrise-value {
   display: flex;
   align-items: center;
+  height: 2.05rem;
   min-height: 2.05rem;
+  box-sizing: border-box;
   padding: 0.45rem 0.55rem;
   border: 1px solid var(--border);
   border-radius: 0.6rem;
@@ -1742,6 +1838,7 @@ body {
 
 .datetime-field__coords-row {
   display: flex;
+  align-items: flex-end;
   gap: 0.45rem;
 }
 
@@ -1764,6 +1861,8 @@ body {
 .datetime-field__coord-input {
   min-width: 5.5rem;
   width: 5.5rem;
+  height: 2.05rem;
+  box-sizing: border-box;
 }
 
 .datetime-card__submit {
@@ -2122,6 +2221,10 @@ body {
   .header h1 {
     max-width: 100%;
   }
+
+  :root {
+    --app-header-offset: 3.85rem;
+  }
 }
 
 @media (max-width: 640px) {
@@ -2135,36 +2238,84 @@ body {
 
   .datetime-card__row {
     flex-wrap: wrap;
-    align-items: stretch;
-    gap: 0.65rem;
+    align-items: flex-end;
+    gap: 0.55rem;
   }
 
-  .datetime-field {
-    flex: 1 1 calc(50% - 0.35rem);
-    min-width: 9rem;
+  .datetime-card__datetime-row {
+    display: flex;
+    flex: 1 1 100%;
+    flex-wrap: nowrap;
+    align-items: flex-end;
+    gap: 0.45rem;
+    min-width: 0;
+  }
+
+  .datetime-field--date,
+  .datetime-field--time {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.35rem;
+    min-width: 0;
   }
 
   .datetime-field--date {
-    flex: 1 1 0;
-    min-width: 0;
-  }
-
-  .datetime-field--date .datetime-field__input {
-    min-width: 0;
+    flex: 1 1 auto;
   }
 
   .datetime-field--time {
     flex: 0 0 auto;
+  }
+
+  .datetime-field--date .datetime-field__label,
+  .datetime-field--time .datetime-field__label {
+    flex-shrink: 0;
+  }
+
+  .datetime-field__date-row {
+    flex: 1 1 auto;
     min-width: 0;
-    width: auto;
+    gap: 0.35rem;
+  }
+
+  .datetime-field--date .datetime-field__input {
+    min-width: 0;
+    width: 100%;
+    padding-inline: 0.35rem;
+    font-size: 0.82rem;
   }
 
   .datetime-field--time .datetime-field__input {
-    min-width: 6.25rem;
+    min-width: 5.25rem;
+    width: auto;
+    padding-inline: 0.35rem;
+  }
+
+  .datetime-card__weekday .bi-ta {
+    font-size: 0.82rem;
+  }
+
+  .datetime-card__weekday .bi-en {
+    display: none;
   }
 
   .datetime-field--location {
     flex: 1 1 100%;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.45rem;
+    min-width: 0;
+  }
+
+  .datetime-field--location .datetime-field__label {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .datetime-field--location .datetime-field__location-autocomplete {
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   .datetime-field--coords {
@@ -2172,22 +2323,32 @@ body {
   }
 
   .datetime-field__coords-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: end;
     gap: 0.35rem;
   }
 
+  .datetime-field__coord--sunrise,
   .datetime-field__coord {
-    flex: 1 1 0;
     min-width: 0;
   }
 
-  .datetime-field__coord-input {
-    min-width: 0;
-    width: 100%;
+  .datetime-field__coord-label {
+    min-height: 1.15rem;
+    line-height: 1.15;
   }
 
+  .datetime-field__coord-input,
   .datetime-field__sunrise-value {
     width: 100%;
     min-width: 0;
+    height: 2.05rem;
+    min-height: 2.05rem;
+    box-sizing: border-box;
+  }
+
+  .datetime-field__sunrise-value {
     justify-content: center;
     padding-inline: 0.35rem;
   }
@@ -2197,7 +2358,8 @@ body {
     width: 100%;
   }
 
-  .datetime-field__input {
+  .datetime-field--location .datetime-field__input,
+  .datetime-field--coords .datetime-field__input {
     width: 100%;
   }
 
@@ -2292,10 +2454,115 @@ body {
   padding: 0.35rem 0;
 }
 
-.context-card--home .context-row--home-thithi,
-.context-card--home .context-row--home-day-athikara {
+.context-card--home .context-row--home-thithi {
   flex-wrap: nowrap;
   gap: 0.75rem 1rem;
+}
+
+.context-card--home .context-row--home-athikara {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+}
+
+.context-card--home .context-row--home-athikara .context-inline-item--athikara {
+  flex: 0 0 auto;
+  min-width: 0;
+  align-items: center;
+}
+
+.context-card--home .context-row--home-athikara .patchi-submenu__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  min-height: 2.15rem;
+  line-height: 1.15;
+}
+
+.context-card--home .context-row--home-athikara .patchi-submenu__btn .bilingual,
+.context-card--home .context-row--home-athikara .patchi-submenu__btn .bi-ta,
+.context-card--home .context-row--home-athikara .patchi-submenu__btn .bi-en {
+  display: inline;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  margin: 0;
+}
+
+.context-card--home .patchi-filter-chips-home-split {
+  display: flex;
+  flex: 1 1 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.28rem;
+  min-width: 0;
+}
+
+.context-card--home .patchi-filter-chips--leading,
+.context-card--home .patchi-filter-chips--rest {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.28rem;
+  padding: 0;
+}
+
+@media (max-width: 640px) {
+  .context-card--home .context-row--home-athikara {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "athikara leading"
+      "rest rest";
+    align-items: center;
+    column-gap: 0.35rem;
+    row-gap: 0.35rem;
+  }
+
+  .context-card--home .context-row--home-athikara .context-label--athikara {
+    display: none;
+  }
+
+  .context-card--home .context-row--home-athikara .context-inline-item--athikara {
+    grid-area: athikara;
+  }
+
+  .context-card--home .patchi-filter-chips-home-split {
+    display: contents;
+  }
+
+  .context-card--home .patchi-filter-chips--leading {
+    grid-area: leading;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    min-width: 0;
+  }
+
+  .context-card--home .patchi-filter-chips--rest {
+    grid-area: rest;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .context-card--home .context-row--home-athikara .patchi-submenu__btn {
+    flex: 0 0 auto;
+    min-width: 2.75rem;
+    min-height: 1.55rem;
+    padding: 0.12rem 0.28rem;
+    font-size: 0.62rem;
+    line-height: 1.15;
+  }
+}
+
+.context-card--home .context-value--home-day {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1.2;
+  flex-shrink: 0;
 }
 
 .context-card--home .context-inline-item {
@@ -2318,16 +2585,26 @@ body {
   font-weight: 500;
 }
 
-.context-card--home .context-row--patchi-filter-home {
-  padding-top: 0.1rem;
-}
-
-.context-card--home .context-row--patchi-filter-home .patchi-filter-chips {
-  width: 100%;
-}
-
 .jamam-pair--single {
   width: 100%;
+}
+
+.context-card--home .jamam-pair__cell--home-inline {
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 0.35rem 0.5rem;
+}
+
+.context-card--home .jamam-pair__cell--home-inline .context-label {
+  flex-shrink: 0;
+}
+
+.context-card--home .jamam-pair__cell--home-inline .context-value-btn,
+.context-card--home .jamam-pair__cell--home-inline .context-value {
+  width: auto;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .context-label {
