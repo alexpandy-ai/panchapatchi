@@ -356,7 +356,7 @@ body {
   overflow: hidden;
 }
 
-.schedule-table-card--alternate-all {
+.schedule-table-card--alternate {
   overflow: visible;
 }
 
@@ -1357,10 +1357,19 @@ body {
 }
 
 .alternate-valarpirai-all-chip {
-  margin-top: 0.35rem;
+  margin-top: 0;
 }
 
-.alternate-valarpirai-all-chip .patchi-pivot-wrap {
+.schedule-table-card--alternate > .patchi-schedule-patchi-picker {
+  padding: 0.4rem 0.85rem 0.2rem;
+}
+
+.schedule-table-card--alternate > .patchi-pivot-tables {
+  padding-top: 0;
+}
+
+.alternate-valarpirai-all-chip .patchi-pivot-wrap,
+.alternate-valarpirai-single-bird .patchi-pivot-wrap {
   overflow-x: auto;
   overflow-y: visible;
 }
@@ -1371,28 +1380,21 @@ body {
   background: var(--bg-card);
 }
 
-.alternate-all-chip-table__banner-row th {
-  top: var(--app-header-offset);
-  z-index: 6;
-  box-shadow: 0 1px 0 var(--border);
+/* Wrap is sticky containing block (overflow-x); app-header-offset left a blank gap */
+.schedule-table-card--alternate .patchi-pivot-table thead th {
+  top: 0;
 }
 
-.alternate-all-chip-table__jamam-row th {
-  top: calc(var(--app-header-offset) + var(--banner-row-height, 2.35rem));
+.alternate-all-chip-table.patchi-pivot-table thead .alternate-all-chip-table__jamam-row th {
+  top: 0;
   z-index: 5;
   box-shadow: 0 1px 0 var(--border);
 }
 
-.alternate-all-chip-table__corner-spacer {
-  left: auto;
-  min-width: 6.75rem;
-  padding: 0.65rem 0.5rem;
-}
-
-/* No rowSpan — sticky left on thead would cover tbody activity labels. */
+/* No sticky left on thead — covers tbody activity labels. */
 .alternate-all-chip-table__jamam-row .alternate-all-chip-table__activity-col {
   left: auto;
-  z-index: 7;
+  z-index: 6;
   vertical-align: middle;
   line-height: 1.2;
   text-align: left;
@@ -1495,8 +1497,7 @@ body {
     line-height: 1.15;
   }
 
-  .alternate-all-chip-table thead .alternate-all-chip-table__activity-col,
-  .alternate-all-chip-table thead .alternate-all-chip-table__corner-spacer {
+  .alternate-all-chip-table thead .alternate-all-chip-table__activity-col {
     min-width: 3.35rem;
     max-width: 4.25rem;
     width: 3.75rem;
@@ -1568,11 +1569,12 @@ body {
 }
 
 .alternate-valarpirai-single-bird__title {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.15rem;
+  padding: 0.15rem 0.85rem 0;
 }
 
 .alternate-valarpirai-single-bird__period + .alternate-valarpirai-single-bird__period {
-  margin-top: 0.75rem;
+  margin-top: 0.5rem;
 }
 
 .patchi-schedule-patchi-section + .patchi-schedule-patchi-section {
@@ -2473,6 +2475,18 @@ body {
   align-items: center;
 }
 
+.context-card--home .context-value--home-athikara {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.context-card--home .context-value--home-athikara .bi-ta {
+  font-weight: 700;
+}
+
 .context-card--home .context-row--home-athikara .patchi-submenu__btn {
   display: inline-flex;
   align-items: center;
@@ -2528,6 +2542,10 @@ body {
 
   .context-card--home .context-row--home-athikara .context-inline-item--athikara {
     grid-area: athikara;
+  }
+
+  .context-card--home .context-value--home-athikara {
+    font-size: 0.95rem;
   }
 
   .context-card--home .patchi-filter-chips-home-split {

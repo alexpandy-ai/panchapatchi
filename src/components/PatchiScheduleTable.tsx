@@ -122,14 +122,14 @@ export function PatchiScheduleTable({
         scheduleSourceBundle.schedules[0])
       : null;
 
-  const isAlternateAllChip =
-    showAlternatePakshaTables && selectedPatchi === "all" && !!alternatePakshaSchedule;
+  const isAlternateSchedule =
+    showAlternatePakshaTables && !!alternatePakshaSchedule;
 
   return (
     <section
       className={
-        isAlternateAllChip
-          ? "schedule-table-card schedule-table-card--alternate-all"
+        isAlternateSchedule
+          ? "schedule-table-card schedule-table-card--alternate"
           : "schedule-table-card"
       }
     >
@@ -321,11 +321,8 @@ function AlternatePakshaDayNightTables({
   onOpenAnthara: (selection: AlternateAntharaSelection) => void;
 }) {
   const showNight = alternatePakshaSupportsNight(pakshaId);
-  const jamamColumnCount = schedule.jamamColumns.length;
   const containerRef = useRef<HTMLDivElement>(null);
   const stickyHeadRef = useRef<HTMLTableSectionElement>(null);
-  const bannerRowRef = useRef<HTMLTableRowElement>(null);
-  const [bannerRowHeight, setBannerRowHeight] = useState(0);
   const [activeSection, setActiveSection] = useState<{
     weekday: number;
     period: PeriodId;
@@ -333,21 +330,6 @@ function AlternatePakshaDayNightTables({
     weekday: ALTERNATE_WEEKDAY_ORDER[0],
     period: "day",
   });
-
-  const activePeriodHeader = periodAthikaraPatchiHeader(activeSection.period);
-
-  useEffect(() => {
-    const measureBannerRow = () => {
-      const bannerRow = bannerRowRef.current;
-      if (!bannerRow) return;
-      setBannerRowHeight(bannerRow.getBoundingClientRect().height);
-    };
-
-    measureBannerRow();
-    window.addEventListener("resize", measureBannerRow);
-
-    return () => window.removeEventListener("resize", measureBannerRow);
-  }, [activeSection.period, pakshaId]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -362,9 +344,7 @@ function AlternatePakshaDayNightTables({
       const stickyHead = stickyHeadRef.current;
       const anchorY = stickyHead
         ? stickyHead.getBoundingClientRect().bottom + 1
-        : bannerRowRef.current
-          ? bannerRowRef.current.getBoundingClientRect().bottom + 1
-          : 96;
+        : 96;
 
       let activeMarker = markers[0];
 
@@ -395,29 +375,14 @@ function AlternatePakshaDayNightTables({
       window.removeEventListener("scroll", updateActiveSection, true);
       window.removeEventListener("resize", updateActiveSection);
     };
-  }, [showNight, pakshaId, bannerRowHeight]);
+  }, [showNight, pakshaId]);
 
   return (
     <div ref={containerRef} className="patchi-pivot-section alternate-valarpirai-all-chip">
       <div className="sheet-table-wrap patchi-pivot-wrap">
         <table className="sheet-table patchi-pivot-table alternate-all-chip-table">
           <thead ref={stickyHeadRef} className="alternate-all-chip-table__sticky-head">
-            <tr ref={bannerRowRef} className="alternate-all-chip-table__banner-row">
-              <th className="alternate-all-chip-table__corner-spacer" aria-hidden="true" />
-              <th colSpan={jamamColumnCount} className="alternate-all-chip-table__jamam-group-header">
-                <span className="alternate-all-chip-table__active-period">
-                  <BilingualText text={activePeriodHeader.period} />
-                </span>
-                <span className="alternate-all-chip-table__header-sep" aria-hidden="true">
-                  ·
-                </span>
-                <BilingualText text={UI.jamamTime} />
-              </th>
-            </tr>
-            <tr
-              className="alternate-all-chip-table__jamam-row"
-              style={bannerRowHeight ? { ["--banner-row-height" as string]: `${bannerRowHeight}px` } : undefined}
-            >
+            <tr className="alternate-all-chip-table__jamam-row">
               <th className="patchi-pivot-table__day-col alternate-all-chip-table__activity-col">
                 <BilingualText text={UI.patchiActivity} />
               </th>
