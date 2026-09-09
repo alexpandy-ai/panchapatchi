@@ -50,14 +50,27 @@ body {
   gap: 0.75rem;
 }
 
-.header__toolbar > .app-menu {
+.header__nav {
   position: absolute;
   right: 0;
   top: 0;
   bottom: 0;
   display: flex;
   align-items: center;
+  gap: 0.35rem;
   z-index: 1;
+}
+
+.header__nav .app-menu {
+  position: static;
+  display: flex;
+  align-items: center;
+}
+
+.header-home-btn--active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .header__actions {
@@ -338,6 +351,10 @@ body {
   overflow: hidden;
 }
 
+.schedule-table-card--alternate-all {
+  overflow: visible;
+}
+
 .schedule-table-card__title {
   font-size: 0.98rem;
   font-weight: 700;
@@ -565,7 +582,7 @@ body {
   display: block;
   margin-top: 0.25rem;
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -676,6 +693,7 @@ body {
   font-weight: 700;
   line-height: 1.15;
   color: var(--text);
+  white-space: nowrap;
 }
 
 .jamam-segments-panel__scroll {
@@ -1081,9 +1099,9 @@ body {
 .jamam-segments-table--matrix thead .jamam-segments-table__segment-col,
 .jamam-segments-table--matrix thead .jamam-segments-table__segment-number-col,
 .jamam-segments-table--matrix thead .jamam-segments-table__segment-time-col,
-.jamam-segments-table--matrix thead .jamam-segments-table__segment-previous-col {
-  white-space: normal;
-  word-break: break-word;
+.jamam-segments-table--matrix thead .jamam-segments-table__segment-previous-col,
+.jamam-segments-table--matrix thead .jamam-segments-table__patchi-col {
+  white-space: nowrap;
   line-height: 1.05;
 }
 
@@ -1259,6 +1277,22 @@ body {
   margin-left: auto;
 }
 
+.context-card:has(.patchi-picker-sections) .context-row.context-row--patchi-filter {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.context-card:has(.patchi-picker-sections) .context-row.context-row--patchi-filter .context-label {
+  flex: 0 0 auto;
+}
+
+.context-card:has(.patchi-picker-sections) .context-row.context-row--patchi-filter .patchi-schedule-patchi-picker {
+  flex: 1 1 auto;
+  padding: 0;
+}
+
 .patchi-schedule-head {
   border-bottom: 1px solid var(--border);
 }
@@ -1296,6 +1330,161 @@ body {
   display: inline;
   font-size: inherit;
   font-weight: inherit;
+}
+
+.patchi-schedule-patchi-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding: 0.65rem 0.85rem 0;
+}
+
+.patchi-schedule-patchi-section__title {
+  padding: 0.75rem 0.85rem 0;
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.patchi-schedule-patchi-section__title--centered {
+  text-align: center;
+}
+
+.alternate-valarpirai-all-chip {
+  margin-top: 0.35rem;
+}
+
+.alternate-valarpirai-all-chip .patchi-pivot-wrap {
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+.alternate-all-chip-table__sticky-head th {
+  position: -webkit-sticky;
+  position: sticky;
+  background: var(--bg-card);
+}
+
+.alternate-all-chip-table__banner-row th {
+  top: 0;
+  z-index: 6;
+  box-shadow: 0 1px 0 var(--border);
+}
+
+.alternate-all-chip-table__jamam-row th {
+  top: var(--banner-row-height, 2.35rem);
+  z-index: 5;
+  box-shadow: 0 1px 0 var(--border);
+}
+
+.alternate-all-chip-table__sticky-head .patchi-pivot-table__day-col {
+  z-index: 7;
+}
+
+.alternate-all-chip-table__jamam-group-header {
+  text-align: center;
+  font-weight: 600;
+}
+
+.alternate-all-chip-table__active-day {
+  font-weight: 700;
+  font-size: calc(1em + 1pt);
+  color: var(--accent);
+}
+
+.alternate-all-chip-table__active-day .bi-ta,
+.alternate-all-chip-table__active-day .bi-en {
+  font-weight: 700;
+}
+
+.alternate-all-chip-table__active-period {
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.alternate-all-chip-table__header-sep {
+  margin: 0 0.35rem;
+  color: var(--muted);
+}
+
+.alternate-all-chip-table__period-label {
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.alternate-all-chip-table__period-spacer {
+  padding: 0.35rem 0.5rem;
+  background: color-mix(in srgb, var(--border) 35%, transparent);
+}
+
+.alternate-all-chip-table__period-marker .alternate-all-chip-table__period-label {
+  background: color-mix(in srgb, var(--border) 35%, transparent);
+}
+
+.alternate-all-chip-table__jamam-header {
+  text-align: center;
+  font-weight: 600;
+}
+
+.alternate-all-chip-table__sticky-head .patchi-pivot-table__time {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.alternate-all-chip-table__weekday-start--spaced > th,
+.alternate-all-chip-table__weekday-start--spaced > td {
+  border-top: 2px solid var(--border);
+}
+
+.alternate-all-chip-table__night-start > th,
+.alternate-all-chip-table__night-start > td {
+  border-top: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+}
+
+.alternate-valarpirai-day-group + .alternate-valarpirai-day-group {
+  margin-top: 1.25rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border);
+}
+
+.alternate-valarpirai-day-group .alternate-valarpirai-day-table__day-title {
+  margin-bottom: 0.65rem;
+}
+
+.alternate-valarpirai-day-group .alternate-valarpirai-night-table {
+  margin-top: 0.65rem;
+}
+
+.alternate-valarpirai-day-table__day-title {
+  margin: 0 0 0.5rem;
+  padding: 0 0.85rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.alternate-valarpirai-day-table__activity {
+  text-align: left;
+  font-weight: 600;
+}
+
+.alternate-valarpirai-day-table__bird {
+  text-align: center;
+}
+
+.alternate-valarpirai-single-bird__title {
+  margin-bottom: 0.75rem;
+}
+
+.alternate-valarpirai-single-bird__period + .alternate-valarpirai-single-bird__period {
+  margin-top: 0.75rem;
+}
+
+.patchi-schedule-patchi-section + .patchi-schedule-patchi-section {
+  border-top: 1px solid var(--border);
+  margin-top: 0.35rem;
+  padding-top: 0.25rem;
 }
 
 .schedule-table-card > .patchi-pivot-tables {
@@ -1689,10 +1878,81 @@ body {
   gap: 1.25rem;
 }
 
+.days-view__submenu {
+  margin-bottom: 0.25rem;
+}
+
+.days-view__thithi-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.thithi-patchi-table {
+  min-width: 0;
+  max-width: 52rem;
+  margin: 0 auto;
+}
+
+.natchathira-patchi-table {
+  min-width: 0;
+  max-width: 52rem;
+  margin: 0 auto;
+}
+
+.natchathira-patchi-table thead th,
+.natchathira-patchi-table tbody td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.patchi-details-table {
+  min-width: 0;
+  max-width: 42rem;
+  margin: 0 auto;
+}
+
+.thithi-patchi-table__thithi {
+  font-size: 0.88rem;
+  line-height: 1.35;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.thithi-patchi-table__row--current td {
+  background: rgba(196, 92, 38, 0.12);
+}
+
+.thithi-patchi-table__cell--current {
+  background: rgba(196, 92, 38, 0.12);
+}
+
+.thithi-patchi-table__thithi-item--current {
+  font-weight: 700;
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
 .days-table {
   min-width: 0;
   max-width: 42rem;
   margin: 0 auto;
+}
+
+.days-table--transposed {
+  max-width: none;
+}
+
+.days-table__row-label-col {
+  width: 4.5rem;
+}
+
+.days-table__row-label {
+  background: var(--bg);
+  font-weight: 700;
+  color: var(--muted);
+  text-align: left;
+  white-space: nowrap;
 }
 
 .days-activity-table {
@@ -2028,6 +2288,44 @@ body {
   padding: 0.35rem 0;
 }
 
+.context-card--home .context-row--home-thithi,
+.context-card--home .context-row--home-day-athikara {
+  flex-wrap: nowrap;
+  gap: 0.75rem 1rem;
+}
+
+.context-card--home .context-inline-item {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.35rem 0.5rem;
+  min-width: 0;
+}
+
+.context-card--home .context-value--thithi-paksha {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.context-card--home .context-value__sep {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.context-card--home .context-row--patchi-filter-home {
+  padding-top: 0.1rem;
+}
+
+.context-card--home .context-row--patchi-filter-home .patchi-filter-chips {
+  width: 100%;
+}
+
+.jamam-pair--single {
+  width: 100%;
+}
+
 .context-label {
   color: var(--muted);
   font-size: 0.9rem;
@@ -2319,11 +2617,16 @@ body {
   .anthara-dialog .jamam-segments-panel__head {
     padding: 0.18rem 0.2rem;
     margin-bottom: 0.12rem;
+    overflow-x: auto;
   }
 
   .anthara-dialog .jamam-segments-panel__title {
     font-size: 0.68rem;
     line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
   }
 
   .anthara-dialog .jamam-segments-panel__close {
@@ -2403,27 +2706,15 @@ body {
     position: static;
     left: auto;
     width: auto;
-    white-space: normal;
+    white-space: nowrap;
   }
 
-  /* Header cells: two-line wrap (Tamil + English stacked) */
+  /* Header cells: single-line titles */
   .anthara-dialog .jamam-segments-table--matrix thead th {
-    white-space: normal;
-    word-break: break-word;
-    hyphens: auto;
+    white-space: nowrap;
     line-height: 1.12;
-    min-height: 2.35em;
-    vertical-align: bottom;
+    vertical-align: middle;
     text-align: center;
-  }
-
-  .anthara-dialog .jamam-segments-table--matrix .jamam-segments-table__segment-number-col .bi-en,
-  .anthara-dialog .jamam-segments-table--matrix .jamam-segments-table__segment-previous-col .bi-en,
-  .anthara-dialog .jamam-segments-table--matrix .jamam-segments-table__segment-time-col .bi-en {
-    display: block;
-    font-size: 0.62em;
-    line-height: 1.1;
-    margin-top: 0.06em;
   }
 
   .anthara-dialog .jamam-segments-panel .bilingual--inline {
@@ -2431,20 +2722,19 @@ body {
     text-align: center;
   }
 
-  /* Patchi column headers: emoji above abbreviated name */
+  /* Patchi column headers: emoji and name on one line */
   .anthara-dialog .jamam-segments-table--matrix thead th:not(.jamam-segments-table__segment-number-col):not(
       .jamam-segments-table__segment-previous-col
     ):not(.jamam-segments-table__segment-time-col) {
     width: auto;
-    white-space: normal;
+    white-space: nowrap;
     line-height: 1.1;
-    min-height: 2.5em;
   }
 
   .anthara-dialog .jamam-segments-panel .inline-emoji-label {
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    white-space: normal;
+    white-space: nowrap;
     gap: 0.08em;
     line-height: 1.08;
     max-width: 100%;
@@ -2454,9 +2744,7 @@ body {
     font-size: 0.92em;
     line-height: 1.08;
     overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
+    text-overflow: ellipsis;
     text-align: center;
   }
 

@@ -6,6 +6,8 @@ import type { GeoCoords } from "../utils/location";
 
 import type { JamamSlot, PeriodId } from "../utils/jamam";
 
+import type { PatchiAntharaMatrixOptions } from "../utils/anthara";
+
 import { JamamSegmentsPanel } from "./JamamSegmentsPanel";
 
 export interface JamamAntharaDialogProps {
@@ -19,6 +21,8 @@ export interface JamamAntharaDialogProps {
   coords?: GeoCoords | null;
   jamamSlots?: JamamSlot[];
   cycleStart?: Date;
+  segmentCount?: number;
+  matrixOptions?: PatchiAntharaMatrixOptions;
 }
 
 export function JamamAntharaDialog({
@@ -32,6 +36,8 @@ export function JamamAntharaDialog({
   coords,
   jamamSlots,
   cycleStart,
+  segmentCount,
+  matrixOptions,
 }: JamamAntharaDialogProps) {
   useEffect(() => {
     if (!open) return;
@@ -69,6 +75,8 @@ export function JamamAntharaDialog({
           coords={coords}
           jamamSlots={jamamSlots}
           cycleStart={cycleStart}
+          segmentCount={segmentCount}
+          matrixOptions={matrixOptions}
         />
       </div>
     </div>

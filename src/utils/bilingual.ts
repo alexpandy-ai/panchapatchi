@@ -61,9 +61,11 @@ export const UI = {
   dayGroup: bi("நாள் குழு", "Day group"),
   period: bi("பகுதி", "Period"),
   patchi: bi("பட்சி", "Bird"),
-  myPatchi: bi("என் பட்சி", "My Patchi"),
+  myPatchi: bi("உங்கள் பட்சி", "Your Patchi"),
   selectOurPatchi: bi("பட்சியைத் தேர்ந்தெடு", "Select Patchi"),
+  all: bi("அனைத்தும்", "All"),
   status: bi("நிலை", "Status"),
+  home: bi("முகப்பு", "Home"),
   dayTime: bi("பகல் நேரம்", "Day time"),
   nightTime: bi("இரவு நேரம்", "Night time"),
   today: bi("இன்று", "Today"),
@@ -82,25 +84,41 @@ export const UI = {
   groups: bi("குழுக்கள்", "Groups"),
   jamams: bi("ஜாமங்கள்", "Jamams"),
   schedule: bi("அட்டவணை", "Schedule"),
+  alternateSchedule: bi("மாற்று அட்டவணை", "Alternate Schedule"),
+  alternateCalculation: bi("மாற்று கணக்கீடு", "Alternate calculation"),
   sheetPicker: bi("அட்டவணை தேர்வு", "Sheet selection"),
   patchiSubmenu: bi("பட்சி துணை மெனு", "Bird submenu"),
   dayGroupSchedule: bi("நாள் குழு அட்டவணை", "Day group schedule"),
   scheduleSheet: bi("அட்டவணை", "Sheet"),
   currentJamamLabel: bi("தற்போதைய ஜாமம்", "Current jamam"),
   timeTableTitle: bi("நேர அட்டவணை", "Time table"),
-  daysTitle: bi("மற்றவை", "Others"),
+  daysTitle: bi("தகவல்", "Information"),
   patchiActivity: bi("பட்சி செயல்", "Patchi Activity"),
+  patchiDays: bi("பட்சி நாட்கள்", "Patchi Days"),
+  thithiPatchi: bi("திதி பட்சி", "Thithi Patchi"),
+  natchathiraPatchi: bi("நட்சத்திர பட்சி", "Natchathira Patchi"),
+  thithi: bi("திதி", "Thithi"),
+  theipiraiPlanets: bi("தேய்பிறை கிரகம்", "Theipirai planet"),
+  valarpiraiPlanets: bi("வளர்பிறை கிரகம்", "Valarpirai planet"),
+  planet: bi("கிரகம்", "Planet"),
+  planets: bi("கிரகங்கள்", "Planets"),
+  valarpiraiPatchi: bi("வளர்பிறை அதிகார பட்சி", "Valarpirai Athikara Patchi"),
+  theipiraiPatchi: bi("தேய்பிறை அதிகார பட்சி", "Theipirai Athikara Patchi"),
   thozhil: bi("தொழில்", "Thozhil"),
   athikaraPatchi: bi("அதிகார பட்சி", "Athikara Patchi"),
   patchiRelation: bi("பட்சி உறவு", "Patchi Relation"),
+  patchiDetails: bi("நிறமும் திசையும்", "Colors and Direction"),
+  color: bi("நிறம்", "Color"),
+  number: bi("எண்", "Number"),
+  direction: bi("திசை", "Direction"),
   patchiRelations: bi("பட்சி உறவுகள்", "Patchi Relations"),
   natpu: bi("நட்பு", "Friends"),
   enemies: bi("பகை", "Enemies"),
   jamamTime: bi("ஜாமம் நேரம்", "Jamam time"),
   segmentStartTime: bi("அந்தர தொடக்க நேரம்", "Anthara start time"),
-  antharaJamam: bi("அந்தர ஜாமம்", "Anthara Jamam"),
+  antharaJamam: bi("அந்தரம்", "Antharam"),
   antharaPreviousTime: bi("முந்தைய நேரம்", "Previous time"),
-  antharaCurrentTime: bi("தற்போதைய நேரம்", "Current time"),
+  antharaCurrentTime: bi("நேரம்", "Time"),
   patchiThozhilMatrix: bi("அனைத்து பட்சி — ஜாமம் தொழில்", "All patchi — jamam thozhil"),
   patchiColumn: bi("பட்சி", "Patchi"),
 } as const;
@@ -164,6 +182,40 @@ export const PANCHA_DAY_PATCHI: (typeof PATCHI_ORDER)[number][] = [
   "காகம்",
 ];
 
+/** Patchi days table columns — planet order from Mercury through Saturn. */
+export const PATCHI_DAYS_TABLE = [
+  {
+    planet: bi("புதன்", "Mercury"),
+    day: bi("புதன்", "Wednesday"),
+    valarpiraiPatchi: "காகம்" as const,
+    theipiraiPatchi: "வல்லூறு" as const,
+  },
+  {
+    planet: bi("வெள்ளி", "Venus"),
+    day: bi("வெள்ளி", "Friday"),
+    valarpiraiPatchi: "வல்லூறு" as const,
+    theipiraiPatchi: "கோழி" as const,
+  },
+  {
+    planet: bi("செவ்வாய்", "Mars"),
+    day: bi("செவ்வாய்", "Tuesday"),
+    valarpiraiPatchi: "கோழி" as const,
+    theipiraiPatchi: "ஆந்தை" as const,
+  },
+  {
+    planet: bi("வியாழம்", "Jupiter"),
+    day: bi("வியாழன்", "Thursday"),
+    valarpiraiPatchi: "ஆந்தை" as const,
+    theipiraiPatchi: "மயில்" as const,
+  },
+  {
+    planet: bi("சனி", "Saturn"),
+    day: bi("சனி", "Saturday"),
+    valarpiraiPatchi: "மயில்" as const,
+    theipiraiPatchi: "காகம்" as const,
+  },
+] as const;
+
 
 export const MENU_ITEMS: { id: string; label: Bilingual }[] = [
   {
@@ -179,8 +231,12 @@ export const MENU_ITEMS: { id: string; label: Bilingual }[] = [
     label: bi("அட்டவணை", "Schedule"),
   },
   {
+    id: "alternateSchedule",
+    label: bi("மாற்று அட்டவணை", "Alternate Schedule"),
+  },
+  {
     id: "days",
-    label: bi("மற்றவை", "Others"),
+    label: bi("தகவல்", "Information"),
   },
 ];
 
@@ -257,7 +313,7 @@ export function nextJamamLabel(index: number): Bilingual {
   return bi(`அடுத்த ஜாமம் ${index}`, `Next jamam ${index}`);
 }
 
-/** Display jamam label for an Excel yama (1–5) in the given period. */
+/** Display jamam label for an Excel yama (1–5) in the given period (day 1–5, night 6–10). */
 export function jamamBilingualForYama(yama: number, period: "day" | "night"): Bilingual {
   const index = period === "day" ? yama : yama + 5;
   return jamamBilingual(index);

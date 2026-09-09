@@ -1,24 +1,19 @@
-import { useState } from "react";
-
 import { BilingualText } from "./BilingualText";
 
 import { PatchiPickerBlock } from "./PatchiPickerBlock";
 
 import { SheetTable } from "./SheetTable";
 
+import { useNavigation } from "../context/NavigationContext";
+
 import type { PakshaData } from "../types";
 
 import {
   PAKSHA_BI,
-  PATCHI_ORDER,
   UI,
 } from "../utils/bilingual";
 
-import { getPakshaFromDate } from "../utils/paksha";
-
 type SheetTab = "valarpirai" | "theipirai";
-
-type PatchiName = (typeof PATCHI_ORDER)[number];
 
 const SHEET_TABS: { id: SheetTab; label: (typeof PAKSHA_BI)[SheetTab] }[] = [
   {
@@ -34,19 +29,18 @@ const SHEET_TABS: { id: SheetTab; label: (typeof PAKSHA_BI)[SheetTab] }[] = [
 interface FindPatchiViewProps {
   data: Record<SheetTab, PakshaData | null>;
   selectedDateTime: Date;
-  highlightPatchi?: PatchiName | null;
 }
 
 export function FindPatchiView({
   data,
   selectedDateTime,
-  highlightPatchi: highlightPatchiProp = null,
 }: FindPatchiViewProps) {
-  const pakshaFromDate = getPakshaFromDate(selectedDateTime);
-  const [activeSheet, setActiveSheet] = useState<SheetTab>(pakshaFromDate);
-  const [selectedPatchi, setSelectedPatchi] = useState<PatchiName>(
-    highlightPatchiProp ?? PATCHI_ORDER[0],
-  );
+  const {
+    paksha: activeSheet,
+    setPaksha: setActiveSheet,
+    findPatchi: selectedPatchi,
+    setFindPatchi: setSelectedPatchi,
+  } = useNavigation();
   const sheet = data[activeSheet];
 
   if (!sheet) {

@@ -24,7 +24,10 @@ export interface ActiveScheduleCell {
 
 export interface ScheduleGridRow {
   yama: number;
+  /** @deprecated Use dayJamamLabel / nightJamamLabel */
   yamaLabel: string;
+  dayJamamLabel: string;
+  nightJamamLabel: string;
   dayTimeRange: string;
   nightTimeRange: string;
   dayBirds: string[];
@@ -236,7 +239,9 @@ function jamamSlotsForYama(
 function buildGridRow(yama: YamaRow, daySlot: JamamSlot, nightSlot: JamamSlot): ScheduleGridRow {
   return {
     yama: yama.yama,
-    yamaLabel: jamamLabel(yama.yama),
+    yamaLabel: jamamLabel(daySlot.index),
+    dayJamamLabel: jamamLabel(daySlot.index),
+    nightJamamLabel: jamamLabel(nightSlot.index),
     dayTimeRange: formatTimeRange(daySlot.start, daySlot.end),
     nightTimeRange: formatTimeRange(nightSlot.start, nightSlot.end),
     dayBirds: yama.day.map((slot) => normalizeBird(slot.bird) || "—"),

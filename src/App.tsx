@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { AppMenu, viewTitle, type AppView } from "./components/AppMenu";
+import { AppMenu, HomeNavButton, viewTitle } from "./components/AppMenu";
 import { BilingualText } from "./components/BilingualText";
 import { useLanguage } from "./context/LanguageContext";
+import { useNavigation } from "./context/NavigationContext";
 import { DateTimeCard } from "./components/DateTimeCard";
 import { DaysView } from "./components/DaysView";
 import { FindPatchiView } from "./components/FindPatchiView";
@@ -16,8 +17,8 @@ type PatchiName = (typeof PATCHI_ORDER)[number];
 
 export default function App() {
   const { language, setLanguage } = useLanguage();
+  const { view: activeView, setView: setActiveView } = useNavigation();
   const [selectedDateTime, setSelectedDateTime] = useState(() => new Date());
-  const [activeView, setActiveView] = useState<AppView>("status");
   const [athikaraPatchi, setAthikaraPatchi] = useState<PatchiName>(PATCHI_ORDER[0]);
   const [data, setData] = useState<Record<SheetTab, PakshaData | null>>({
     valarpirai: null,
@@ -105,16 +106,27 @@ export default function App() {
           <h1>
             <BilingualText text={UI.appTitle} />
           </h1>
-          <AppMenu activeView={activeView} onNavigate={setActiveView} />
+          <div className="header__nav">
+            <HomeNavButton
+              active={activeView === "home"}
+              onNavigate={() => setActiveView("home")}
+              label={UI.home}
+            />
+            <AppMenu activeView={activeView} onNavigate={setActiveView} />
+          </div>
         </div>
       </header>
 
-      {activeView !== "schedule" && (
+      {activeView !== "schedule" && activeView !== "alternateSchedule" && (
         <DateTimeCard value={selectedDateTime} onChange={setSelectedDateTime} />
       )}
 
       <main className="content">
-        {activeView !== "schedule" && activeView !== "find" && (
+        {activeView !== "schedule" &&
+          activeView !== "alternateSchedule" &&
+          activeView !== "find" &&
+          activeView !== "home" &&
+          activeView !== "status" && (
           <h2 className="content__section-title">
             <BilingualText text={viewTitle(activeView)} />
           </h2>
@@ -131,13 +143,12 @@ export default function App() {
           </p>
         )}
 
+        {!loading && !error && activeView === "home" && (
+          <PatchiStatusView selectedDateTime={selectedDateTime} data={data} variant="home" />
+        )}
+
         {!loading && !error && activeView === "status" && (
-          <PatchiStatusView
-            selectedDateTime={selectedDateTime}
-            data={data}
-            athikaraPatchi={athikaraPatchi}
-            onAthikaraPatchiChange={setAthikaraPatchi}
-          />
+          <PatchiStatusView selectedDateTime={selectedDateTime} data={data} variant="status" />
         )}
 
         {!loading && !error && activeView === "find" && (
@@ -152,7 +163,16 @@ export default function App() {
           <TimeTableView selectedDateTime={selectedDateTime} data={data} />
         )}
 
-        {activeView === "days" && <DaysView />}
+        {!loading && !error && activeView === "alternateSchedule" && (
+          <TimeTableView
+            selectedDateTime={selectedDateTime}
+            data={data}
+            subtitle={UI.alternateCalculation}
+            alternateCalculation
+          />
+        )}
+
+        {activeView === "days" && <DaysView selectedDateTime={selectedDateTime} />}
       </main>
     </div>
   );

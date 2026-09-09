@@ -20,9 +20,10 @@ export function ScheduleGridTable({ grid, title, subtitle, emptyCell = "—" }: 
         <table className="sheet-table schedule-grid-table">
           <thead>
             <tr>
-              <th rowSpan={2}>ஜாமம்</th>
+              <th rowSpan={2}>பகல் ஜாமம்</th>
               <th rowSpan={2}>பகல் நேரம்</th>
               <th colSpan={grid.dayActivities.length}>{grid.daySectionLabel}</th>
+              <th rowSpan={2}>இரவு ஜாமம்</th>
               <th rowSpan={2}>இரவு நேரம்</th>
               <th colSpan={grid.nightActivities.length}>{grid.nightSectionLabel}</th>
             </tr>
@@ -48,8 +49,8 @@ export function ScheduleGridTable({ grid, title, subtitle, emptyCell = "—" }: 
                 }
               >
                 <td className="sheet-table__yama">
-                  {row.yamaLabel}
-                  {(row.dayJamamActive || row.nightJamamActive) && (
+                  {row.dayJamamLabel}
+                  {row.dayJamamActive && (
                     <span className="schedule-table__badge schedule-table__badge--inline">நடப்பில்</span>
                   )}
                 </td>
@@ -61,6 +62,12 @@ export function ScheduleGridTable({ grid, title, subtitle, emptyCell = "—" }: 
                     active={isActivePeriodCell(grid.activeCell, grid.groupKey, row.yama, "day")}
                   />
                 ))}
+                <td className="sheet-table__yama">
+                  {row.nightJamamLabel}
+                  {row.nightJamamActive && (
+                    <span className="schedule-table__badge schedule-table__badge--inline">நடப்பில்</span>
+                  )}
+                </td>
                 <td className="schedule-grid-table__time">{row.nightTimeRange}</td>
                 {row.nightBirds.map((bird, index) => (
                   <GridCell

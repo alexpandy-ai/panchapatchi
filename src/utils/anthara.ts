@@ -10,10 +10,19 @@ import {
   patchiLabelBilingual,
   type Bilingual,
 } from "./bilingual";
-import type { PeriodId } from "./jamam";
+import type { JamamSlot, PeriodId } from "./jamam";
 import { formatTimeWithSeconds, splitJamamStartTimes, yamaFromJamamIndex } from "./jamam";
 
 export const JAMAM_ANTHARA_SEGMENT_COUNT = 10;
+
+/** Anthara sub-segments within one day jamam when night jamam rows are appended. */
+export const ANTHARA_DAY_SEGMENT_COUNT = 5;
+
+/** Anthara sub-segments within one night jamam. */
+export const ANTHARA_NIGHT_SEGMENT_COUNT = 5;
+
+export const NIGHT_JAMAM_SCHEDULE_START = 6;
+export const NIGHT_JAMAM_SCHEDULE_END = 10;
 
 /** Birds cycle in Pancha display order (same as Others / Know Patchi). */
 const ANTHARA_BIRD_ORDER = PATCHI_ORDER;
@@ -193,6 +202,15 @@ export interface PatchiAntharaColumn {
   segmentIndex: number;
   startTime: Date;
   startTimeLabel: string;
+  /** Appended night jamam rows (6–10) — shown in the Antharam column. */
+  jamamIndex?: number;
+}
+
+export interface PatchiAntharaMatrixOptions {
+  /** Append jamams 6–10 with schedule activities after day anthara rows. */
+  appendNightJamamRows?: boolean;
+  /** All jamam slots (1–10) — required when appendNightJamamRows is true. */
+  allJamamSlots?: JamamSlot[];
 }
 
 export interface PatchiAntharaRow {
@@ -205,9 +223,13 @@ export interface PatchiAntharaMatrix {
   rows: PatchiAntharaRow[];
 }
 
-/** Ten anthara segment start columns for a jamam window. */
-export function getAntharaSegmentColumns(jamamStart: Date, jamamEnd: Date): PatchiAntharaColumn[] {
-  const segmentStarts = splitJamamStartTimes(jamamStart, jamamEnd);
+/** Equal split segment start columns for a jamam window. */
+export function getAntharaSegmentColumns(
+  jamamStart: Date,
+  jamamEnd: Date,
+  parts = JAMAM_ANTHARA_SEGMENT_COUNT,
+): PatchiAntharaColumn[] {
+  const segmentStarts = splitJamamStartTimes(jamamStart, jamamEnd, parts);
   return segmentStarts.map((start, index) => ({
     segmentIndex: index,
     startTime: start,
@@ -215,26 +237,116 @@ export function getAntharaSegmentColumns(jamamStart: Date, jamamEnd: Date): Patc
   }));
 }
 
-/** Five patchi × ten anthara segments for one jamam window. */
+function getPatchiJamamActivity(
+  getActivitySlots: (yama: number, period: PeriodId) => ActivitySlot[],
+  jamamIndex: number,
+  patchi: (typeof PATCHI_ORDER)[number],
+): string {
+  const { yama, period } = yamaFromJamamIndex(jamamIndex);
+  const slots = getActivitySlots(yama, period);
+  const match = slots.find((entry) => patchiBaseName(entry.bird) === patchi);
+  return match ? displayActivity(match.activity) : "—";
+}
+
+/** Day click: ten equal time parts within the jamam; rows 6–10 carry night jamam activities. */
+function buildDayAntharaColumnsWithNightJamamRows(
+  jamamStart: Date,
+  jamamEnd: Date,
+  allJamamSlots: JamamSlot[],
+): PatchiAntharaColumn[] {
+  const columns = getAntharaSegmentColumns(
+    jamamStart,
+    jamamEnd,
+    JAMAM_ANTHARA_SEGMENT_COUNT,
+  );
+  const nightSlots = allJamamSlots
+    .filter(
+      (slot) =>
+        slot.index >= NIGHT_JAMAM_SCHEDULE_START && slot.index <= NIGHT_JAMAM_SCHEDULE_END,
+    )
+    .sort((a, b) => a.index - b.index);
+
+  return columns.map((column, index) => {
+    const nightSlot = nightSlots[index - ANTHARA_DAY_SEGMENT_COUNT];
+    if (index >= ANTHARA_DAY_SEGMENT_COUNT && nightSlot) {
+      return { ...column, jamamIndex: nightSlot.index };
+    }
+    return column;
+  });
+}
+
+/** Resolve anthara segment count for a jamam dialog open. */
+export function antharaSegmentCountForJamam(
+  jamamIndex: number,
+  segmentCount?: number,
+  appendNightJamamRows = false,
+): number {
+  const { period } = yamaFromJamamIndex(jamamIndex);
+  if (period === "night") {
+    return segmentCount ?? ANTHARA_NIGHT_SEGMENT_COUNT;
+  }
+  if (appendNightJamamRows) {
+    return segmentCount ?? ANTHARA_DAY_SEGMENT_COUNT;
+  }
+  return segmentCount ?? JAMAM_ANTHARA_SEGMENT_COUNT;
+}
+
+/** Five patchi × anthara segments for one jamam window; day opens may append jamams 6–10. */
 export function getPatchiAntharaMatrix(
   jamamStart: Date,
   jamamEnd: Date,
   getActivitySlots: (yama: number, period: PeriodId) => ActivitySlot[],
   jamamIndex: number,
+  segmentCount?: number,
+  options: PatchiAntharaMatrixOptions = {},
 ): PatchiAntharaMatrix {
-  const columns = getAntharaSegmentColumns(jamamStart, jamamEnd);
-  const { yama, period } = yamaFromJamamIndex(jamamIndex);
+  const { period } = yamaFromJamamIndex(jamamIndex);
+  const appendNightJamamRows =
+    options.appendNightJamamRows === true &&
+    period === "day" &&
+    Boolean(options.allJamamSlots?.length);
+  const antharaSegmentCount = antharaSegmentCountForJamam(
+    jamamIndex,
+    segmentCount,
+    appendNightJamamRows,
+  );
+
+  let columns: PatchiAntharaColumn[];
+  let antharaColumnCount: number;
+
+  if (appendNightJamamRows && options.allJamamSlots) {
+    columns = buildDayAntharaColumnsWithNightJamamRows(
+      jamamStart,
+      jamamEnd,
+      options.allJamamSlots,
+    );
+    antharaColumnCount = ANTHARA_DAY_SEGMENT_COUNT;
+  } else {
+    columns = getAntharaSegmentColumns(jamamStart, jamamEnd, antharaSegmentCount);
+    antharaColumnCount = antharaSegmentCount;
+  }
+
+  const { yama } = yamaFromJamamIndex(jamamIndex);
   const slots = getActivitySlots(yama, period);
   const activityOrder = antharaThozhilCycleOrder(period);
 
   const rows: PatchiAntharaRow[] = PATCHI_ORDER.map((patchi) => {
     const match = slots.find((entry) => patchiBaseName(entry.bird) === patchi);
     const thozhil = match ? displayActivity(match.activity) : "—";
-    const activities =
+    const antharaActivities =
       thozhil === "—"
-        ? Array<string>(columns.length).fill("—")
-        : antharaActivitiesFrom(thozhil, columns.length, activityOrder);
-    return { patchi, activities };
+        ? Array<string>(antharaColumnCount).fill("—")
+        : antharaActivitiesFrom(thozhil, antharaColumnCount, activityOrder);
+
+    const nightJamamActivities = columns
+      .slice(antharaColumnCount)
+      .map((column) =>
+        column.jamamIndex != null
+          ? getPatchiJamamActivity(getActivitySlots, column.jamamIndex, patchi)
+          : "—",
+      );
+
+    return { patchi, activities: [...antharaActivities, ...nightJamamActivities] };
   });
 
   return { columns, rows };

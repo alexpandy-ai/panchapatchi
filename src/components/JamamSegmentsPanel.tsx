@@ -22,7 +22,13 @@ import {
   shouldShowPreviousJamamRow,
 } from "../utils/jamam";
 
-import { antharaDialogTitle, getAntharaSegmentColumns, getPatchiAntharaMatrix } from "../utils/anthara";
+import {
+  antharaDialogTitle,
+  antharaSegmentCountForJamam,
+  getAntharaSegmentColumns,
+  getPatchiAntharaMatrix,
+  type PatchiAntharaMatrixOptions,
+} from "../utils/anthara";
 
 import { BilingualText } from "./BilingualText";
 import { InlineEmojiLabel } from "./InlineEmojiLabel";
@@ -37,6 +43,8 @@ export interface JamamSegmentsPanelProps {
   coords?: GeoCoords | null;
   jamamSlots?: JamamSlot[];
   cycleStart?: Date;
+  segmentCount?: number;
+  matrixOptions?: PatchiAntharaMatrixOptions;
 }
 
 export function JamamSegmentsPanel({
@@ -49,12 +57,16 @@ export function JamamSegmentsPanel({
   coords = null,
   jamamSlots,
   cycleStart,
+  segmentCount,
+  matrixOptions,
 }: JamamSegmentsPanelProps) {
   const matrix = getPatchiAntharaMatrix(
     jamamSlot.start,
     jamamSlot.end,
     getActivitySlots,
     jamamSlot.index,
+    segmentCount,
+    matrixOptions,
   );
   const title = antharaDialogTitle(jamamSlot.index, highlightPatchi, highlightThozhil);
 
@@ -76,7 +88,16 @@ export function JamamSegmentsPanel({
 
   const previousJamamColumns = useMemo(() => {
     if (!previousJamamSlot) return null;
-    return getAntharaSegmentColumns(previousJamamSlot.start, previousJamamSlot.end);
+    const previousSegmentCount = antharaSegmentCountForJamam(
+      previousJamamSlot.index,
+      segmentCount,
+      matrixOptions?.appendNightJamamRows,
+    );
+    return getAntharaSegmentColumns(
+      previousJamamSlot.start,
+      previousJamamSlot.end,
+      previousSegmentCount,
+    );
   }, [previousJamamSlot]);
 
   const segmentRows = useMemo(
@@ -181,7 +202,13 @@ export function JamamSegmentsPanel({
                       .join(" ")}
                   >
                     <span className="jamam-segments-table__jamam-label">
-                      <BilingualText text={antharaJamamHeader(column.segmentIndex + 1)} />
+                      <BilingualText
+                        text={
+                          column.jamamIndex != null
+                            ? antharaJamamHeader(column.jamamIndex)
+                            : antharaJamamHeader(column.segmentIndex + 1)
+                        }
+                      />
                     </span>
                   </th>
                   {showPreviousJamamRow ? (
