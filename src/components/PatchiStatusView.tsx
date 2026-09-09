@@ -80,10 +80,10 @@ export function PatchiStatusView({
     setMyPatchi: setMyPatchiSelection,
   } = useNavigation();
 
-  const homePatchi =
-    myPatchiSelection === "all" ? PATCHI_ORDER[0] : myPatchiSelection;
-
-  const myPatchi = isHome ? homePatchi : myPatchiSelection === "all" ? PATCHI_ORDER[0] : myPatchiSelection;
+  /** Home-only chip selection; null = none highlighted by default. */
+  const [homeChipSelection, setHomeChipSelection] = useState<(typeof PATCHI_ORDER)[number] | null>(
+    null,
+  );
 
   const [antharaDialogTarget, setAntharaDialogTarget] = useState<"current" | "next" | null>(
     null,
@@ -100,6 +100,14 @@ export function PatchiStatusView({
 
   const thithiScheduleWeekday = thithiPatchiEntry.weekday;
   const athikaraPatchi = thithiPatchiEntry.patchi;
+
+  const homePatchi = homeChipSelection ?? athikaraPatchi;
+
+  const myPatchi = isHome
+    ? homePatchi
+    : myPatchiSelection === "all"
+      ? PATCHI_ORDER[0]
+      : myPatchiSelection;
 
   const paksha = data[pakshaId];
 
@@ -364,11 +372,20 @@ export function PatchiStatusView({
                   />
                 </span>
               </span>
+            </div>
+
+            <div className="context-row context-row--home-chips">
               <PatchiFilterChips
-                selected={homePatchi}
-                onSelect={setMyPatchiSelection}
+                selected={homeChipSelection}
+                onSelect={(patchi) => {
+                  if (patchi === "all") {
+                    setHomeChipSelection(null);
+                    return;
+                  }
+                  setHomeChipSelection(patchi);
+                }}
                 includeAll={false}
-                mobileSplit
+                hideEmoji
                 ariaLabel={`${UI.myPatchi.ta} ${UI.myPatchi.en}`}
               />
             </div>

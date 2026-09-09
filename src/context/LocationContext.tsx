@@ -16,6 +16,8 @@ import type { Bilingual } from "../utils/bilingual";
 
 const GEO_TIMEOUT_MS = 15_000;
 
+export type GeoPermissionState = "granted" | "denied" | "prompt" | "unsupported";
+
 export interface ApplyLocationInput {
   countryId?: string | null;
   lat?: number | null;
@@ -33,7 +35,10 @@ export interface LocationContextValue {
   countryName: Bilingual | null;
   placeName: Bilingual | null;
   locationDisplay: Bilingual;
+  geoPermission: GeoPermissionState;
+  geoPending: boolean;
   applyLocation: (input: ApplyLocationInput) => void;
+  requestGeolocation: () => void;
 }
 
 const LocationContext = createContext<LocationContextValue | null>(null);
@@ -46,6 +51,28 @@ export function LocationProvider({ children }: { children: ReactNode }) {
   const [countryId, setCountryIdState] = useState<string | null>(null);
   const [resolvedPlaceName, setResolvedPlaceName] = useState<string | null>(null);
   const [geoPending, setGeoPending] = useState(true);
+  const [geoPermission, setGeoPermission] = useState<GeoPermissionState>(() =>
+    typeof navigator !== "undefined" && "geolocation" in navigator ? "prompt" : "unsupported",
+  );
+
+  const syncPermissionState = useCallback(async () => {
+    if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
+      setGeoPermission("unsupported");
+      return;
+    }
+
+    try {
+      const permissions = navigator.permissions;
+      if (!permissions?.query) return;
+      const status = await permissions.query({ name: "geolocation" as PermissionName });
+      setGeoPermission(status.state as GeoPermissionState);
+      status.onchange = () => {
+        setGeoPermission(status.state as GeoPermissionState);
+      };
+    } catch {
+      // Permissions API may be unavailable; keep last known state.
+    }
+  }, []);
 
   const requestGeolocation = useCallback(() => {
     if (!navigator.geolocation) {
@@ -54,7 +81,9 @@ export function LocationProvider({ children }: { children: ReactNode }) {
       setSource("fallback");
       setCountryIdState(null);
       setManualCoords(null);
+      setResolvedPlaceName(null);
       setGeoPending(false);
+      setGeoPermission("unsupported");
       return;
     }
 
@@ -71,12 +100,14 @@ export function LocationProvider({ children }: { children: ReactNode }) {
         setCountryIdState(null);
         setManualCoords(null);
         setResolvedPlaceName(null);
+        setGeoPermission("granted");
 
         const placeName = await reverseGeocodeCoordinates(nextCoords.lat, nextCoords.lng);
         setResolvedPlaceName(formatPlaceLabel(placeName));
         setGeoPending(false);
+        void syncPermissionState();
       },
-      () => {
+      (error) => {
         setGeoCoords(null);
         setCoords(null);
         setSource("fallback");
@@ -84,14 +115,17 @@ export function LocationProvider({ children }: { children: ReactNode }) {
         setManualCoords(null);
         setResolvedPlaceName(null);
         setGeoPending(false);
+        setGeoPermission(error.code === error.PERMISSION_DENIED ? "denied" : "prompt");
+        void syncPermissionState();
       },
       { enableHighAccuracy: true, timeout: GEO_TIMEOUT_MS, maximumAge: 60_000 },
     );
-  }, []);
+  }, [syncPermissionState]);
 
   useEffect(() => {
+    void syncPermissionState();
     requestGeolocation();
-  }, [requestGeolocation]);
+  }, [requestGeolocation, syncPermissionState]);
 
   const applyLocation = useCallback(({
     countryId: nextCountryId = null,
@@ -143,9 +177,25 @@ export function LocationProvider({ children }: { children: ReactNode }) {
       countryName,
       placeName,
       locationDisplay,
+      geoPermission,
+      geoPending,
       applyLocation,
+      requestGeolocation,
     }),
-    [coords, geoCoords, manualCoords, source, countryId, countryName, placeName, locationDisplay, applyLocation],
+    [
+      coords,
+      geoCoords,
+      manualCoords,
+      source,
+      countryId,
+      countryName,
+      placeName,
+      locationDisplay,
+      geoPermission,
+      geoPending,
+      applyLocation,
+      requestGeolocation,
+    ],
   );
 
   return <LocationContext.Provider value={value}>{children}</LocationContext.Provider>;

@@ -2,7 +2,13 @@ import { useEffect, useState } from "react";
 
 import { BilingualText } from "./BilingualText";
 
-import { PATCHI_ORDER, patchiBilingual, UI, type Bilingual } from "../utils/bilingual";
+import {
+  PATCHI_ORDER,
+  patchiBilingual,
+  patchiLabelBilingual,
+  UI,
+  type Bilingual,
+} from "../utils/bilingual";
 
 const HOME_MOBILE_SPLIT_BREAKPOINT_PX = 640;
 const HOME_MOBILE_ONE_CHIP_BREAKPOINT_PX = 400;
@@ -30,52 +36,49 @@ function useHomeLeadingChipCount(mobileSplit: boolean): number {
   return leadingCount;
 }
 
-
-
 type PatchiName = (typeof PATCHI_ORDER)[number];
 
 export type PatchiSelection = PatchiName | "all";
 
 interface PatchiPickerBlockProps {
-
   title: Bilingual;
-
   ariaLabel: string;
-
   selected: PatchiName;
-
   onSelect: (patchi: PatchiName) => void;
-
 }
 
 interface PatchiFilterChipsProps {
-  selected: PatchiSelection;
+  selected: PatchiSelection | null;
   onSelect: (patchi: PatchiSelection) => void;
   includeAll?: boolean;
   ariaLabel: string;
   /** Home mobile: first chips beside athikara, rest on the next row. */
   mobileSplit?: boolean;
+  /** Show bird name only (no emoji) in chip labels. */
+  hideEmoji?: boolean;
 }
 
 function PatchiFilterChipButton({
   name,
   selected,
   onSelect,
+  hideEmoji = false,
 }: {
   name: PatchiName;
-  selected: PatchiSelection;
+  selected: PatchiSelection | null;
   onSelect: (patchi: PatchiSelection) => void;
+  hideEmoji?: boolean;
 }) {
+  const isActive = selected != null && name === selected;
+
   return (
     <button
       type="button"
-      className={`patchi-submenu__btn${
-        name === selected ? " patchi-submenu__btn--active" : ""
-      }`}
-      aria-pressed={name === selected}
+      className={`patchi-submenu__btn${isActive ? " patchi-submenu__btn--active" : ""}`}
+      aria-pressed={isActive}
       onClick={() => onSelect(name)}
     >
-      <BilingualText text={patchiBilingual(name)} />
+      <BilingualText text={hideEmoji ? patchiLabelBilingual(name) : patchiBilingual(name)} />
     </button>
   );
 }
@@ -86,6 +89,7 @@ export function PatchiFilterChips({
   includeAll = true,
   ariaLabel,
   mobileSplit = false,
+  hideEmoji = false,
 }: PatchiFilterChipsProps) {
   const allChip = includeAll ? (
     <button
@@ -115,6 +119,7 @@ export function PatchiFilterChips({
               name={name}
               selected={selected}
               onSelect={onSelect}
+              hideEmoji={hideEmoji}
             />
           ))}
         </div>
@@ -125,6 +130,7 @@ export function PatchiFilterChips({
               name={name}
               selected={selected}
               onSelect={onSelect}
+              hideEmoji={hideEmoji}
             />
           ))}
           {allChip}
@@ -145,6 +151,7 @@ export function PatchiFilterChips({
           name={name}
           selected={selected}
           onSelect={onSelect}
+          hideEmoji={hideEmoji}
         />
       ))}
       {allChip}

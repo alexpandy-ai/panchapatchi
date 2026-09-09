@@ -7,8 +7,6 @@ import {
   PATCHI_NATPU,
   PATCHI_ORDER,
   PANCHA_ACTIVITIES,
-  PANCHA_DAY_PATCHI,
-  PANCHA_DAYS,
   PAKSHA_BI,
   PATCHI_DAYS_TABLE,
   patchiEmoji,
@@ -39,11 +37,6 @@ const INFORMATION_SECTIONS: { id: InformationSection; label: Bilingual }[] = [
   { id: "patchiRelation", label: UI.patchiRelation },
 ];
 
-function dayForBird(bird: (typeof PATCHI_ORDER)[number]): Bilingual {
-  const index = PANCHA_DAY_PATCHI.indexOf(bird);
-  return PANCHA_DAYS[index];
-}
-
 function PatchiCell({ bird }: { bird: string }) {
   return <InlineEmojiLabel text={patchiLabelBilingual(bird)} emoji={patchiEmoji(bird)} />;
 }
@@ -68,48 +61,40 @@ function PatchiDaysSection() {
         <BilingualText text={UI.patchiDays} />
       </h3>
       <div className="sheet-table-wrap">
-        <table className="sheet-table days-table days-table--transposed">
-          <tbody>
+        <table className="sheet-table days-table">
+          <thead>
             <tr>
-              <th scope="row" className="days-table__row-label">
+              <th>
                 <BilingualText text={UI.planets} />
               </th>
-              {PATCHI_DAYS_TABLE.map((column) => (
-                <td key={`${column.planet.en}-planet`}>
-                  <BilingualText text={column.planet} />
-                </td>
-              ))}
-            </tr>
-            <tr>
-              <th scope="row" className="days-table__row-label">
+              <th>
                 <BilingualText text={UI.day} />
               </th>
-              {PATCHI_DAYS_TABLE.map((column) => (
-                <td key={`${column.planet.en}-day`}>
-                  <BilingualText text={column.day} />
-                </td>
-              ))}
-            </tr>
-            <tr>
-              <th scope="row" className="days-table__row-label">
+              <th>
                 <BilingualText text={UI.valarpiraiPatchi} />
               </th>
-              {PATCHI_DAYS_TABLE.map((column) => (
-                <td key={`${column.planet.en}-valarpirai`}>
-                  <PatchiCell bird={column.valarpiraiPatchi} />
-                </td>
-              ))}
-            </tr>
-            <tr>
-              <th scope="row" className="days-table__row-label">
+              <th>
                 <BilingualText text={UI.theipiraiPatchi} />
               </th>
-              {PATCHI_DAYS_TABLE.map((column) => (
-                <td key={`${column.planet.en}-theipirai`}>
-                  <PatchiCell bird={column.theipiraiPatchi} />
-                </td>
-              ))}
             </tr>
+          </thead>
+          <tbody>
+            {PATCHI_DAYS_TABLE.map((row) => (
+              <tr key={row.planet.en}>
+                <td>
+                  <BilingualText text={row.planet} />
+                </td>
+                <td className="days-table__day">
+                  <BilingualText text={row.day} />
+                </td>
+                <td>
+                  <PatchiCell bird={row.valarpiraiPatchi} />
+                </td>
+                <td>
+                  <PatchiCell bird={row.theipiraiPatchi} />
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
@@ -212,17 +197,21 @@ function NatchathiraPatchiSection() {
         <table className="sheet-table days-table natchathira-patchi-table">
           <thead>
             <tr>
-              {NATCHATHIRA_PATCHI_COLUMNS.map((column) => (
-                <th key={column.patchi}>
-                  <PatchiCell bird={column.patchi} />
-                </th>
+              <th>
+                <BilingualText text={UI.patchi} />
+              </th>
+              {Array.from({ length: NATCHATHIRA_PATCHI_ROW_COUNT }, (_, index) => (
+                <th key={`natchathira-col-${index}`} aria-hidden="true" />
               ))}
             </tr>
           </thead>
           <tbody>
-            {Array.from({ length: NATCHATHIRA_PATCHI_ROW_COUNT }, (_, rowIndex) => (
-              <tr key={rowIndex}>
-                {NATCHATHIRA_PATCHI_COLUMNS.map((column) => {
+            {NATCHATHIRA_PATCHI_COLUMNS.map((column) => (
+              <tr key={column.patchi}>
+                <th scope="row" className="days-table__row-label">
+                  <PatchiCell bird={column.patchi} />
+                </th>
+                {Array.from({ length: NATCHATHIRA_PATCHI_ROW_COUNT }, (_, rowIndex) => {
                   const natchathira = column.natchathiras[rowIndex];
 
                   return (
@@ -261,47 +250,101 @@ function ThithiPatchiSection({ selectedDateTime }: { selectedDateTime: Date }) {
 
 function PatchiDetailsSection() {
   return (
-    <section className="schedule-table-card days-view__details-card">
-      <h3 className="schedule-table-card__title">
-        <BilingualText text={UI.patchiDetails} />
-      </h3>
-      <div className="sheet-table-wrap">
-        <table className="sheet-table days-table patchi-details-table">
-          <thead>
-            <tr>
-              <th>
-                <BilingualText text={UI.patchi} />
-              </th>
-              <th>
-                <BilingualText text={UI.color} />
-              </th>
-              <th>
-                <BilingualText text={UI.number} />
-              </th>
-              <th>
-                <BilingualText text={UI.direction} />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {PATCHI_DETAILS_TABLE.map((row) => (
-              <tr key={row.patchi}>
-                <td>
-                  <PatchiCell bird={row.patchi} />
-                </td>
-                <td>
-                  <BilingualText text={row.color} />
-                </td>
-                <td>{row.number}</td>
-                <td>
-                  <BilingualText text={row.direction} />
-                </td>
+    <div className="days-view__details-tables">
+      <section className="schedule-table-card days-view__details-card">
+        <h3 className="schedule-table-card__title">
+          <BilingualText text={UI.color} />
+        </h3>
+        <div className="sheet-table-wrap">
+          <table className="sheet-table days-table patchi-details-table">
+            <thead>
+              <tr>
+                <th>
+                  <BilingualText text={UI.patchi} />
+                </th>
+                <th>
+                  <BilingualText text={UI.color} />
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </section>
+            </thead>
+            <tbody>
+              {PATCHI_DETAILS_TABLE.map((row) => (
+                <tr key={`color-${row.patchi}`}>
+                  <td>
+                    <PatchiCell bird={row.patchi} />
+                  </td>
+                  <td>
+                    <BilingualText text={row.color} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="schedule-table-card days-view__details-card">
+        <h3 className="schedule-table-card__title">
+          <BilingualText text={UI.number} />
+        </h3>
+        <div className="sheet-table-wrap">
+          <table className="sheet-table days-table patchi-details-table">
+            <thead>
+              <tr>
+                <th>
+                  <BilingualText text={UI.patchi} />
+                </th>
+                <th>
+                  <BilingualText text={UI.number} />
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {PATCHI_DETAILS_TABLE.map((row) => (
+                <tr key={`number-${row.patchi}`}>
+                  <td>
+                    <PatchiCell bird={row.patchi} />
+                  </td>
+                  <td>{row.number}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="schedule-table-card days-view__details-card">
+        <h3 className="schedule-table-card__title">
+          <BilingualText text={UI.direction} />
+        </h3>
+        <div className="sheet-table-wrap">
+          <table className="sheet-table days-table patchi-details-table">
+            <thead>
+              <tr>
+                <th>
+                  <BilingualText text={UI.patchi} />
+                </th>
+                <th>
+                  <BilingualText text={UI.direction} />
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {PATCHI_DETAILS_TABLE.map((row) => (
+                <tr key={`direction-${row.patchi}`}>
+                  <td>
+                    <PatchiCell bird={row.patchi} />
+                  </td>
+                  <td>
+                    <BilingualText text={row.direction} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
   );
 }
 
@@ -312,16 +355,16 @@ function PatchiActivitySection() {
         <BilingualText text={UI.patchiActivity} />
       </h3>
       <div className="sheet-table-wrap">
-        <table className="sheet-table days-activity-table">
-          <thead>
-            <tr>
-              {PANCHA_ACTIVITIES.map((activity) => (
-                <th key={activity.ta}>
+        <table className="sheet-table days-activity-table days-activity-table--transposed">
+          <tbody>
+            {PANCHA_ACTIVITIES.map((activity) => (
+              <tr key={activity.ta}>
+                <td>
                   <BilingualText text={activity} />
-                </th>
-              ))}
-            </tr>
-          </thead>
+                </td>
+              </tr>
+            ))}
+          </tbody>
         </table>
       </div>
     </section>
@@ -330,49 +373,71 @@ function PatchiActivitySection() {
 
 function PatchiRelationSection() {
   return (
-    <section className="schedule-table-card days-view__relation-card">
-      <h3 className="schedule-table-card__title">
-        <BilingualText text={UI.patchiRelation} />
-      </h3>
-      <div className="sheet-table-wrap">
-        <table className="sheet-table days-table">
-          <thead>
-            <tr>
-              <th>
-                <BilingualText text={UI.day} />
-              </th>
-              <th>
-                <BilingualText text={UI.patchi} />
-              </th>
-              <th>
-                <BilingualText text={UI.natpu} />
-              </th>
-              <th>
-                <BilingualText text={UI.enemies} />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {PATCHI_ORDER.map((bird) => (
-              <tr key={bird}>
-                <td className="days-table__day">
-                  <BilingualText text={dayForBird(bird)} />
-                </td>
-                <td>
-                  <PatchiCell bird={bird} />
-                </td>
-                <td>
-                  <PatchiListCell birds={PATCHI_NATPU[bird]} />
-                </td>
-                <td>
-                  <PatchiListCell birds={PATCHI_ENEMIES[bird]} />
-                </td>
+    <div className="days-view__relation-tables">
+      <section className="schedule-table-card days-view__relation-card">
+        <h3 className="schedule-table-card__title">
+          <BilingualText text={UI.natpu} />
+        </h3>
+        <div className="sheet-table-wrap">
+          <table className="sheet-table days-table">
+            <thead>
+              <tr>
+                <th>
+                  <BilingualText text={UI.patchi} />
+                </th>
+                <th>
+                  <BilingualText text={UI.natpu} />
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </section>
+            </thead>
+            <tbody>
+              {PATCHI_ORDER.map((bird) => (
+                <tr key={`friend-${bird}`}>
+                  <td>
+                    <PatchiCell bird={bird} />
+                  </td>
+                  <td>
+                    <PatchiListCell birds={PATCHI_NATPU[bird]} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="schedule-table-card days-view__relation-card">
+        <h3 className="schedule-table-card__title">
+          <BilingualText text={UI.enemies} />
+        </h3>
+        <div className="sheet-table-wrap">
+          <table className="sheet-table days-table">
+            <thead>
+              <tr>
+                <th>
+                  <BilingualText text={UI.patchi} />
+                </th>
+                <th>
+                  <BilingualText text={UI.enemies} />
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {PATCHI_ORDER.map((bird) => (
+                <tr key={`enemy-${bird}`}>
+                  <td>
+                    <PatchiCell bird={bird} />
+                  </td>
+                  <td>
+                    <PatchiListCell birds={PATCHI_ENEMIES[bird]} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
   );
 }
 

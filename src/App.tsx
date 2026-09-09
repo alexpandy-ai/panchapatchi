@@ -84,7 +84,7 @@ export default function App() {
                 }
                 onClick={() => setLanguage("ta")}
               >
-                தமிழ்
+                த
               </button>
               <button
                 type="button"
@@ -97,7 +97,7 @@ export default function App() {
                 }
                 onClick={() => setLanguage("en")}
               >
-                English
+                E
               </button>
             </nav>
           </div>
@@ -115,7 +115,9 @@ export default function App() {
         </div>
       </header>
 
-      {activeView !== "schedule" && activeView !== "alternateSchedule" && (
+      {activeView !== "schedule" &&
+        activeView !== "alternateSchedule" &&
+        activeView !== "days" && (
         <DateTimeCard value={selectedDateTime} onChange={setSelectedDateTime} />
       )}
 

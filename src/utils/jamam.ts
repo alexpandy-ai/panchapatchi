@@ -10,12 +10,12 @@ export const FULL_JAMAM_COUNT = 10;
 /** Night jamams continue day numbering: yama 1 → jamam 6, etc. */
 export const NIGHT_JAMAM_OFFSET = 5;
 
-/** First night jamam index (6); previous-jamam row is shown from here through jamam 10. */
+/** First night jamam index (6). */
 export const FIRST_NIGHT_JAMAM_INDEX = NIGHT_JAMAM_OFFSET + 1;
 
-/** Anthara dialog: show previous jamam time row only for jamam 6–10. */
-export function shouldShowPreviousJamamRow(jamamIndex: number): boolean {
-  return jamamIndex >= FIRST_NIGHT_JAMAM_INDEX;
+/** Anthara dialog: previous-jamam time column is not shown (current time only). */
+export function shouldShowPreviousJamamRow(_jamamIndex: number): boolean {
+  return false;
 }
 
 export type PeriodId = "day" | "night";

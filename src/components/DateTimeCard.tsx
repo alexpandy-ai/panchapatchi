@@ -113,7 +113,8 @@ function previewCoordsForSource(
 
 export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
 
-  const { coords, geoCoords, manualCoords, source, locationDisplay, applyLocation } = useLocation();
+  const { coords, geoCoords, manualCoords, source, locationDisplay, applyLocation, requestGeolocation, geoPermission } =
+    useLocation();
   const { language } = useLanguage();
 
   const listId = useId();
@@ -367,9 +368,19 @@ export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
     draftDirtyRef.current = false;
   };
 
+  const handleRefresh = () => {
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    clearPlaceSuggestions();
 
+    const now = new Date();
+    draftDirtyRef.current = false;
+    setDateInput(toDateInputValue(now));
+    setTimeInput(toTimeInputValue(now));
+    onChange(now);
+    requestGeolocation();
+  };
 
-  const submitLabel = source === "manual" ? UI.updateLocation : UI.submitLocation;
+  const locationPermissionOn = geoPermission === "granted" || source === "geolocation";
 
   const { sunrise } = getDayCycleBounds(value, coords);
 
@@ -680,23 +691,53 @@ export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
 
 
 
-        <button
+        <div className="datetime-card__actions">
+          <button
+            type="button"
+            className={[
+              "datetime-card__permission",
+              locationPermissionOn
+                ? "datetime-card__permission--on"
+                : "datetime-card__permission--off",
+            ].join(" ")}
+            onClick={() => requestGeolocation()}
+            aria-label={pickBilingual(
+              locationPermissionOn ? UI.locationPermissionOn : UI.locationPermissionOff,
+              language,
+            )}
+            title={pickBilingual(
+              locationPermissionOn ? UI.locationPermissionOn : UI.locationPermissionOff,
+              language,
+            )}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" className="datetime-card__permission-icon">
+              <path
+                d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z"
+                fill="currentColor"
+              />
+            </svg>
+          </button>
 
-          type="button"
+          <button
+            type="button"
+            className="datetime-card__refresh"
+            onClick={handleRefresh}
+            aria-label={pickBilingual(UI.refreshDefaults, language)}
+          >
+            <BilingualText text={UI.refreshDefaults} />
+          </button>
 
-          className="datetime-card__submit"
-
-          onClick={() => {
-            void handleSubmit();
-          }}
-
-          aria-label={pickBilingual(submitLabel, language)}
-
-        >
-
-          <BilingualText text={submitLabel} />
-
-        </button>
+          <button
+            type="button"
+            className="datetime-card__submit"
+            onClick={() => {
+              void handleSubmit();
+            }}
+            aria-label={pickBilingual(UI.submitLocation, language)}
+          >
+            <BilingualText text={UI.submitLocation} />
+          </button>
+        </div>
 
       </div>
 
