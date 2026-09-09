@@ -8,18 +8,16 @@ import { DaysView } from "./components/DaysView";
 import { FindPatchiView } from "./components/FindPatchiView";
 import { PatchiStatusView } from "./components/PatchiStatusView";
 import { TimeTableView } from "./components/TimeTableView";
-import { PATCHI_ORDER, UI } from "./utils/bilingual";
+import { UI } from "./utils/bilingual";
 import type { PakshaData } from "./types";
 import "./index.css";
 
 type SheetTab = "valarpirai" | "theipirai";
-type PatchiName = (typeof PATCHI_ORDER)[number];
 
 export default function App() {
   const { language, setLanguage } = useLanguage();
   const { view: activeView, setView: setActiveView } = useNavigation();
   const [selectedDateTime, setSelectedDateTime] = useState(() => new Date());
-  const [athikaraPatchi, setAthikaraPatchi] = useState<PatchiName>(PATCHI_ORDER[0]);
   const [data, setData] = useState<Record<SheetTab, PakshaData | null>>({
     valarpirai: null,
     theipirai: null,
@@ -152,11 +150,7 @@ export default function App() {
         )}
 
         {!loading && !error && activeView === "find" && (
-          <FindPatchiView
-            data={data}
-            selectedDateTime={selectedDateTime}
-            highlightPatchi={athikaraPatchi}
-          />
+          <FindPatchiView data={data} selectedDateTime={selectedDateTime} />
         )}
 
         {!loading && !error && activeView === "schedule" && (
