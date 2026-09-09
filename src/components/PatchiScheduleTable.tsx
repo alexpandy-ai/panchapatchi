@@ -31,6 +31,7 @@ import {
   getAlternateNightActivity,
   getAlternateNightBirdForActivity,
   getAlternateJamamActivitySlots,
+  getNextPanchaWeekday,
   ALTERNATE_ANTHARA_SEGMENT_COUNT,
   ALTERNATE_NIGHT_ACTIVITY_TA,
 } from "../utils/alternateCalculation";
@@ -245,6 +246,16 @@ function AlternatePakshaScheduleView({
   const appendNightJamamRows =
     antharaSelection?.period === "day" && alternatePakshaSupportsNight(pakshaId);
 
+  const nextWeekday =
+    antharaSelection?.period === "night" && antharaSelection
+      ? getNextPanchaWeekday(antharaSelection.weekday)
+      : null;
+
+  const appendNextDayMorningJamamRows =
+    antharaSelection?.period === "night" &&
+    alternatePakshaSupportsNight(pakshaId) &&
+    nextWeekday != null;
+
   return (
     <>
       {selectedPatchi === "all" ? (
@@ -284,7 +295,13 @@ function AlternatePakshaScheduleView({
           matrixOptions={
             appendNightJamamRows
               ? { appendNightJamamRows: true, allJamamSlots }
-              : undefined
+              : appendNextDayMorningJamamRows && nextWeekday != null
+                ? {
+                    appendNextDayMorningJamamRows: true,
+                    getMorningJamamActivitySlots: (yama) =>
+                      getAlternateJamamActivitySlots(pakshaId, nextWeekday, yama, "day"),
+                  }
+                : undefined
           }
         />
       ) : null}
@@ -316,11 +333,6 @@ function AlternatePakshaDayNightTables({
     weekday: ALTERNATE_WEEKDAY_ORDER[0],
     period: "day",
   });
-
-  const activeDayLabel = useMemo(() => {
-    const groupKey = getAlternateGroupKey(pakshaId, activeSection.weekday);
-    return groupKey ? getPakshaGroupDayBilingual(pakshaId, groupKey) : UI.day;
-  }, [activeSection.weekday, pakshaId]);
 
   const activePeriodHeader = periodAthikaraPatchiHeader(activeSection.period);
 
@@ -395,12 +407,6 @@ function AlternatePakshaDayNightTables({
                 <BilingualText text={UI.patchiActivity} />
               </th>
               <th colSpan={jamamColumnCount} className="alternate-all-chip-table__jamam-group-header">
-                <span className="alternate-all-chip-table__active-day">
-                  <BilingualText text={activeDayLabel} />
-                </span>
-                <span className="alternate-all-chip-table__header-sep" aria-hidden="true">
-                  ·
-                </span>
                 <span className="alternate-all-chip-table__active-period">
                   <BilingualText text={activePeriodHeader.period} />
                 </span>
@@ -459,6 +465,12 @@ function AlternatePakshaDayNightTables({
                       scope="row"
                       className="alternate-all-chip-table__period-label alternate-valarpirai-day-table__activity"
                     >
+                      <span className="alternate-all-chip-table__active-day">
+                        <BilingualText text={getPakshaGroupDayBilingual(pakshaId, groupKey)} />
+                      </span>
+                      <span className="alternate-all-chip-table__header-sep" aria-hidden="true">
+                        ·
+                      </span>
                       <BilingualText text={periodAthikaraPatchiHeader("day").period} />
                     </th>
                     {schedule.jamamColumns.map((column) => (

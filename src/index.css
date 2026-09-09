@@ -1422,6 +1422,10 @@ body {
   background: color-mix(in srgb, var(--border) 35%, transparent);
 }
 
+.alternate-all-chip-table__period-label .alternate-all-chip-table__active-day {
+  display: inline;
+}
+
 .alternate-all-chip-table__jamam-header {
   text-align: center;
   font-weight: 600;

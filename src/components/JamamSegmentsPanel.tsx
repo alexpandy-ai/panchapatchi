@@ -92,6 +92,7 @@ export function JamamSegmentsPanel({
       previousJamamSlot.index,
       segmentCount,
       matrixOptions?.appendNightJamamRows,
+      matrixOptions?.appendNextDayMorningJamamRows,
     );
     return getAntharaSegmentColumns(
       previousJamamSlot.start,

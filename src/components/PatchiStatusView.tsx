@@ -46,7 +46,10 @@ import {
 import {
   getAlternateJamamActivitySlots,
   getAlternatePatchiJamamActivityForWeekday,
+  getNextPanchaWeekday,
 } from "../utils/alternateCalculation";
+
+import { getDayGroupKey, getPanchaDisplayWeekday } from "../utils/dayGroup";
 
 import { derivePatchiStatusFromSchedule } from "../utils/patchi";
 
@@ -204,6 +207,20 @@ export function PatchiStatusView({
     [paksha, derived.athikaraGroupKey],
   );
 
+  const nextScheduleWeekday = useMemo(
+    () =>
+      getNextPanchaWeekday(
+        isHome ? thithiScheduleWeekday : getPanchaDisplayWeekday(weekday),
+      ),
+    [isHome, thithiScheduleWeekday, weekday],
+  );
+
+  const nextDayGroup = useMemo(() => {
+    if (!paksha || nextScheduleWeekday == null) return null;
+    const nextGroupKey = getDayGroupKey(nextScheduleWeekday);
+    return paksha.groups.find((group) => group.key === nextGroupKey) ?? null;
+  }, [nextScheduleWeekday, paksha]);
+
   const antharaDialogProps = useMemo(() => {
     if (isHome) {
       if (antharaDialogTarget !== "current" || !activeSlot) return null;
@@ -219,7 +236,7 @@ export function PatchiStatusView({
           activeSlot.start,
           activeSlot.end,
           selectedDateTime,
-          jamam.period === "night"
+          jamam.period === "night" && nextScheduleWeekday == null
             ? ANTHARA_NIGHT_SEGMENT_COUNT
             : JAMAM_ANTHARA_SEGMENT_COUNT,
         ),
@@ -244,7 +261,7 @@ export function PatchiStatusView({
           activeSlot.start,
           activeSlot.end,
           selectedDateTime,
-          jamam.period === "night"
+          jamam.period === "night" && nextScheduleWeekday == null
             ? ANTHARA_NIGHT_SEGMENT_COUNT
             : JAMAM_ANTHARA_SEGMENT_COUNT,
         ),
@@ -279,6 +296,8 @@ export function PatchiStatusView({
     isHome,
     jamam.period,
     myPatchi,
+    nextDayGroup,
+    nextScheduleWeekday,
     nextSlot,
     pakshaId,
     selectedDateTime,
@@ -516,15 +535,32 @@ export function PatchiStatusView({
           jamamSlots={jamam.slots}
           cycleStart={cycleStart}
           segmentCount={
-            yamaFromJamamIndex(antharaDialogProps.jamamSlot.index).period === "night"
+            yamaFromJamamIndex(antharaDialogProps.jamamSlot.index).period === "night" &&
+            nextScheduleWeekday == null
               ? ANTHARA_NIGHT_SEGMENT_COUNT
               : ANTHARA_DAY_SEGMENT_COUNT
           }
-          matrixOptions={
-            yamaFromJamamIndex(antharaDialogProps.jamamSlot.index).period === "day"
-              ? { appendNightJamamRows: true, allJamamSlots: jamam.slots }
-              : undefined
-          }
+          matrixOptions={(() => {
+            const { period } = yamaFromJamamIndex(antharaDialogProps.jamamSlot.index);
+            if (period === "day") {
+              return { appendNightJamamRows: true, allJamamSlots: jamam.slots };
+            }
+            if (period === "night" && nextScheduleWeekday != null) {
+              return {
+                appendNextDayMorningJamamRows: true,
+                getMorningJamamActivitySlots: (yama: number) =>
+                  isHome
+                    ? getAlternateJamamActivitySlots(
+                        pakshaId as "valarpirai" | "theipirai",
+                        nextScheduleWeekday,
+                        yama,
+                        "day",
+                      )
+                    : (nextDayGroup?.yamas.find((row) => row.yama === yama)?.day ?? []),
+              };
+            }
+            return undefined;
+          })()}
         />
       ) : null}
 
