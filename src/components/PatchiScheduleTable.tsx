@@ -31,7 +31,6 @@ import {
   getAlternateNightActivity,
   getAlternateNightBirdForActivity,
   getAlternateJamamActivitySlots,
-  getNextPanchaWeekday,
   ALTERNATE_ANTHARA_SEGMENT_COUNT,
   ALTERNATE_NIGHT_ACTIVITY_TA,
 } from "../utils/alternateCalculation";
@@ -48,6 +47,11 @@ import {
   type Bilingual,
 } from "../utils/bilingual";
 import type { PakshaId } from "../utils/paksha";
+import {
+  getNextThithiPatchiEntryAfterWeekday,
+  getNextThithiPatchiEntryForDate,
+  getThithiPatchiEntryForDate,
+} from "../utils/thithi";
 
 const SHEET_TABS: { id: PakshaId; label: (typeof PAKSHA_BI)[PakshaId] }[] = [
   { id: "valarpirai", label: PAKSHA_BI.valarpirai },
@@ -63,6 +67,22 @@ interface PatchiScheduleTableProps {
   onSelectPatchi: (patchi: PatchiSelection) => void;
   subtitle?: Bilingual;
   alternateCalculation?: boolean;
+  selectedDateTime?: Date;
+}
+
+/** Next morning day schedule from Thithi Patchi (current date when it matches the day column). */
+function resolveNextThithiMorningSchedule(
+  pakshaId: "valarpirai" | "theipirai",
+  weekday: number,
+  selectedDateTime?: Date,
+) {
+  if (selectedDateTime) {
+    const todayEntry = getThithiPatchiEntryForDate(selectedDateTime, pakshaId);
+    if (todayEntry.weekday === weekday) {
+      return getNextThithiPatchiEntryForDate(selectedDateTime, pakshaId);
+    }
+  }
+  return getNextThithiPatchiEntryAfterWeekday(pakshaId, weekday);
 }
 
 interface AlternateAntharaSelection {
@@ -98,6 +118,7 @@ export function PatchiScheduleTable({
   onSelectPatchi,
   subtitle,
   alternateCalculation = false,
+  selectedDateTime,
 }: PatchiScheduleTableProps) {
   const activeBundle = bundle ?? allBundles?.[0]?.bundle ?? null;
   const { paksha: activePaksha, setPaksha: setActivePaksha } = useNavigation();
@@ -177,6 +198,7 @@ export function PatchiScheduleTable({
             schedule={alternatePakshaSchedule}
             pakshaId={activePaksha}
             selectedPatchi={selectedPatchi}
+            selectedDateTime={selectedDateTime}
           />
         </div>
       ) : (
@@ -222,10 +244,12 @@ function AlternatePakshaScheduleView({
   schedule,
   pakshaId,
   selectedPatchi,
+  selectedDateTime,
 }: {
   schedule: PatchiSchedule;
   pakshaId: "valarpirai" | "theipirai";
   selectedPatchi: PatchiSelection;
+  selectedDateTime?: Date;
 }) {
   const { coords } = useLocation();
   const [antharaSelection, setAntharaSelection] = useState<AlternateAntharaSelection | null>(
@@ -246,15 +270,19 @@ function AlternatePakshaScheduleView({
   const appendNightJamamRows =
     antharaSelection?.period === "day" && alternatePakshaSupportsNight(pakshaId);
 
-  const nextWeekday =
+  const nextThithiMorning =
     antharaSelection?.period === "night" && antharaSelection
-      ? getNextPanchaWeekday(antharaSelection.weekday)
+      ? resolveNextThithiMorningSchedule(
+          pakshaId,
+          antharaSelection.weekday,
+          selectedDateTime,
+        )
       : null;
 
   const appendNextDayMorningJamamRows =
     antharaSelection?.period === "night" &&
     alternatePakshaSupportsNight(pakshaId) &&
-    nextWeekday != null;
+    nextThithiMorning != null;
 
   return (
     <>
@@ -295,11 +323,16 @@ function AlternatePakshaScheduleView({
           matrixOptions={
             appendNightJamamRows
               ? { appendNightJamamRows: true, allJamamSlots }
-              : appendNextDayMorningJamamRows && nextWeekday != null
+              : appendNextDayMorningJamamRows && nextThithiMorning != null
                 ? {
                     appendNextDayMorningJamamRows: true,
                     getMorningJamamActivitySlots: (yama) =>
-                      getAlternateJamamActivitySlots(pakshaId, nextWeekday, yama, "day"),
+                      getAlternateJamamActivitySlots(
+                        nextThithiMorning.pakshaId,
+                        nextThithiMorning.weekday,
+                        yama,
+                        "day",
+                      ),
                   }
                 : undefined
           }

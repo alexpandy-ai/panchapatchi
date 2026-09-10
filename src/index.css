@@ -991,6 +991,60 @@ body {
   left: 3.5rem;
 }
 
+.jamam-segments-table--home-compact.jamam-segments-table--matrix:not(.jamam-segments-table--matrix-with-previous)
+  .jamam-segments-table__segment-time-col {
+  left: 0;
+  width: 8.75rem;
+}
+
+.jamam-segments-table--home-compact thead .jamam-segments-table__segment-time-col,
+.jamam-segments-table--home-compact thead .jamam-segments-table__patchi-col {
+  background: var(--bg-card);
+}
+
+/* Home anthara: match home page text scale, tighter horizontal cell padding */
+.jamam-segments-table--home-compact {
+  font-size: 0.95rem;
+  line-height: 1.25;
+}
+
+.jamam-segments-table--home-compact th,
+.jamam-segments-table--home-compact td {
+  padding: 0.28rem 0.12rem;
+}
+
+.jamam-segments-table--home-compact th {
+  font-size: 0.9rem;
+  line-height: 1.2;
+  padding: 0.3rem 0.12rem;
+}
+
+.jamam-segments-table--home-compact .jamam-segments-table__jamam-time {
+  font-size: 0.92rem;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.jamam-segments-table--home-compact .inline-emoji-label {
+  font-size: 0.95rem;
+  gap: 0.2rem;
+}
+
+.jamam-segments-table--home-compact .inline-emoji-label__text,
+.jamam-segments-table--home-compact .inline-emoji-label__text .bi-ta {
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.jamam-segments-table--home-compact .bi-en {
+  font-size: 0.78em;
+}
+
+.jamam-segments-table--home-compact.jamam-segments-table--matrix tbody .jamam-segments-table__segment-time-col {
+  font-size: 0.92rem;
+}
+
 .jamam-segments-table--matrix-with-previous .jamam-segments-table__segment-time-col {
   left: 7.75rem;
 }
@@ -2067,57 +2121,98 @@ body {
 }
 
 .days-view__thithi-sections {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 1.25rem;
 }
 
-.days-view__relation-tables {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
+@media (min-width: 720px) {
+  .days-view__thithi-sections {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
 }
 
+.days-view__two-col-tables,
+.days-view__relation-tables,
 .days-view__details-tables {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 1.25rem;
 }
 
-.thithi-patchi-table {
-  min-width: 0;
-  max-width: 52rem;
-  margin: 0 auto;
+@media (min-width: 720px) {
+  .days-view__two-col-tables {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+
+  .days-view__details-tables {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .days-view__details-tables > :last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    max-width: calc(50% - 0.625rem);
+  }
 }
 
-.natchathira-patchi-table {
+.days-view .sheet-table,
+.days-view .sheet-table.days-table--two-col {
   min-width: 0;
-  max-width: 52rem;
-  margin: 0 auto;
+  width: 100%;
+  max-width: none;
+  margin: 0;
 }
 
-.natchathira-patchi-table thead th,
-.natchathira-patchi-table tbody td {
-  text-align: center;
+.days-table--two-col th,
+.days-table--two-col td {
   vertical-align: middle;
 }
 
-.natchathira-patchi-table thead th:first-child,
-.natchathira-patchi-table tbody th.days-table__row-label {
-  text-align: left;
-}
-
-.patchi-details-table {
-  min-width: 0;
-  max-width: 42rem;
-  margin: 0 auto;
+.days-table--two-col th:first-child,
+.days-table--two-col td:first-child,
+.days-table--two-col th.days-table__row-label {
+  width: 42%;
+  white-space: nowrap;
 }
 
 .thithi-patchi-table__thithi {
   font-size: 0.88rem;
   line-height: 1.35;
-  text-align: center;
+  text-align: left;
   vertical-align: middle;
+}
+
+.thithi-patchi-table__thithi-list {
+  display: block;
+}
+
+.thithi-patchi-table__meta {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.78em;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.natchathira-patchi-table thead th,
+.natchathira-patchi-table tbody td {
+  text-align: left;
+  vertical-align: middle;
+}
+
+.natchathira-patchi-table__list {
+  text-align: left;
+  line-height: 1.35;
+  white-space: normal;
+}
+
+.days-activity-table__index {
+  width: 3rem;
+  text-align: center;
+  font-weight: 700;
+  color: var(--muted);
 }
 
 .thithi-patchi-table__row--current td {
@@ -2588,17 +2683,29 @@ body {
   min-width: 0;
 }
 
-.context-card--home .context-row--home-athikara .context-inline-item--athikara {
+.context-card--home .context-row--home-padu {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  padding-top: 0.1rem;
+}
+
+.context-card--home .context-row--home-athikara .context-inline-item--athikara,
+.context-card--home .context-row--home-padu .context-inline-item--padu {
   flex: 0 1 auto;
   min-width: 0;
   align-items: center;
 }
 
-.context-card--home .context-row--home-athikara .context-label--athikara {
+.context-card--home .context-row--home-athikara .context-label--athikara,
+.context-card--home .context-row--home-padu .context-label--padu {
   display: inline;
 }
 
-.context-card--home .context-value--home-athikara {
+.context-card--home .context-value--home-athikara,
+.context-card--home .context-value--home-padu {
   font-size: 1.05rem;
   font-weight: 700;
   color: var(--accent);
@@ -2606,7 +2713,8 @@ body {
   white-space: nowrap;
 }
 
-.context-card--home .context-value--home-athikara .bi-ta {
+.context-card--home .context-value--home-athikara .bi-ta,
+.context-card--home .context-value--home-padu .bi-ta {
   font-weight: 700;
 }
 
@@ -2653,7 +2761,8 @@ body {
 }
 
 @media (max-width: 640px) {
-  .context-card--home .context-value--home-athikara {
+  .context-card--home .context-value--home-athikara,
+  .context-card--home .context-value--home-padu {
     font-size: 0.95rem;
   }
 
@@ -2973,6 +3082,10 @@ body {
   background: rgba(0, 0, 0, 0.45);
 }
 
+.naal-dialog-overlay {
+  z-index: 220;
+}
+
 .anthara-dialog {
   max-width: min(100%, 56rem);
   max-height: min(90vh, 100%);
@@ -2981,6 +3094,40 @@ body {
   border-radius: 0.75rem;
   background: var(--bg-card);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.22);
+}
+
+.naal-dialog {
+  max-width: min(100%, 28rem);
+}
+
+.naal-dialog--all-birds {
+  max-width: min(100%, 56rem);
+}
+
+.naal-dialog--with-next-day {
+  max-width: min(100%, 56rem);
+}
+
+.jamam-segments-table__activity-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: 0;
+  padding: 0.1rem 0.15rem;
+  border: none;
+  border-radius: 0.35rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  cursor: pointer;
+}
+
+.jamam-segments-table__activity-btn:hover,
+.jamam-segments-table__activity-btn:focus-visible {
+  background: color-mix(in srgb, var(--accent, #b45309) 14%, transparent);
+  outline: none;
 }
 
 /* Anthara dialog — mobile: fit viewport, wrap headers, no horizontal scroll */
@@ -3177,6 +3324,68 @@ body {
     line-height: 1.05;
     -webkit-line-clamp: 2;
   }
+
+  /* Home compact anthara — keep home-scale text on mobile */
+  .anthara-dialog .jamam-segments-table--home-compact {
+    font-size: 0.95rem;
+    line-height: 1.25;
+  }
+
+  .anthara-dialog .jamam-segments-table--home-compact th,
+  .anthara-dialog .jamam-segments-table--home-compact td {
+    padding: 0.26rem 0.08rem;
+  }
+
+  .anthara-dialog .jamam-segments-table--home-compact th {
+    font-size: 0.88rem;
+    padding: 0.28rem 0.08rem;
+  }
+
+  .anthara-dialog .jamam-segments-table--home-compact .jamam-segments-table__jamam-time {
+    font-size: 0.9rem;
+    white-space: nowrap;
+    word-break: normal;
+    line-height: 1.25;
+  }
+
+  .anthara-dialog:has(.jamam-segments-table--home-compact) .jamam-segments-panel__title {
+    font-size: 0.92rem;
+    white-space: normal;
+  }
+
+  .anthara-dialog:has(.jamam-segments-table--home-compact) .jamam-segments-panel__close {
+    font-size: 0.78rem;
+    padding: 0.2rem 0.45rem;
+  }
+
+  .anthara-dialog
+    .jamam-segments-table--home-compact.jamam-segments-table--matrix:not(
+      .jamam-segments-table--matrix-with-previous
+    )
+    .jamam-segments-table__col-segment-time {
+    width: 52%;
+  }
+
+  .anthara-dialog
+    .jamam-segments-table--home-compact.jamam-segments-table--matrix:not(
+      .jamam-segments-table--matrix-with-previous
+    )
+    .jamam-segments-table__col-patchi {
+    width: 48%;
+  }
+
+  .anthara-dialog .jamam-segments-table--home-compact .inline-emoji-label {
+    flex-direction: row;
+    gap: 0.2rem;
+    font-size: 0.95rem;
+  }
+
+  .anthara-dialog .jamam-segments-table--home-compact.jamam-segments-table--matrix tbody .inline-emoji-label__text {
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.2;
+    -webkit-line-clamp: unset;
+  }
 }
 
 @media (max-width: 480px) {
@@ -3238,6 +3447,44 @@ body {
 
   .anthara-dialog .jamam-segments-table__jamam-time {
     font-size: 0.48rem;
+  }
+
+  .anthara-dialog .jamam-segments-table--home-compact {
+    font-size: 0.92rem;
+  }
+
+  .anthara-dialog .jamam-segments-table--home-compact th {
+    font-size: 0.85rem;
+    padding: 0.24rem 0.06rem;
+  }
+
+  .anthara-dialog .jamam-segments-table--home-compact th,
+  .anthara-dialog .jamam-segments-table--home-compact td {
+    padding: 0.24rem 0.06rem;
+  }
+
+  .anthara-dialog .jamam-segments-table--home-compact .jamam-segments-table__jamam-time {
+    font-size: 0.88rem;
+  }
+
+  .anthara-dialog
+    .jamam-segments-table--home-compact.jamam-segments-table--matrix:not(
+      .jamam-segments-table--matrix-with-previous
+    )
+    .jamam-segments-table__col-segment-time {
+    width: 54%;
+  }
+
+  .anthara-dialog
+    .jamam-segments-table--home-compact.jamam-segments-table--matrix:not(
+      .jamam-segments-table--matrix-with-previous
+    )
+    .jamam-segments-table__col-patchi {
+    width: 46%;
+  }
+
+  .anthara-dialog .jamam-segments-table--home-compact.jamam-segments-table--matrix tbody .inline-emoji-label__text {
+    font-size: 0.92rem;
   }
 }
 

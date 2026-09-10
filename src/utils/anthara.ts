@@ -27,7 +27,7 @@ export const NIGHT_JAMAM_SCHEDULE_END = 10;
 /** Birds cycle in Pancha display order (same as Others / Know Patchi). */
 const ANTHARA_BIRD_ORDER = PATCHI_ORDER;
 
-/** Day: Pancha order; night: jamam sheet order — used for all anthara patchi views. */
+  /** Day uses Pancha order; night uses jamam sheet / alternate night cycle order. */
 function antharaThozhilCycleOrder(period: PeriodId): readonly string[] {
   return period === "day" ? PANCHA_ACTIVITY_TA : JAMAM_ACTIVITY_TA;
 }
@@ -202,8 +202,10 @@ export interface PatchiAntharaColumn {
   segmentIndex: number;
   startTime: Date;
   startTimeLabel: string;
-  /** Appended night jamam rows (6–10) — shown in the Antharam column. */
+  /** Appended schedule jamam row — night 6–10 or next-morning 1–5. */
   jamamIndex?: number;
+  /** Appended next-day morning jamam (label as morning, not night 6–10). */
+  appendedMorning?: boolean;
 }
 
 export interface PatchiAntharaMatrixOptions {
@@ -252,16 +254,11 @@ function getPatchiJamamActivity(
   return match ? displayActivity(match.activity) : "—";
 }
 
-function morningJamamIndexToYama(jamamIndex: number): number {
-  return jamamIndex - NIGHT_JAMAM_SCHEDULE_START + 1;
-}
-
 function getMorningPatchiJamamActivity(
   getMorningJamamActivitySlots: (yama: number) => ActivitySlot[],
-  jamamIndex: number,
+  yama: number,
   patchi: (typeof PATCHI_ORDER)[number],
 ): string {
-  const yama = morningJamamIndexToYama(jamamIndex);
   if (yama < 1 || yama > 5) return "—";
   const slots = getMorningJamamActivitySlots(yama);
   const match = slots.find((entry) => patchiBaseName(entry.bird) === patchi);
@@ -295,7 +292,7 @@ function buildDayAntharaColumnsWithNightJamamRows(
   });
 }
 
-/** Night click: ten equal time parts; rows 6–10 carry next-day morning jamam activities. */
+/** Night click: ten equal time parts; rows 6–10 carry next-day morning jamams 1–5. */
 function buildNightAntharaColumnsWithNextDayMorningRows(
   jamamStart: Date,
   jamamEnd: Date,
@@ -308,9 +305,8 @@ function buildNightAntharaColumnsWithNextDayMorningRows(
 
   return columns.map((column, index) => {
     if (index >= ANTHARA_DAY_SEGMENT_COUNT) {
-      const jamamIndex =
-        NIGHT_JAMAM_SCHEDULE_START + (index - ANTHARA_DAY_SEGMENT_COUNT);
-      return { ...column, jamamIndex };
+      const yama = index - ANTHARA_DAY_SEGMENT_COUNT + 1;
+      return { ...column, jamamIndex: yama, appendedMorning: true };
     }
     return column;
   });
@@ -326,12 +322,13 @@ export function antharaSegmentCountForJamam(
   const { period } = yamaFromJamamIndex(jamamIndex);
   if (period === "night") {
     if (appendNextDayMorningJamamRows) {
-      return segmentCount ?? ANTHARA_DAY_SEGMENT_COUNT;
+      return JAMAM_ANTHARA_SEGMENT_COUNT;
     }
-    return segmentCount ?? ANTHARA_NIGHT_SEGMENT_COUNT;
+    // Night-only: five anthara parts — never a 10-row cycle that looks like jamam 6–10.
+    return ANTHARA_NIGHT_SEGMENT_COUNT;
   }
   if (appendNightJamamRows) {
-    return segmentCount ?? ANTHARA_DAY_SEGMENT_COUNT;
+    return JAMAM_ANTHARA_SEGMENT_COUNT;
   }
   return segmentCount ?? JAMAM_ANTHARA_SEGMENT_COUNT;
 }
@@ -436,4 +433,35 @@ export function antharaDialogTitle(
     `அந்தர பட்சி · ஜாமம் ${jamamIndex} · ${patchiBi.ta} · ${thozhilBi.ta}`,
     `Anthara Patchi · Jamam ${jamamIndex} · ${patchiBi.en} · ${thozhilBi.en}`,
   );
+}
+
+/** Start/end of one anthara segment column within a jamam window. */
+export function antharaSegmentWindow(
+  columns: PatchiAntharaColumn[],
+  segmentIndex: number,
+  jamamEnd: Date,
+): { start: Date; end: Date } {
+  const start = columns[segmentIndex]?.startTime ?? jamamEnd;
+  const next = columns[segmentIndex + 1];
+  const end = next ? next.startTime : jamamEnd;
+  return { start, end };
+}
+
+/** Dialog title: Naal · Antharam N · patchi · activity (single bird). */
+export function naalDialogTitle(
+  antharaSerial: number,
+  patchi: string,
+  activity: string,
+): Bilingual {
+  const patchiBi = patchiLabelBilingual(patchi);
+  const activityBi = activityBilingual(displayActivity(activity));
+  return bi(
+    `நாள் · அந்தரம் ${antharaSerial} · ${patchiBi.ta} · ${activityBi.ta}`,
+    `Naal · Antharam ${antharaSerial} · ${patchiBi.en} · ${activityBi.en}`,
+  );
+}
+
+/** Dialog title: Naal · Antharam N (all birds). */
+export function naalAllBirdsDialogTitle(antharaSerial: number): Bilingual {
+  return bi(`நாள் · அந்தரம் ${antharaSerial}`, `Naal · Antharam ${antharaSerial}`);
 }

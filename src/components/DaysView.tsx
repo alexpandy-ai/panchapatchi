@@ -17,7 +17,6 @@ import {
 import { PATCHI_DETAILS_TABLE } from "../utils/patchiDetails";
 import {
   NATCHATHIRA_PATCHI_COLUMNS,
-  NATCHATHIRA_PATCHI_ROW_COUNT,
 } from "../utils/natchathiraPatchi";
 import {
   THITHI_PATCHI_BY_PAKSHA,
@@ -56,49 +55,71 @@ function PatchiListCell({ birds }: { birds: readonly string[] }) {
 
 function PatchiDaysSection() {
   return (
-    <section className="schedule-table-card days-view__patchi-days-card">
-      <h3 className="schedule-table-card__title">
-        <BilingualText text={UI.patchiDays} />
-      </h3>
-      <div className="sheet-table-wrap">
-        <table className="sheet-table days-table">
-          <thead>
-            <tr>
-              <th>
-                <BilingualText text={UI.planets} />
-              </th>
-              <th>
-                <BilingualText text={UI.day} />
-              </th>
-              <th>
-                <BilingualText text={UI.valarpiraiPatchi} />
-              </th>
-              <th>
-                <BilingualText text={UI.theipiraiPatchi} />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {PATCHI_DAYS_TABLE.map((row) => (
-              <tr key={row.planet.en}>
-                <td>
-                  <BilingualText text={row.planet} />
-                </td>
-                <td className="days-table__day">
-                  <BilingualText text={row.day} />
-                </td>
-                <td>
-                  <PatchiCell bird={row.valarpiraiPatchi} />
-                </td>
-                <td>
-                  <PatchiCell bird={row.theipiraiPatchi} />
-                </td>
+    <div className="days-view__two-col-tables">
+      <section className="schedule-table-card days-view__patchi-days-card">
+        <h3 className="schedule-table-card__title">
+          <BilingualText text={UI.valarpiraiPatchi} />
+        </h3>
+        <div className="sheet-table-wrap">
+          <table className="sheet-table days-table days-table--two-col">
+            <thead>
+              <tr>
+                <th>
+                  <BilingualText text={UI.day} />
+                </th>
+                <th>
+                  <BilingualText text={UI.patchi} />
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </section>
+            </thead>
+            <tbody>
+              {PATCHI_DAYS_TABLE.map((row) => (
+                <tr key={`valar-${row.planet.en}`}>
+                  <td className="days-table__day">
+                    <BilingualText text={row.day} />
+                  </td>
+                  <td>
+                    <PatchiCell bird={row.valarpiraiPatchi} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="schedule-table-card days-view__patchi-days-card">
+        <h3 className="schedule-table-card__title">
+          <BilingualText text={UI.theipiraiPatchi} />
+        </h3>
+        <div className="sheet-table-wrap">
+          <table className="sheet-table days-table days-table--two-col">
+            <thead>
+              <tr>
+                <th>
+                  <BilingualText text={UI.day} />
+                </th>
+                <th>
+                  <BilingualText text={UI.patchi} />
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {PATCHI_DAYS_TABLE.map((row) => (
+                <tr key={`thei-${row.planet.en}`}>
+                  <td className="days-table__day">
+                    <BilingualText text={row.day} />
+                  </td>
+                  <td>
+                    <PatchiCell bird={row.theipiraiPatchi} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
   );
 }
 
@@ -115,7 +136,6 @@ function ThithiPakshaTable({
 }) {
   const currentThithi = getCurrentThithiPosition(selectedDateTime);
   const highlightPaksha = currentThithi.pakshaId === pakshaId;
-  const groupHighlightClass = "thithi-patchi-table__cell--current";
 
   return (
     <section className="schedule-table-card days-view__thithi-patchi-card">
@@ -123,17 +143,11 @@ function ThithiPakshaTable({
         <BilingualText text={title} />
       </h3>
       <div className="sheet-table-wrap">
-        <table className="sheet-table days-table thithi-patchi-table">
+        <table className="sheet-table days-table days-table--two-col thithi-patchi-table">
           <thead>
             <tr>
-              <th colSpan={3}>
+              <th>
                 <BilingualText text={UI.thithi} />
-              </th>
-              <th>
-                <BilingualText text={UI.planet} />
-              </th>
-              <th>
-                <BilingualText text={UI.day} />
               </th>
               <th>
                 <BilingualText text={UI.athikaraPatchi} />
@@ -143,38 +157,52 @@ function ThithiPakshaTable({
           <tbody>
             {groups.map((group, groupIndex) => {
               const isGroupCurrent = highlightPaksha && currentThithi.groupIndex === groupIndex;
-              const sharedCellClass = isGroupCurrent ? groupHighlightClass : undefined;
 
               return (
                 <tr
                   key={`${pakshaId}-${group.thithis[0].en}`}
                   className={isGroupCurrent ? "thithi-patchi-table__row--current" : undefined}
                 >
-                  {group.thithis.map((thithi, thithiIndex) => {
-                    const isCurrent =
-                      highlightPaksha &&
-                      isCurrentThithiRow(selectedDateTime, groupIndex, thithiIndex);
+                  <td
+                    className={
+                      isGroupCurrent
+                        ? "thithi-patchi-table__thithi thithi-patchi-table__cell--current"
+                        : "thithi-patchi-table__thithi"
+                    }
+                  >
+                    <span className="thithi-patchi-table__thithi-list">
+                      {group.thithis.map((thithi, thithiIndex) => {
+                        const isCurrent =
+                          highlightPaksha &&
+                          isCurrentThithiRow(selectedDateTime, groupIndex, thithiIndex);
 
-                    return (
-                      <td
-                        key={thithi.en}
-                        className={
-                          isCurrent
-                            ? "thithi-patchi-table__thithi thithi-patchi-table__thithi-item--current"
-                            : "thithi-patchi-table__thithi"
-                        }
-                      >
-                        <BilingualText text={thithi} />
-                      </td>
-                    );
-                  })}
-                  <td className={sharedCellClass}>
-                    <BilingualText text={group.planet} />
+                        return (
+                          <Fragment key={thithi.en}>
+                            {thithiIndex > 0 ? (
+                              <span className="thithi-patchi-table__thithi-sep" aria-hidden="true">
+                                {" · "}
+                              </span>
+                            ) : null}
+                            <span
+                              className={
+                                isCurrent
+                                  ? "thithi-patchi-table__thithi-item thithi-patchi-table__thithi-item--current"
+                                  : "thithi-patchi-table__thithi-item"
+                              }
+                            >
+                              <BilingualText text={thithi} />
+                            </span>
+                          </Fragment>
+                        );
+                      })}
+                    </span>
+                    <span className="thithi-patchi-table__meta">
+                      <BilingualText text={group.planet} block={false} />
+                      <span aria-hidden="true"> · </span>
+                      <BilingualText text={getThithiPlanetDay(group.planet)} block={false} />
+                    </span>
                   </td>
-                  <td className={sharedCellClass}>
-                    <BilingualText text={getThithiPlanetDay(group.planet)} />
-                  </td>
-                  <td className={sharedCellClass}>
+                  <td className={isGroupCurrent ? "thithi-patchi-table__cell--current" : undefined}>
                     <PatchiCell bird={group.patchi} />
                   </td>
                 </tr>
@@ -194,15 +222,15 @@ function NatchathiraPatchiSection() {
         <BilingualText text={UI.natchathiraPatchi} />
       </h3>
       <div className="sheet-table-wrap">
-        <table className="sheet-table days-table natchathira-patchi-table">
+        <table className="sheet-table days-table days-table--two-col natchathira-patchi-table">
           <thead>
             <tr>
               <th>
                 <BilingualText text={UI.patchi} />
               </th>
-              {Array.from({ length: NATCHATHIRA_PATCHI_ROW_COUNT }, (_, index) => (
-                <th key={`natchathira-col-${index}`} aria-hidden="true" />
-              ))}
+              <th>
+                <BilingualText text={UI.natchathira} />
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -211,15 +239,18 @@ function NatchathiraPatchiSection() {
                 <th scope="row" className="days-table__row-label">
                   <PatchiCell bird={column.patchi} />
                 </th>
-                {Array.from({ length: NATCHATHIRA_PATCHI_ROW_COUNT }, (_, rowIndex) => {
-                  const natchathira = column.natchathiras[rowIndex];
-
-                  return (
-                    <td key={`${column.patchi}-${rowIndex}`}>
-                      {natchathira ? <BilingualText text={natchathira} /> : null}
-                    </td>
-                  );
-                })}
+                <td className="natchathira-patchi-table__list">
+                  {column.natchathiras.map((natchathira, index) => (
+                    <Fragment key={natchathira.en}>
+                      {index > 0 ? (
+                        <span className="natchathira-patchi-table__sep" aria-hidden="true">
+                          {", "}
+                        </span>
+                      ) : null}
+                      <BilingualText text={natchathira} block={false} />
+                    </Fragment>
+                  ))}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -250,13 +281,13 @@ function ThithiPatchiSection({ selectedDateTime }: { selectedDateTime: Date }) {
 
 function PatchiDetailsSection() {
   return (
-    <div className="days-view__details-tables">
+    <div className="days-view__two-col-tables days-view__details-tables">
       <section className="schedule-table-card days-view__details-card">
         <h3 className="schedule-table-card__title">
           <BilingualText text={UI.color} />
         </h3>
         <div className="sheet-table-wrap">
-          <table className="sheet-table days-table patchi-details-table">
+          <table className="sheet-table days-table days-table--two-col patchi-details-table">
             <thead>
               <tr>
                 <th>
@@ -288,7 +319,7 @@ function PatchiDetailsSection() {
           <BilingualText text={UI.number} />
         </h3>
         <div className="sheet-table-wrap">
-          <table className="sheet-table days-table patchi-details-table">
+          <table className="sheet-table days-table days-table--two-col patchi-details-table">
             <thead>
               <tr>
                 <th>
@@ -318,7 +349,7 @@ function PatchiDetailsSection() {
           <BilingualText text={UI.direction} />
         </h3>
         <div className="sheet-table-wrap">
-          <table className="sheet-table days-table patchi-details-table">
+          <table className="sheet-table days-table days-table--two-col patchi-details-table">
             <thead>
               <tr>
                 <th>
@@ -355,10 +386,19 @@ function PatchiActivitySection() {
         <BilingualText text={UI.patchiActivity} />
       </h3>
       <div className="sheet-table-wrap">
-        <table className="sheet-table days-activity-table days-activity-table--transposed">
+        <table className="sheet-table days-table days-table--two-col days-activity-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>
+                <BilingualText text={UI.patchiActivity} />
+              </th>
+            </tr>
+          </thead>
           <tbody>
-            {PANCHA_ACTIVITIES.map((activity) => (
+            {PANCHA_ACTIVITIES.map((activity, index) => (
               <tr key={activity.ta}>
+                <td className="days-activity-table__index">{index + 1}</td>
                 <td>
                   <BilingualText text={activity} />
                 </td>
@@ -373,13 +413,13 @@ function PatchiActivitySection() {
 
 function PatchiRelationSection() {
   return (
-    <div className="days-view__relation-tables">
+    <div className="days-view__two-col-tables days-view__relation-tables">
       <section className="schedule-table-card days-view__relation-card">
         <h3 className="schedule-table-card__title">
           <BilingualText text={UI.natpu} />
         </h3>
         <div className="sheet-table-wrap">
-          <table className="sheet-table days-table">
+          <table className="sheet-table days-table days-table--two-col">
             <thead>
               <tr>
                 <th>
@@ -411,7 +451,7 @@ function PatchiRelationSection() {
           <BilingualText text={UI.enemies} />
         </h3>
         <div className="sheet-table-wrap">
-          <table className="sheet-table days-table">
+          <table className="sheet-table days-table days-table--two-col">
             <thead>
               <tr>
                 <th>

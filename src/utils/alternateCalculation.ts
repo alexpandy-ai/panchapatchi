@@ -327,6 +327,14 @@ export function getAlternateValarpiraiNextMorningWalkBird(
   return getAlternateValarpiraiNightBirdForActivity(weekday, jamam, NIGHT_EAT_ACTIVITY_INDEX);
 }
 
+/** Padu Patchi: bird that Dies (சாவு) in jamam 1 morning for that weekday. */
+export function getAlternatePaduPatchi(
+  pakshaId: AlternatePakshaId,
+  weekday: number,
+): (typeof PATCHI_ORDER)[number] | null {
+  return getAlternateDayBirdForActivity(pakshaId, weekday, 1, DIE_ACTIVITY_INDEX);
+}
+
 /** Anthara dialog splits each jamam into ten weighted anthara time sections. */
 export const ALTERNATE_ANTHARA_SEGMENT_COUNT = 10;
 

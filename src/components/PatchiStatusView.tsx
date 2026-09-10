@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { BilingualText } from "./BilingualText";
 
@@ -48,14 +48,17 @@ import {
   ALTERNATE_ANTHARA_SEGMENT_COUNT,
   alternatePakshaSupportsNight,
   getAlternateJamamActivitySlots,
+  getAlternatePaduPatchi,
   getAlternatePatchiJamamActivityForWeekday,
-  getNextPanchaWeekday,
 } from "../utils/alternateCalculation";
 
 import { derivePatchiStatusFromSchedule } from "../utils/patchi";
 
 import { getPakshaFromDate, type PakshaId } from "../utils/paksha";
-import { getThithiPatchiEntryForDate } from "../utils/thithi";
+import {
+  getNextThithiPatchiEntryForDate,
+  getThithiPatchiEntryForDate,
+} from "../utils/thithi";
 
 interface PatchiStatusViewProps {
   selectedDateTime: Date;
@@ -89,6 +92,12 @@ export function PatchiStatusView({
     null,
   );
 
+  useEffect(() => {
+    if (isHome && homeChipSelection == null) {
+      setAntharaDialogTarget(null);
+    }
+  }, [homeChipSelection, isHome]);
+
   const weekday = selectedDateTime.getDay();
   const currentPakshaId = isHome ? getPakshaFromDate(selectedDateTime) : navigationPakshaId;
   const pakshaId = currentPakshaId;
@@ -102,6 +111,7 @@ export function PatchiStatusView({
   const athikaraPatchi = thithiPatchiEntry.patchi;
 
   const homePatchi = homeChipSelection ?? athikaraPatchi;
+  const showHomeJamamValue = homeChipSelection != null;
 
   const myPatchi = isHome
     ? homePatchi
@@ -172,15 +182,28 @@ export function PatchiStatusView({
   }, [paksha, weekday, athikaraPatchi, myPatchi, jamam.yamaIndex, jamam.period]);
 
   const homeJamamActivity = useMemo(() => {
-    if (!isHome || (pakshaId !== "valarpirai" && pakshaId !== "theipirai")) return null;
+    if (!isHome || !homeChipSelection) return null;
+    if (pakshaId !== "valarpirai" && pakshaId !== "theipirai") return null;
     return getAlternatePatchiJamamActivityForWeekday(
       pakshaId,
       thithiScheduleWeekday,
       jamam.yamaIndex,
       jamam.period,
-      homePatchi,
+      homeChipSelection,
     );
-  }, [homePatchi, isHome, jamam.period, jamam.yamaIndex, pakshaId, thithiScheduleWeekday]);
+  }, [
+    homeChipSelection,
+    isHome,
+    jamam.period,
+    jamam.yamaIndex,
+    pakshaId,
+    thithiScheduleWeekday,
+  ]);
+
+  const paduPatchi = useMemo(() => {
+    if (!isHome || (pakshaId !== "valarpirai" && pakshaId !== "theipirai")) return null;
+    return getAlternatePaduPatchi(pakshaId, thithiScheduleWeekday);
+  }, [isHome, pakshaId, thithiScheduleWeekday]);
 
   const derivedNext = useMemo(() => {
     if (isHome) return { myPatchiActivity: null };
@@ -218,21 +241,21 @@ export function PatchiStatusView({
 
   const antharaDialogProps = useMemo(() => {
     if (isHome) {
-      if (antharaDialogTarget !== "current" || !activeSlot) return null;
+      if (antharaDialogTarget !== "current" || !activeSlot || !homeChipSelection) return null;
       if (pakshaId !== "valarpirai" && pakshaId !== "theipirai") return null;
 
       const { period } = yamaFromJamamIndex(activeSlot.index);
       const supportsNight = alternatePakshaSupportsNight(pakshaId);
-      const nextWeekday =
+      const nextThithiMorning =
         period === "night" && supportsNight
-          ? getNextPanchaWeekday(thithiScheduleWeekday)
+          ? getNextThithiPatchiEntryForDate(selectedDateTime, pakshaId)
           : null;
 
       return {
         jamamSlot: activeSlot,
         getActivitySlots: (yama: number, slotPeriod: PeriodId) =>
           getAlternateJamamActivitySlots(pakshaId, thithiScheduleWeekday, yama, slotPeriod),
-        highlightPatchi: homePatchi,
+        highlightPatchi: homeChipSelection,
         highlightThozhil: homeJamamActivity ?? "—",
         highlightSegmentIndex: getAntharaSegmentIndex(
           activeSlot.start,
@@ -243,11 +266,16 @@ export function PatchiStatusView({
         matrixOptions:
           period === "day" && supportsNight
             ? { appendNightJamamRows: true as const, allJamamSlots: jamam.slots }
-            : period === "night" && nextWeekday != null
+            : period === "night" && nextThithiMorning != null
               ? {
                   appendNextDayMorningJamamRows: true as const,
                   getMorningJamamActivitySlots: (yama: number) =>
-                    getAlternateJamamActivitySlots(pakshaId, nextWeekday, yama, "day"),
+                    getAlternateJamamActivitySlots(
+                      nextThithiMorning.pakshaId,
+                      nextThithiMorning.weekday,
+                      yama,
+                      "day",
+                    ),
                 }
               : undefined,
       };
@@ -304,7 +332,7 @@ export function PatchiStatusView({
     derived.myPatchiActivity,
     derivedNext.myPatchiActivity,
     homeJamamActivity,
-    homePatchi,
+    homeChipSelection,
     isHome,
     jamam.period,
     jamam.slots,
@@ -374,6 +402,22 @@ export function PatchiStatusView({
               </span>
             </div>
 
+            {paduPatchi ? (
+              <div className="context-row context-row--home-padu">
+                <span className="context-inline-item context-inline-item--padu">
+                  <span className="context-label context-label--padu">
+                    <BilingualText text={UI.paduPatchi} block={false} />
+                  </span>
+                  <span className="context-value context-value--home-padu">
+                    <InlineEmojiLabel
+                      text={patchiLabelBilingual(paduPatchi)}
+                      emoji={patchiEmoji(paduPatchi)}
+                    />
+                  </span>
+                </span>
+              </div>
+            ) : null}
+
             <div className="context-row context-row--home-chips">
               <PatchiFilterChips
                 selected={homeChipSelection}
@@ -382,7 +426,7 @@ export function PatchiStatusView({
                     setHomeChipSelection(null);
                     return;
                   }
-                  setHomeChipSelection(patchi);
+                  setHomeChipSelection((current) => (current === patchi ? null : patchi));
                 }}
                 includeAll={false}
                 hideEmoji
@@ -473,7 +517,24 @@ export function PatchiStatusView({
                       block={false}
                     />
                   </span>
-                  {currentJamamActivity ? (
+                  {isHome ? (
+                    showHomeJamamValue && currentJamamActivity ? (
+                      <button
+                        type="button"
+                        className="context-value-btn thozhil-value-btn jamam-summary__value"
+                        aria-expanded={antharaDialogTarget === "current"}
+                        onClick={() => setAntharaDialogTarget("current")}
+                      >
+                        <BilingualText
+                          text={thozhilValueWithTime(
+                            displayActivityBi(currentJamamActivity),
+                            formatTimeRange(activeSlot.start, activeSlot.end),
+                          )}
+                          block={false}
+                        />
+                      </button>
+                    ) : null
+                  ) : currentJamamActivity ? (
                     <button
                       type="button"
                       className="context-value-btn thozhil-value-btn jamam-summary__value"
@@ -534,7 +595,7 @@ export function PatchiStatusView({
 
 
 
-      {!currentJamamActivity && (
+      {!(isHome && !showHomeJamamValue) && !currentJamamActivity && (
 
         <section className="activity-card activity-card--empty">
 
@@ -576,6 +637,7 @@ export function PatchiStatusView({
                 ? { appendNightJamamRows: true, allJamamSlots: jamam.slots }
                 : undefined
           }
+          onlyPatchi={isHome ? antharaDialogProps.highlightPatchi : undefined}
         />
       ) : null}
 

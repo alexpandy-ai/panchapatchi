@@ -58,6 +58,7 @@ export function TimeTableView({
           onSelectPatchi={setSelectedPatchi}
           subtitle={subtitle}
           alternateCalculation={alternateCalculation}
+          selectedDateTime={selectedDateTime}
         />
       ) : (
         <p className="status">

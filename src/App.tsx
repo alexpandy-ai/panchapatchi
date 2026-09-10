@@ -118,7 +118,12 @@ export default function App() {
       {activeView !== "schedule" &&
         activeView !== "alternateSchedule" &&
         activeView !== "days" && (
-        <DateTimeCard value={selectedDateTime} onChange={setSelectedDateTime} />
+        <DateTimeCard
+          value={selectedDateTime}
+          onChange={setSelectedDateTime}
+          hideDateLabel={activeView === "home"}
+          hideTimeLabel={activeView === "home"}
+        />
       )}
 
       <main className="content">

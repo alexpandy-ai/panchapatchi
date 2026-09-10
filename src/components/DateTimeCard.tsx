@@ -29,6 +29,12 @@ interface DateTimeCardProps {
 
   onChange: (next: Date) => void;
 
+  /** Home: hide the visible Date field label; input stays. */
+  hideDateLabel?: boolean;
+
+  /** Home: hide the visible Time field label; input stays. */
+  hideTimeLabel?: boolean;
+
 }
 
 
@@ -111,7 +117,12 @@ function previewCoordsForSource(
 
 
 
-export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
+export function DateTimeCard({
+  value,
+  onChange,
+  hideDateLabel = false,
+  hideTimeLabel = false,
+}: DateTimeCardProps) {
 
   const { coords, geoCoords, manualCoords, source, locationDisplay, applyLocation, requestGeolocation, geoPermission } =
     useLocation();
@@ -394,11 +405,13 @@ export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
 
         <label className="datetime-field datetime-field--date">
 
-          <span className="datetime-field__label">
+          {hideDateLabel ? null : (
+            <span className="datetime-field__label">
 
-            <BilingualText text={UI.date} />
+              <BilingualText text={UI.date} />
 
-          </span>
+            </span>
+          )}
 
           <div className="datetime-field__date-row">
 
@@ -416,6 +429,8 @@ export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
 
               value={dateInput}
 
+              aria-label={hideDateLabel ? pickBilingual(UI.date, language) : undefined}
+
               onChange={(event) => {
                 draftDirtyRef.current = true;
                 setDateInput(event.target.value);
@@ -431,11 +446,13 @@ export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
 
         <label className="datetime-field datetime-field--time">
 
-          <span className="datetime-field__label">
+          {hideTimeLabel ? null : (
+            <span className="datetime-field__label">
 
-            <BilingualText text={UI.time} />
+              <BilingualText text={UI.time} />
 
-          </span>
+            </span>
+          )}
 
           <input
 
@@ -444,6 +461,8 @@ export function DateTimeCard({ value, onChange }: DateTimeCardProps) {
             className="datetime-field__input"
 
             value={timeInput}
+
+            aria-label={hideTimeLabel ? pickBilingual(UI.time, language) : undefined}
 
             onChange={(event) => {
               draftDirtyRef.current = true;

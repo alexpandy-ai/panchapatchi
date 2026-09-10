@@ -2,10 +2,12 @@ import { useMemo } from "react";
 
 import type { ActivitySlot } from "../types";
 
-import { displayActivityBi } from "../utils/activityLabel";
+import { displayActivity, displayActivityBi } from "../utils/activityLabel";
 
 import {
   antharaJamamHeader,
+  antharaMorningJamamHeader,
+  patchiBaseName,
   patchiEmoji,
   patchiLabelBilingual,
   UI,
@@ -20,11 +22,13 @@ import {
   getPreviousJamamSlot,
   getPreviousJamamSlotForIndex,
   shouldShowPreviousJamamRow,
+  yamaFromJamamIndex,
 } from "../utils/jamam";
 
 import {
   antharaDialogTitle,
   antharaSegmentCountForJamam,
+  antharaSegmentWindow,
   getAntharaSegmentColumns,
   getPatchiAntharaMatrix,
   type PatchiAntharaMatrixOptions,
@@ -33,18 +37,66 @@ import {
 import { BilingualText } from "./BilingualText";
 import { InlineEmojiLabel } from "./InlineEmojiLabel";
 
+export interface NaalActivitySelection {
+  segmentStart: Date;
+  segmentEnd: Date;
+  antharaSerial: number;
+  patchi: string;
+  activity: string;
+  /** Birds and their anthara-row activities shown in Naal (one on Home, all elsewhere). */
+  birdRows: { patchi: string; activity: string }[];
+  period: PeriodId;
+  /**
+   * When true (appended Jamam 6–10 / morning rows), keep the jamam activity on every
+   * Naal slot instead of cycling like anthara segments 1–5.
+   */
+  repeatActivity: boolean;
+  /**
+   * Night anthara → Naal: rows 6–10 are next Thithi day’s day jamams 1–5
+   * (same logic as night Anthara appended morning rows).
+   */
+  appendNextDayMorning?: boolean;
+  /** Per bird, day activities for next-day jamams 1–5. */
+  nextDayMorningByBird?: { patchi: string; activities: string[] }[];
+}
+
 export interface JamamSegmentsPanelProps {
   jamamSlot: JamamSlot;
   getActivitySlots: (yama: number, period: PeriodId) => ActivitySlot[];
   highlightPatchi: string;
   highlightThozhil: string;
   highlightSegmentIndex?: number;
+  /** When set, show only this bird's activity column. */
+  onlyPatchi?: string;
   onClose: () => void;
+  /** Open Naal dialog for the clicked anthara activity cell. */
+  onActivityClick?: (selection: NaalActivitySelection) => void;
   coords?: GeoCoords | null;
   jamamSlots?: JamamSlot[];
   cycleStart?: Date;
   segmentCount?: number;
   matrixOptions?: PatchiAntharaMatrixOptions;
+}
+
+function antharaSerialNumber(column: {
+  jamamIndex?: number;
+  segmentIndex: number;
+  appendedMorning?: boolean;
+}): number {
+  return column.jamamIndex != null ? column.jamamIndex : column.segmentIndex + 1;
+}
+
+function antharaRowHeader(column: {
+  jamamIndex?: number;
+  segmentIndex: number;
+  appendedMorning?: boolean;
+}) {
+  if (column.appendedMorning && column.jamamIndex != null) {
+    return antharaMorningJamamHeader(column.jamamIndex);
+  }
+  return antharaJamamHeader(
+    column.jamamIndex != null ? column.jamamIndex : column.segmentIndex + 1,
+  );
 }
 
 export function JamamSegmentsPanel({
@@ -53,14 +105,16 @@ export function JamamSegmentsPanel({
   highlightPatchi,
   highlightThozhil,
   highlightSegmentIndex,
+  onlyPatchi,
   onClose,
+  onActivityClick,
   coords = null,
   jamamSlots,
   cycleStart,
   segmentCount,
   matrixOptions,
 }: JamamSegmentsPanelProps) {
-  const matrix = getPatchiAntharaMatrix(
+  const fullMatrix = getPatchiAntharaMatrix(
     jamamSlot.start,
     jamamSlot.end,
     getActivitySlots,
@@ -68,9 +122,17 @@ export function JamamSegmentsPanel({
     segmentCount,
     matrixOptions,
   );
+  const matrix = onlyPatchi
+    ? {
+        ...fullMatrix,
+        rows: fullMatrix.rows.filter((row) => row.patchi === onlyPatchi),
+      }
+    : fullMatrix;
   const title = antharaDialogTitle(jamamSlot.index, highlightPatchi, highlightThozhil);
+  const compactHomeLayout = Boolean(onlyPatchi);
 
-  const showPreviousJamamRow = shouldShowPreviousJamamRow(jamamSlot.index);
+  const showPreviousJamamRow =
+    !compactHomeLayout && shouldShowPreviousJamamRow(jamamSlot.index);
 
   const previousJamamSlot = useMemo(() => {
     if (!showPreviousJamamRow) return null;
@@ -98,7 +160,7 @@ export function JamamSegmentsPanel({
       previousJamamSlot.end,
       previousSegmentCount,
     );
-  }, [previousJamamSlot]);
+  }, [matrixOptions?.appendNightJamamRows, previousJamamSlot, segmentCount]);
 
   const segmentRows = useMemo(
     () =>
@@ -132,13 +194,16 @@ export function JamamSegmentsPanel({
           className={[
             "jamam-segments-table",
             "jamam-segments-table--matrix",
+            compactHomeLayout ? "jamam-segments-table--home-compact" : "",
             showPreviousJamamRow ? "jamam-segments-table--matrix-with-previous" : "",
           ]
             .filter(Boolean)
             .join(" ")}
         >
           <colgroup>
-            <col className="jamam-segments-table__col-segment-number" />
+            {compactHomeLayout ? null : (
+              <col className="jamam-segments-table__col-segment-number" />
+            )}
             {showPreviousJamamRow ? (
               <col className="jamam-segments-table__col-segment-previous" />
             ) : null}
@@ -149,19 +214,23 @@ export function JamamSegmentsPanel({
           </colgroup>
           <thead>
             <tr>
-              <th scope="col" className="jamam-segments-table__segment-number-col">
-                <BilingualText text={UI.antharaJamam} />
-              </th>
+              {compactHomeLayout ? null : (
+                <th scope="col" className="jamam-segments-table__segment-number-col">
+                  <BilingualText text={UI.antharaJamam} />
+                </th>
+              )}
               {showPreviousJamamRow ? (
                 <th scope="col" className="jamam-segments-table__segment-previous-col">
                   <BilingualText text={UI.antharaPreviousTime} />
                 </th>
               ) : null}
               <th scope="col" className="jamam-segments-table__segment-time-col">
-                <BilingualText text={UI.antharaCurrentTime} />
+                <BilingualText
+                  text={compactHomeLayout ? UI.antharaTime : UI.antharaCurrentTime}
+                />
               </th>
               {matrix.rows.map((row) => {
-                const patchiHighlighted = row.patchi === highlightPatchi;
+                const patchiHighlighted = !compactHomeLayout && row.patchi === highlightPatchi;
 
                 return (
                   <th
@@ -185,32 +254,30 @@ export function JamamSegmentsPanel({
           </thead>
           <tbody>
             {segmentRows.map(({ column, segmentIndex, previousTimeLabel, activities }) => {
-              const rowHighlighted = highlightSegmentIndex === segmentIndex;
+              const rowHighlighted =
+                !compactHomeLayout && highlightSegmentIndex === segmentIndex;
+              const serial = antharaSerialNumber(column);
 
               return (
                 <tr
                   key={column.segmentIndex}
                   className={rowHighlighted ? "jamam-segments-table__row--highlight" : ""}
                 >
-                  <th
-                    scope="row"
-                    className={[
-                      "jamam-segments-table__segment-number-col",
-                      rowHighlighted ? "jamam-segments-table__col--highlight" : "",
-                    ]
-                      .filter(Boolean)
-                      .join(" ")}
-                  >
-                    <span className="jamam-segments-table__jamam-label">
-                      <BilingualText
-                        text={
-                          column.jamamIndex != null
-                            ? antharaJamamHeader(column.jamamIndex)
-                            : antharaJamamHeader(column.segmentIndex + 1)
-                        }
-                      />
-                    </span>
-                  </th>
+                  {compactHomeLayout ? null : (
+                    <th
+                      scope="row"
+                      className={[
+                        "jamam-segments-table__segment-number-col",
+                        rowHighlighted ? "jamam-segments-table__col--highlight" : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                    >
+                      <span className="jamam-segments-table__jamam-label">
+                        <BilingualText text={antharaRowHeader(column)} />
+                      </span>
+                    </th>
+                  )}
                   {showPreviousJamamRow ? (
                     <td
                       className={[
@@ -235,12 +302,18 @@ export function JamamSegmentsPanel({
                       .filter(Boolean)
                       .join(" ")}
                   >
-                    <span className="jamam-segments-table__jamam-time">{column.startTimeLabel}</span>
+                    <span className="jamam-segments-table__jamam-time">
+                      {compactHomeLayout
+                        ? `${serial} -- ${column.startTimeLabel}`
+                        : column.startTimeLabel}
+                    </span>
                   </td>
                   {activities.map((activity, patchiIndex) => {
                     const patchi = matrix.rows[patchiIndex]?.patchi;
-                    const patchiHighlighted = patchi === highlightPatchi;
+                    const patchiHighlighted = !compactHomeLayout && patchi === highlightPatchi;
                     const cellHighlighted = rowHighlighted && patchiHighlighted;
+                    const canOpenNaal =
+                      Boolean(onActivityClick) && activity !== "—" && Boolean(patchi);
 
                     return (
                       <td
@@ -254,6 +327,67 @@ export function JamamSegmentsPanel({
                       >
                         {activity === "—" ? (
                           "—"
+                        ) : canOpenNaal ? (
+                          <button
+                            type="button"
+                            className="jamam-segments-table__activity-btn"
+                            onClick={() => {
+                              const { start, end } = antharaSegmentWindow(
+                                matrix.columns,
+                                segmentIndex,
+                                jamamSlot.end,
+                              );
+                              const jamamPeriod = yamaFromJamamIndex(jamamSlot.index).period;
+                              const isAppendedMorning = column.appendedMorning === true;
+                              const birdSourceRows = onlyPatchi
+                                ? fullMatrix.rows.filter((row) => row.patchi === onlyPatchi)
+                                : fullMatrix.rows;
+                              const birdRows = onlyPatchi
+                                ? [{ patchi: patchi!, activity }]
+                                : fullMatrix.rows.map((row) => ({
+                                    patchi: row.patchi,
+                                    activity: row.activities[segmentIndex] ?? "—",
+                                  }));
+
+                              const morningSlotsFn = matrixOptions?.getMorningJamamActivitySlots;
+                              const appendNextDayMorning =
+                                jamamPeriod === "night" &&
+                                !isAppendedMorning &&
+                                Boolean(morningSlotsFn);
+
+                              const nextDayMorningByBird =
+                                appendNextDayMorning && morningSlotsFn
+                                  ? birdSourceRows.map((row) => ({
+                                      patchi: row.patchi,
+                                      activities: [1, 2, 3, 4, 5].map((yama) => {
+                                        const slots = morningSlotsFn(yama);
+                                        const match = slots.find(
+                                          (entry) =>
+                                            patchiBaseName(entry.bird) === row.patchi,
+                                        );
+                                        return match
+                                          ? displayActivity(match.activity)
+                                          : "—";
+                                      }),
+                                    }))
+                                  : undefined;
+
+                              onActivityClick?.({
+                                segmentStart: start,
+                                segmentEnd: end,
+                                antharaSerial: serial,
+                                patchi: patchi!,
+                                activity,
+                                birdRows,
+                                period: isAppendedMorning ? "day" : jamamPeriod,
+                                repeatActivity: column.jamamIndex != null,
+                                appendNextDayMorning,
+                                nextDayMorningByBird,
+                              });
+                            }}
+                          >
+                            <InlineEmojiLabel text={displayActivityBi(activity)} />
+                          </button>
                         ) : (
                           <InlineEmojiLabel text={displayActivityBi(activity)} />
                         )}

@@ -100,6 +100,7 @@ export const UI = {
   patchiDays: bi("பட்சி நாட்கள்", "Patchi Days"),
   thithiPatchi: bi("திதி பட்சி", "Thithi Patchi"),
   natchathiraPatchi: bi("நட்சத்திர பட்சி", "Natchathira Patchi"),
+  natchathira: bi("நட்சத்திரம்", "Natchathira"),
   thithi: bi("திதி", "Thithi"),
   theipiraiPlanets: bi("தேய்பிறை கிரகம்", "Theipirai planet"),
   valarpiraiPlanets: bi("வளர்பிறை கிரகம்", "Valarpirai planet"),
@@ -109,6 +110,7 @@ export const UI = {
   theipiraiPatchi: bi("தேய்பிறை அதிகார பட்சி", "Theipirai Athikara Patchi"),
   thozhil: bi("தொழில்", "Thozhil"),
   athikaraPatchi: bi("அதிகார பட்சி", "Athikara Patchi"),
+  paduPatchi: bi("படு பட்சி", "Padu Patchi"),
   patchiRelation: bi("பட்சி உறவு", "Patchi Relation"),
   patchiDetails: bi("நிறமும் திசையும்", "Colors and Direction"),
   color: bi("நிறம்", "Color"),
@@ -122,6 +124,8 @@ export const UI = {
   antharaJamam: bi("அந்தரம்", "Antharam"),
   antharaPreviousTime: bi("முந்தைய நேரம்", "Previous time"),
   antharaCurrentTime: bi("நேரம்", "Time"),
+  antharaTime: bi("அந்தர நேரம்", "Anthara time"),
+  naalTime: bi("நாள் நேரம்", "Naal time"),
   patchiThozhilMatrix: bi("அனைத்து பட்சி — ஜாமம் தொழில்", "All patchi — jamam thozhil"),
   patchiColumn: bi("பட்சி", "Patchi"),
 } as const;
@@ -141,6 +145,11 @@ export function antharaStartTimeHeader(jamamIndex: number): Bilingual {
 export function antharaJamamHeader(segmentNumber: number): Bilingual {
   const label = String(segmentNumber);
   return bi(label, label);
+}
+
+/** Next-morning jamam label on night Anthara (day jamams of the next Thithi day). */
+export function antharaMorningJamamHeader(yama: number): Bilingual {
+  return bi(`அடுத்த நாள் ${yama}`, `Next day ${yama}`);
 }
 
 export function thozhilHeader(jamamIndex: number): Bilingual {
