@@ -47,17 +47,22 @@ export interface NaalActivitySelection {
   birdRows: { patchi: string; activity: string }[];
   period: PeriodId;
   /**
-   * When true (appended Jamam 6–10 / morning rows), keep the jamam activity on every
-   * Naal slot instead of cycling like anthara segments 1–5.
+   * When true (appended night Jamam 6–10 on day Anthara), keep the jamam activity on
+   * every Naal slot instead of cycling.
    */
   repeatActivity: boolean;
   /**
-   * Night anthara → Naal: rows 6–10 are next Thithi day’s day jamams 1–5
-   * (same logic as night Anthara appended morning rows).
+   * Night anthara → Naal: rows 6–10 are next Thithi day’s day jamams 1–5.
    */
   appendNextDayMorning?: boolean;
   /** Per bird, day activities for next-day jamams 1–5. */
   nextDayMorningByBird?: { patchi: string; activities: string[] }[];
+  /**
+   * Next-day morning Anthara row → Naal: rows 1–5 day cycle, rows 6–10 that day’s night jamams.
+   */
+  appendNextDayNight?: boolean;
+  /** Per bird, night activities for next-day jamams 1–5 (shown as Naal 6–10). */
+  nextDayNightByBird?: { patchi: string; activities: string[] }[];
 }
 
 export interface JamamSegmentsPanelProps {
@@ -76,6 +81,20 @@ export interface JamamSegmentsPanelProps {
   cycleStart?: Date;
   segmentCount?: number;
   matrixOptions?: PatchiAntharaMatrixOptions;
+}
+
+function activitiesForBirdsFromSlots(
+  birdSourceRows: { patchi: string }[],
+  getSlots: (yama: number) => ActivitySlot[],
+): { patchi: string; activities: string[] }[] {
+  return birdSourceRows.map((row) => ({
+    patchi: row.patchi,
+    activities: [1, 2, 3, 4, 5].map((yama) => {
+      const slots = getSlots(yama);
+      const match = slots.find((entry) => patchiBaseName(entry.bird) === row.patchi);
+      return match ? displayActivity(match.activity) : "—";
+    }),
+  }));
 }
 
 function antharaSerialNumber(column: {
@@ -350,27 +369,14 @@ export function JamamSegmentsPanel({
                                   }));
 
                               const morningSlotsFn = matrixOptions?.getMorningJamamActivitySlots;
+                              const nextDayNightSlotsFn =
+                                matrixOptions?.getNextDayNightJamamActivitySlots;
                               const appendNextDayMorning =
                                 jamamPeriod === "night" &&
                                 !isAppendedMorning &&
                                 Boolean(morningSlotsFn);
-
-                              const nextDayMorningByBird =
-                                appendNextDayMorning && morningSlotsFn
-                                  ? birdSourceRows.map((row) => ({
-                                      patchi: row.patchi,
-                                      activities: [1, 2, 3, 4, 5].map((yama) => {
-                                        const slots = morningSlotsFn(yama);
-                                        const match = slots.find(
-                                          (entry) =>
-                                            patchiBaseName(entry.bird) === row.patchi,
-                                        );
-                                        return match
-                                          ? displayActivity(match.activity)
-                                          : "—";
-                                      }),
-                                    }))
-                                  : undefined;
+                              const appendNextDayNight =
+                                isAppendedMorning && Boolean(nextDayNightSlotsFn);
 
                               onActivityClick?.({
                                 segmentStart: start,
@@ -380,9 +386,25 @@ export function JamamSegmentsPanel({
                                 activity,
                                 birdRows,
                                 period: isAppendedMorning ? "day" : jamamPeriod,
-                                repeatActivity: column.jamamIndex != null,
+                                // Night jamams on day Anthara repeat; next-day morning uses day+night split.
+                                repeatActivity:
+                                  column.jamamIndex != null && !isAppendedMorning,
                                 appendNextDayMorning,
-                                nextDayMorningByBird,
+                                nextDayMorningByBird:
+                                  appendNextDayMorning && morningSlotsFn
+                                    ? activitiesForBirdsFromSlots(
+                                        birdSourceRows,
+                                        morningSlotsFn,
+                                      )
+                                    : undefined,
+                                appendNextDayNight,
+                                nextDayNightByBird:
+                                  appendNextDayNight && nextDayNightSlotsFn
+                                    ? activitiesForBirdsFromSlots(
+                                        birdSourceRows,
+                                        nextDayNightSlotsFn,
+                                      )
+                                    : undefined,
                               });
                             }}
                           >

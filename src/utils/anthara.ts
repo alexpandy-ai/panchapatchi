@@ -217,6 +217,11 @@ export interface PatchiAntharaMatrixOptions {
   appendNextDayMorningJamamRows?: boolean;
   /** Day jamam slots (yamas 1–5) for appended rows 6–10 on night click. */
   getMorningJamamActivitySlots?: (yama: number) => ActivitySlot[];
+  /**
+   * Night jamam slots for the same next Thithi day as getMorningJamamActivitySlots —
+   * used when opening Naal from next-day morning rows (Anthara 6–10).
+   */
+  getNextDayNightJamamActivitySlots?: (yama: number) => ActivitySlot[];
 }
 
 export interface PatchiAntharaRow {

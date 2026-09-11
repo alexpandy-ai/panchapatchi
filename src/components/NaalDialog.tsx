@@ -10,12 +10,14 @@ import {
   naalDialogTitle,
 } from "../utils/anthara";
 import {
+  antharaJamamHeader,
   antharaMorningJamamHeader,
   JAMAM_ACTIVITY_TA,
   PANCHA_ACTIVITY_TA,
   patchiEmoji,
   patchiLabelBilingual,
   UI,
+  type Bilingual,
 } from "../utils/bilingual";
 import type { PeriodId } from "../utils/jamam";
 
@@ -31,11 +33,14 @@ export interface NaalDialogProps {
   activity: string;
   birdRows: { patchi: string; activity: string }[];
   period: PeriodId;
-  /** Jamam-level rows (6–10): same activity on every Naal slot. */
+  /** Jamam-level night rows on day Anthara: same activity on every Naal slot. */
   repeatActivity?: boolean;
   /** Night Naal: rows 6–10 = next Thithi day jamams 1–5. */
   appendNextDayMorning?: boolean;
   nextDayMorningByBird?: { patchi: string; activities: string[] }[];
+  /** Next-day morning → Naal: rows 1–5 day cycle, 6–10 that day’s night jamams. */
+  appendNextDayNight?: boolean;
+  nextDayNightByBird?: { patchi: string; activities: string[] }[];
   onClose: () => void;
 }
 
@@ -47,15 +52,21 @@ function naalCycleActivities(startActivity: string, period: PeriodId, count: num
   return antharaActivitiesFrom(startActivity, count, order);
 }
 
+function fillDash(count: number): string[] {
+  return Array.from({ length: count }, () => "—");
+}
+
 function naalActivitiesForBird(
   startActivity: string,
   period: PeriodId,
   repeatActivity: boolean,
   appendNextDayMorning: boolean,
   nextDayMorningActivities: string[] | undefined,
+  appendNextDayNight: boolean,
+  nextDayNightActivities: string[] | undefined,
 ): string[] {
   if (startActivity === "—" || startActivity === "") {
-    return Array.from({ length: JAMAM_ANTHARA_SEGMENT_COUNT }, () => "—");
+    return fillDash(JAMAM_ANTHARA_SEGMENT_COUNT);
   }
   if (repeatActivity) {
     return Array.from({ length: JAMAM_ANTHARA_SEGMENT_COUNT }, () => startActivity);
@@ -69,10 +80,32 @@ function naalActivitiesForBird(
     const morningPart =
       nextDayMorningActivities && nextDayMorningActivities.length >= ANTHARA_DAY_SEGMENT_COUNT
         ? nextDayMorningActivities.slice(0, ANTHARA_DAY_SEGMENT_COUNT)
-        : Array.from({ length: ANTHARA_DAY_SEGMENT_COUNT }, () => "—");
+        : fillDash(ANTHARA_DAY_SEGMENT_COUNT);
     return [...antharaPart, ...morningPart];
   }
+  if (appendNextDayNight) {
+    const dayPart = naalCycleActivities(startActivity, "day", ANTHARA_DAY_SEGMENT_COUNT);
+    const nightPart =
+      nextDayNightActivities && nextDayNightActivities.length >= ANTHARA_DAY_SEGMENT_COUNT
+        ? nextDayNightActivities.slice(0, ANTHARA_DAY_SEGMENT_COUNT)
+        : fillDash(ANTHARA_DAY_SEGMENT_COUNT);
+    return [...dayPart, ...nightPart];
+  }
   return naalCycleActivities(startActivity, period, JAMAM_ANTHARA_SEGMENT_COUNT);
+}
+
+function naalRowLabel(
+  index: number,
+  appendNextDayMorning: boolean,
+  appendNextDayNight: boolean,
+): Bilingual {
+  if (appendNextDayMorning && index >= ANTHARA_DAY_SEGMENT_COUNT) {
+    return antharaMorningJamamHeader(index - ANTHARA_DAY_SEGMENT_COUNT + 1);
+  }
+  if (appendNextDayNight && index >= ANTHARA_DAY_SEGMENT_COUNT) {
+    return antharaJamamHeader(index + 1); // jamam 6–10
+  }
+  return { ta: String(index + 1), en: String(index + 1) };
 }
 
 export function NaalDialog({
@@ -87,9 +120,12 @@ export function NaalDialog({
   repeatActivity = false,
   appendNextDayMorning = false,
   nextDayMorningByBird,
+  appendNextDayNight = false,
+  nextDayNightByBird,
   onClose,
 }: NaalDialogProps) {
   const singleBird = birdRows.length <= 1;
+  const showSplitLabels = appendNextDayMorning || appendNextDayNight;
   const title = singleBird
     ? naalDialogTitle(antharaSerial, patchi, activity)
     : naalAllBirdsDialogTitle(antharaSerial);
@@ -103,6 +139,7 @@ export function NaalDialog({
     () =>
       birdRows.map((row) => {
         const morning = nextDayMorningByBird?.find((entry) => entry.patchi === row.patchi);
+        const night = nextDayNightByBird?.find((entry) => entry.patchi === row.patchi);
         return {
           patchi: row.patchi,
           activities: naalActivitiesForBird(
@@ -111,10 +148,20 @@ export function NaalDialog({
             repeatActivity,
             appendNextDayMorning,
             morning?.activities,
+            appendNextDayNight,
+            night?.activities,
           ),
         };
       }),
-    [appendNextDayMorning, birdRows, nextDayMorningByBird, period, repeatActivity],
+    [
+      appendNextDayMorning,
+      appendNextDayNight,
+      birdRows,
+      nextDayMorningByBird,
+      nextDayNightByBird,
+      period,
+      repeatActivity,
+    ],
   );
 
   useEffect(() => {
@@ -144,7 +191,7 @@ export function NaalDialog({
           "anthara-dialog",
           "naal-dialog",
           singleBird ? "naal-dialog--single" : "naal-dialog--all-birds",
-          appendNextDayMorning ? "naal-dialog--with-next-day" : "",
+          showSplitLabels ? "naal-dialog--with-next-day" : "",
         ]
           .filter(Boolean)
           .join(" ")}
@@ -179,7 +226,7 @@ export function NaalDialog({
             >
               <thead>
                 <tr>
-                  {appendNextDayMorning ? (
+                  {showSplitLabels ? (
                     <th scope="col" className="jamam-segments-table__segment-number-col">
                       <BilingualText text={UI.antharaJamam} />
                     </th>
@@ -207,57 +254,48 @@ export function NaalDialog({
                 </tr>
               </thead>
               <tbody>
-                {columns.map((column, index) => {
-                  const isNextDayRow =
-                    appendNextDayMorning && index >= ANTHARA_DAY_SEGMENT_COUNT;
-                  const nextDayYama = index - ANTHARA_DAY_SEGMENT_COUNT + 1;
-
-                  return (
-                    <tr key={column.segmentIndex}>
-                      {appendNextDayMorning ? (
-                        <th scope="row" className="jamam-segments-table__segment-number-col">
-                          <span className="jamam-segments-table__jamam-label">
-                            <BilingualText
-                              text={
-                                isNextDayRow
-                                  ? antharaMorningJamamHeader(nextDayYama)
-                                  : {
-                                      ta: String(index + 1),
-                                      en: String(index + 1),
-                                    }
-                              }
-                            />
-                          </span>
-                        </th>
-                      ) : null}
-                      <td className="jamam-segments-table__segment-time-col">
-                        <span className="jamam-segments-table__jamam-time">
-                          {singleBird && !appendNextDayMorning
-                            ? `${index + 1} -- ${column.startTimeLabel}`
-                            : column.startTimeLabel}
-                        </span>
-                      </td>
-                      {birdActivityRows.map((row) => {
-                        const cellActivity = row.activities[index] ?? "—";
-                        const highlighted = !singleBird && row.patchi === patchi;
-                        return (
-                          <td
-                            key={`${column.segmentIndex}-${row.patchi}`}
-                            className={
-                              highlighted ? "jamam-segments-table__col--highlight" : undefined
-                            }
-                          >
-                            {cellActivity === "—" ? (
-                              "—"
-                            ) : (
-                              <InlineEmojiLabel text={displayActivityBi(cellActivity)} />
+                {columns.map((column, index) => (
+                  <tr key={column.segmentIndex}>
+                    {showSplitLabels ? (
+                      <th scope="row" className="jamam-segments-table__segment-number-col">
+                        <span className="jamam-segments-table__jamam-label">
+                          <BilingualText
+                            text={naalRowLabel(
+                              index,
+                              appendNextDayMorning,
+                              appendNextDayNight,
                             )}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  );
-                })}
+                          />
+                        </span>
+                      </th>
+                    ) : null}
+                    <td className="jamam-segments-table__segment-time-col">
+                      <span className="jamam-segments-table__jamam-time">
+                        {singleBird && !showSplitLabels
+                          ? `${index + 1} -- ${column.startTimeLabel}`
+                          : column.startTimeLabel}
+                      </span>
+                    </td>
+                    {birdActivityRows.map((row) => {
+                      const cellActivity = row.activities[index] ?? "—";
+                      const highlighted = !singleBird && row.patchi === patchi;
+                      return (
+                        <td
+                          key={`${column.segmentIndex}-${row.patchi}`}
+                          className={
+                            highlighted ? "jamam-segments-table__col--highlight" : undefined
+                          }
+                        >
+                          {cellActivity === "—" ? (
+                            "—"
+                          ) : (
+                            <InlineEmojiLabel text={displayActivityBi(cellActivity)} />
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

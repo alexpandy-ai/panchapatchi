@@ -276,6 +276,13 @@ export function PatchiStatusView({
                       yama,
                       "day",
                     ),
+                  getNextDayNightJamamActivitySlots: (yama: number) =>
+                    getAlternateJamamActivitySlots(
+                      nextThithiMorning.pakshaId,
+                      nextThithiMorning.weekday,
+                      yama,
+                      "night",
+                    ),
                 }
               : undefined,
       };

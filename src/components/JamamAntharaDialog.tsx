@@ -111,6 +111,8 @@ export function JamamAntharaDialog({
           repeatActivity={naalSelection.repeatActivity}
           appendNextDayMorning={naalSelection.appendNextDayMorning}
           nextDayMorningByBird={naalSelection.nextDayMorningByBird}
+          appendNextDayNight={naalSelection.appendNextDayNight}
+          nextDayNightByBird={naalSelection.nextDayNightByBird}
           onClose={() => setNaalSelection(null)}
         />
       ) : null}

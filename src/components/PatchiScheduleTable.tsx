@@ -333,6 +333,13 @@ function AlternatePakshaScheduleView({
                         yama,
                         "day",
                       ),
+                    getNextDayNightJamamActivitySlots: (yama) =>
+                      getAlternateJamamActivitySlots(
+                        nextThithiMorning.pakshaId,
+                        nextThithiMorning.weekday,
+                        yama,
+                        "night",
+                      ),
                   }
                 : undefined
           }
