@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AppMenu, HomeNavButton, viewTitle } from "./components/AppMenu";
 import { BilingualText } from "./components/BilingualText";
 import { useLanguage } from "./context/LanguageContext";
@@ -8,64 +8,14 @@ import { DaysView } from "./components/DaysView";
 import { FindPatchiView } from "./components/FindPatchiView";
 import { PatchiStatusView } from "./components/PatchiStatusView";
 import { TimeTableView } from "./components/TimeTableView";
+import { PATCHI_SCHEDULE_DATA } from "./data/patchiScheduleData";
 import { UI } from "./utils/bilingual";
-import type { PakshaData } from "./types";
 import "./index.css";
-
-type SheetTab = "valarpirai" | "theipirai";
 
 export default function App() {
   const { language, setLanguage } = useLanguage();
   const { view: activeView, setView: setActiveView } = useNavigation();
   const [selectedDateTime, setSelectedDateTime] = useState(() => new Date());
-  const [data, setData] = useState<Record<SheetTab, PakshaData | null>>({
-    valarpirai: null,
-    theipirai: null,
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function load() {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const [valarpiraiRes, theipiraiRes] = await Promise.all([
-          fetch("/api/valarpirai.json"),
-          fetch("/api/theipirai.json"),
-        ]);
-
-        if (!valarpiraiRes.ok || !theipiraiRes.ok) {
-          throw new Error(UI.loadError.ta);
-        }
-
-        const [valarpirai, theipirai] = await Promise.all([
-          valarpiraiRes.json() as Promise<PakshaData>,
-          theipiraiRes.json() as Promise<PakshaData>,
-        ]);
-
-        if (!cancelled) {
-          setData({ valarpirai, theipirai });
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setError(err instanceof Error ? err.message : UI.loadError.en);
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    }
-
-    load();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   return (
     <div className="app">
@@ -137,37 +87,30 @@ export default function App() {
           </h2>
         )}
 
-        {loading && (
-          <p className="status">
-            <BilingualText text={UI.loading} />
-          </p>
-        )}
-        {error && (
-          <p className="status status--error">
-            <BilingualText text={UI.loadError} />
-          </p>
+        {activeView === "home" && (
+          <PatchiStatusView selectedDateTime={selectedDateTime} variant="home" />
         )}
 
-        {!loading && !error && activeView === "home" && (
-          <PatchiStatusView selectedDateTime={selectedDateTime} data={data} variant="home" />
+        {activeView === "status" && (
+          <PatchiStatusView
+            selectedDateTime={selectedDateTime}
+            data={PATCHI_SCHEDULE_DATA}
+            variant="status"
+          />
         )}
 
-        {!loading && !error && activeView === "status" && (
-          <PatchiStatusView selectedDateTime={selectedDateTime} data={data} variant="status" />
+        {activeView === "find" && (
+          <FindPatchiView selectedDateTime={selectedDateTime} />
         )}
 
-        {!loading && !error && activeView === "find" && (
-          <FindPatchiView data={data} selectedDateTime={selectedDateTime} />
+        {activeView === "schedule" && (
+          <TimeTableView selectedDateTime={selectedDateTime} />
         )}
 
-        {!loading && !error && activeView === "schedule" && (
-          <TimeTableView selectedDateTime={selectedDateTime} data={data} />
-        )}
-
-        {!loading && !error && activeView === "alternateSchedule" && (
+        {activeView === "alternateSchedule" && (
           <TimeTableView
             selectedDateTime={selectedDateTime}
-            data={data}
+            data={PATCHI_SCHEDULE_DATA}
             subtitle={UI.alternateCalculation}
             alternateCalculation
           />

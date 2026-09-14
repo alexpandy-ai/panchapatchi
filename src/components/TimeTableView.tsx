@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { BilingualText } from "./BilingualText";
 import { useNavigation } from "../context/NavigationContext";
 import { useLocation } from "../context/LocationContext";
+import { PATCHI_SCHEDULE_DATA } from "../data/patchiScheduleData";
 import type { PakshaData } from "../types";
 import { PATCHI_ORDER, UI, type Bilingual } from "../utils/bilingual";
 import type { PakshaId } from "../utils/paksha";
@@ -12,14 +13,16 @@ type PatchiName = (typeof PATCHI_ORDER)[number];
 
 interface TimeTableViewProps {
   selectedDateTime: Date;
-  data: Record<PakshaId, PakshaData | null>;
+  /** Patchi Schedule paksha tables. Day Scheduler may pass the same for jamam times only. */
+  data?: Record<PakshaId, PakshaData | null>;
   subtitle?: Bilingual;
+  /** Day Scheduler only — never set for Patchi Schedule. */
   alternateCalculation?: boolean;
 }
 
 export function TimeTableView({
   selectedDateTime,
-  data,
+  data = PATCHI_SCHEDULE_DATA,
   subtitle,
   alternateCalculation = false,
 }: TimeTableViewProps) {

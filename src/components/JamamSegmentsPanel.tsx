@@ -47,8 +47,8 @@ export interface NaalActivitySelection {
   birdRows: { patchi: string; activity: string }[];
   period: PeriodId;
   /**
-   * When true (appended night Jamam 6–10 on day Anthara), keep the jamam activity on
-   * every Naal slot instead of cycling.
+   * When true, keep the start activity on every Naal slot instead of cycling.
+   * Day Scheduler night jamam rows must leave this false so each bird cycles.
    */
   repeatActivity: boolean;
   /**
@@ -358,6 +358,8 @@ export function JamamSegmentsPanel({
                               );
                               const jamamPeriod = yamaFromJamamIndex(jamamSlot.index).period;
                               const isAppendedMorning = column.appendedMorning === true;
+                              const isAppendedNightJamam =
+                                column.jamamIndex != null && !isAppendedMorning;
                               const birdSourceRows = onlyPatchi
                                 ? fullMatrix.rows.filter((row) => row.patchi === onlyPatchi)
                                 : fullMatrix.rows;
@@ -385,10 +387,14 @@ export function JamamSegmentsPanel({
                                 patchi: patchi!,
                                 activity,
                                 birdRows,
-                                period: isAppendedMorning ? "day" : jamamPeriod,
-                                // Night jamams on day Anthara repeat; next-day morning uses day+night split.
-                                repeatActivity:
-                                  column.jamamIndex != null && !isAppendedMorning,
+                                // Appended night jamam rows must cycle with night order (not the parent day jamam period).
+                                period: isAppendedMorning
+                                  ? "day"
+                                  : isAppendedNightJamam
+                                    ? "night"
+                                    : jamamPeriod,
+                                // Never repeat one jamam activity across all Naal slots — each bird cycles from its cell.
+                                repeatActivity: false,
                                 appendNextDayMorning,
                                 nextDayMorningByBird:
                                   appendNextDayMorning && morningSlotsFn

@@ -12,13 +12,13 @@ import {
 import {
   antharaJamamHeader,
   antharaMorningJamamHeader,
-  JAMAM_ACTIVITY_TA,
   PANCHA_ACTIVITY_TA,
   patchiEmoji,
   patchiLabelBilingual,
   UI,
   type Bilingual,
 } from "../utils/bilingual";
+import { ALTERNATE_NIGHT_ACTIVITY_TA } from "../utils/alternateCalculation";
 import type { PeriodId } from "../utils/jamam";
 
 import { BilingualText } from "./BilingualText";
@@ -33,7 +33,7 @@ export interface NaalDialogProps {
   activity: string;
   birdRows: { patchi: string; activity: string }[];
   period: PeriodId;
-  /** Jamam-level night rows on day Anthara: same activity on every Naal slot. */
+  /** When true, keep the start activity on every Naal slot instead of cycling. */
   repeatActivity?: boolean;
   /** Night Naal: rows 6–10 = next Thithi day jamams 1–5. */
   appendNextDayMorning?: boolean;
@@ -48,7 +48,9 @@ function naalCycleActivities(startActivity: string, period: PeriodId, count: num
   if (startActivity === "—" || startActivity === "") {
     return Array.from({ length: count }, () => "—");
   }
-  const order = period === "day" ? PANCHA_ACTIVITY_TA : JAMAM_ACTIVITY_TA;
+  // Day Scheduler night uses Die→Sleep→Rule→Walk→Eat; day uses Pancha day order.
+  const order =
+    period === "day" ? PANCHA_ACTIVITY_TA : ALTERNATE_NIGHT_ACTIVITY_TA;
   return antharaActivitiesFrom(startActivity, count, order);
 }
 

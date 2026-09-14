@@ -62,7 +62,8 @@ import {
 
 interface PatchiStatusViewProps {
   selectedDateTime: Date;
-  data: Record<PakshaId, PakshaData | null>;
+  /** Excel sheet data — required for Status; unused on Home (Alternate Day Scheduler). */
+  data?: Record<PakshaId, PakshaData | null>;
   /** Home: compact thithi/athikara line and date-based paksha only. Status: full layout. */
   variant?: "home" | "status";
 }
@@ -119,7 +120,7 @@ export function PatchiStatusView({
       ? PATCHI_ORDER[0]
       : myPatchiSelection;
 
-  const paksha = data[pakshaId];
+  const paksha = !isHome && data ? data[pakshaId] : null;
 
   const jamam = getJamamState(selectedDateTime, coords);
 
@@ -146,40 +147,24 @@ export function PatchiStatusView({
 
 
   const derived = useMemo(() => {
-
-    if (!paksha) {
-
+    if (isHome || !paksha) {
       return {
-
         athikaraGroupKey: null,
-
         myPatchi: null,
-
         myPatchiActivity: null,
-
         jamamSlots: [],
-
       };
-
     }
 
     return derivePatchiStatusFromSchedule(
-
       paksha,
-
       weekday,
-
       athikaraPatchi,
-
       jamam.yamaIndex,
-
       jamam.period,
-
       myPatchi,
-
     );
-
-  }, [paksha, weekday, athikaraPatchi, myPatchi, jamam.yamaIndex, jamam.period]);
+  }, [isHome, paksha, weekday, athikaraPatchi, myPatchi, jamam.yamaIndex, jamam.period]);
 
   const homeJamamActivity = useMemo(() => {
     if (!isHome || !homeChipSelection) return null;
@@ -351,20 +336,12 @@ export function PatchiStatusView({
 
   const currentJamamActivity = isHome ? homeJamamActivity : derived.myPatchiActivity;
 
-
-
-  if (!paksha) {
-
+  if (!isHome && !paksha) {
     return (
-
       <p className="status">
-
         <BilingualText text={UI.loading} />
-
       </p>
-
     );
-
   }
 
 

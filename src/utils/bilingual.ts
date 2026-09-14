@@ -86,7 +86,7 @@ export const UI = {
   noDayData: bi("இந்த நாளுக்கான தரவு கிடைக்கவில்லை.", "No data for this day."),
   groups: bi("குழுக்கள்", "Groups"),
   jamams: bi("ஜாமங்கள்", "Jamams"),
-  schedule: bi("அட்டவணை", "Schedule"),
+  schedule: bi("பட்சி அட்டவணை", "Patchi Schedule"),
   alternateSchedule: bi("நாள் அட்டவணை", "Day Scheduler"),
   alternateCalculation: bi("நாள் அட்டவணை", "Day Scheduler"),
   sheetPicker: bi("அட்டவணை தேர்வு", "Sheet selection"),
@@ -231,6 +231,10 @@ export const PATCHI_DAYS_TABLE = [
 
 export const MENU_ITEMS: { id: string; label: Bilingual }[] = [
   {
+    id: "home",
+    label: bi("முகப்பு", "Home"),
+  },
+  {
     id: "status",
     label: bi("பட்சி நிலை", "Patchi status"),
   },
@@ -240,7 +244,7 @@ export const MENU_ITEMS: { id: string; label: Bilingual }[] = [
   },
   {
     id: "schedule",
-    label: bi("அட்டவணை", "Schedule"),
+    label: bi("பட்சி அட்டவணை", "Patchi Schedule"),
   },
   {
     id: "alternateSchedule",

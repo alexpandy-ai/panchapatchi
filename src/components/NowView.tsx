@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import rawData from "../data/pancha-pakshi.json";
-import type { ActivitySlot, PanchaPakshiData } from "../types";
+import { PATCHI_SCHEDULE_DATA } from "../data/patchiScheduleData";
+import type { ActivitySlot } from "../types";
 import { useLocation } from "../context/LocationContext";
 import { patchiBilingual } from "../utils/bilingual";
 import { BilingualText } from "./BilingualText";
@@ -21,7 +21,7 @@ import {
   type PakshaId,
 } from "../utils/paksha";
 
-const data = rawData as PanchaPakshiData;
+const data = PATCHI_SCHEDULE_DATA;
 
 type PakshaMode = "auto" | PakshaId;
 

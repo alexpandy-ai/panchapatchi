@@ -1,5 +1,6 @@
 import type { ActivitySlot } from "../types";
 import { displayActivity } from "./activityLabel";
+import { ALTERNATE_NIGHT_ACTIVITY_TA } from "./alternateCalculation";
 import {
   activityBilingual,
   bi,
@@ -27,9 +28,9 @@ export const NIGHT_JAMAM_SCHEDULE_END = 10;
 /** Birds cycle in Pancha display order (same as Others / Know Patchi). */
 const ANTHARA_BIRD_ORDER = PATCHI_ORDER;
 
-  /** Day uses Pancha order; night uses jamam sheet / alternate night cycle order. */
+/** Day uses Pancha order; night uses Day Scheduler night cycle (Die→Sleep→Rule→Walk→Eat). */
 function antharaThozhilCycleOrder(period: PeriodId): readonly string[] {
-  return period === "day" ? PANCHA_ACTIVITY_TA : JAMAM_ACTIVITY_TA;
+  return period === "day" ? PANCHA_ACTIVITY_TA : ALTERNATE_NIGHT_ACTIVITY_TA;
 }
 
 /** Traditional duration weights (parts of 144) for day anthara sub-periods. */
