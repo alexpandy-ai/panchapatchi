@@ -67,27 +67,27 @@ export const THITHI_PATCHI_VALARPIRAI: ThithiPakshaGroup[] = [
   {
     thithis: [bi("பிரதமை", "Prathamai"), bi("சஷ்டி", "Sashti"), bi("ஏகாதசி", "Ekadasi")],
     planet: bi("செ", "Mars"),
-    patchi: "கோழி",
+    patchi: "வல்லூறு",
   },
   {
     thithis: [bi("துவிதியை", "Dwitiyai"), bi("சப்தமி", "Sapthami"), bi("துவாதசி", "Dwadasi")],
     planet: bi("ச", "Saturn"),
-    patchi: "மயில்",
+    patchi: "ஆந்தை",
   },
   {
     thithis: [bi("திரிதியை", "Trithiyai"), bi("அஷ்டமி", "Ashtami"), bi("திரியோதசி", "Trayodasi")],
     planet: bi("வெ", "Venus"),
-    patchi: "வல்லூறு",
+    patchi: "காகம்",
   },
   {
     thithis: [bi("சதுர்த்தி", "Chathurthi"), bi("நவமி", "Navami"), bi("சதுர்தசி", "Chaturdasi")],
     planet: bi("வி", "Jupiter"),
-    patchi: "ஆந்தை",
+    patchi: "கோழி",
   },
   {
     thithis: [bi("பஞ்சமி", "Panchami"), bi("தசமி", "Dasami"), bi("பௌர்ணமி", "Pournami")],
     planet: bi("பு", "Mercury"),
-    patchi: "காகம்",
+    patchi: "மயில்",
   },
 ];
 
