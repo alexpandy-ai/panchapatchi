@@ -2717,20 +2717,20 @@ body {
 }
 
 .context-card--home .context-row--home-day {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: var(--home-label-width) minmax(0, 1fr);
+  column-gap: var(--home-label-gap);
   align-items: baseline;
-  gap: 0.35rem 0.75rem;
   padding-top: 0.05rem;
   padding-bottom: 0.2rem;
-  padding-left: calc(var(--home-label-width) + var(--home-label-gap));
 }
 
 .context-card--home .context-value--home-pirai {
-  font-size: var(--home-value-size);
+  font-size: var(--home-label-size);
   font-weight: 600;
   line-height: 1.25;
-  color: var(--text);
+  color: var(--muted);
+  min-width: 0;
 }
 
 .context-card--home .context-row--home-athikara,
@@ -2911,8 +2911,7 @@ body {
   }
 
   .context-card--home .context-row--home-day {
-    gap: 0.3rem 0.55rem;
-    padding-left: calc(var(--home-label-width) + var(--home-label-gap));
+    gap: 0;
   }
 
   .context-card--home .context-value--home-athikara,
