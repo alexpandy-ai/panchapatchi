@@ -6,9 +6,9 @@ import { useNavigation } from "./context/NavigationContext";
 import { DateTimeCard } from "./components/DateTimeCard";
 import { DaysView } from "./components/DaysView";
 import { DaySchedulerView } from "./components/DaySchedulerView";
+import { FindPatchiView, type FindPatchiQuery } from "./components/FindPatchiView";
 import { PatchiStatusView } from "./components/PatchiStatusView";
 import { TimeTableView } from "./components/TimeTableView";
-import { PATCHI_SCHEDULE_DATA } from "./data/patchiScheduleData";
 import { UI } from "./utils/bilingual";
 import "./index.css";
 
@@ -16,9 +16,18 @@ export default function App() {
   const { language, setLanguage } = useLanguage();
   const { view: activeView, setView: setActiveView } = useNavigation();
   const [selectedDateTime, setSelectedDateTime] = useState(() => new Date());
+  const [findPatchiQuery, setFindPatchiQuery] = useState<FindPatchiQuery | null>(null);
 
   return (
-    <div className="app">
+    <div
+      className={[
+        "app",
+        activeView === "home" ? "app--home" : "",
+        activeView === "status" ? "app--find-patchi" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
       <header className="header">
         <div className="header__toolbar">
           <div className="header__actions">
@@ -52,7 +61,9 @@ export default function App() {
             </nav>
           </div>
           <h1>
-            <BilingualText text={UI.appTitle} />
+            <BilingualText
+              text={activeView === "home" ? UI.appTitle : viewTitle(activeView)}
+            />
           </h1>
           <div className="header__nav">
             <HomeNavButton
@@ -73,40 +84,28 @@ export default function App() {
           onChange={setSelectedDateTime}
           hideDateLabel={activeView === "home"}
           hideTimeLabel={activeView === "home"}
+          selectFieldLabels={activeView === "status"}
+          onSubmit={
+            activeView === "status"
+              ? (payload) => setFindPatchiQuery(payload)
+              : undefined
+          }
         />
       )}
 
       <main className="content">
-        {activeView !== "schedule" &&
-          activeView !== "alternateSchedule" &&
-          activeView !== "home" &&
-          activeView !== "status" && (
-          <h2 className="content__section-title">
-            <BilingualText text={viewTitle(activeView)} />
-          </h2>
-        )}
-
         {activeView === "home" && (
           <PatchiStatusView selectedDateTime={selectedDateTime} variant="home" />
         )}
 
-        {activeView === "status" && (
-          <PatchiStatusView
-            selectedDateTime={selectedDateTime}
-            data={PATCHI_SCHEDULE_DATA}
-            variant="status"
-          />
-        )}
+        {activeView === "status" && <FindPatchiView query={findPatchiQuery} />}
 
         {activeView === "schedule" && (
           <TimeTableView selectedDateTime={selectedDateTime} />
         )}
 
         {activeView === "alternateSchedule" && (
-          <DaySchedulerView
-            selectedDateTime={selectedDateTime}
-            subtitle={UI.alternateCalculation}
-          />
+          <DaySchedulerView selectedDateTime={selectedDateTime} />
         )}
 
         {activeView === "days" && <DaysView selectedDateTime={selectedDateTime} />}

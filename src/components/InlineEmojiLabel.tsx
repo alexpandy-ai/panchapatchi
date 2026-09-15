@@ -5,10 +5,17 @@ interface InlineEmojiLabelProps {
   text: Bilingual | string;
   emoji?: string;
   className?: string;
+  /** Default: before text. Home uses after. */
+  emojiPosition?: "before" | "after";
 }
 
-/** Emoji left of label text on one line (flex row). */
-export function InlineEmojiLabel({ text, emoji, className = "" }: InlineEmojiLabelProps) {
+/** Emoji and label text on one line (flex row). */
+export function InlineEmojiLabel({
+  text,
+  emoji,
+  className = "",
+  emojiPosition = "before",
+}: InlineEmojiLabelProps) {
   const { language } = useLanguage();
   const label = typeof text === "string" ? text : pickBilingual(text, language);
 
@@ -16,12 +23,26 @@ export function InlineEmojiLabel({ text, emoji, className = "" }: InlineEmojiLab
     return <span className={className}>{label}</span>;
   }
 
+  const emojiEl = (
+    <span className="inline-emoji-label__emoji" aria-hidden="true">
+      {emoji}
+    </span>
+  );
+  const textEl = <span className="inline-emoji-label__text">{label}</span>;
+
   return (
     <span className={`inline-emoji-label${className ? ` ${className}` : ""}`}>
-      <span className="inline-emoji-label__emoji" aria-hidden="true">
-        {emoji}
-      </span>
-      <span className="inline-emoji-label__text">{label}</span>
+      {emojiPosition === "after" ? (
+        <>
+          {textEl}
+          {emojiEl}
+        </>
+      ) : (
+        <>
+          {emojiEl}
+          {textEl}
+        </>
+      )}
     </span>
   );
 }

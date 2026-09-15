@@ -7,6 +7,10 @@
   --accent: #c45c26;
   --accent-soft: rgba(196, 92, 38, 0.12);
   --app-header-offset: 3.5rem;
+  --app-max-width: 1100px;
+  --touch-min: 44px;
+  --page-pad-x: 1rem;
+  --page-pad-y: 1.5rem;
 }
 
 *,
@@ -17,10 +21,15 @@
   padding: 0;
 }
 
+html {
+  overflow-x: hidden;
+}
+
 html,
 body,
 #root {
   min-height: 100vh;
+  max-width: 100%;
 }
 
 body {
@@ -28,12 +37,16 @@ body {
   background: var(--bg);
   color: var(--text);
   line-height: 1.6;
+  overflow-x: hidden;
 }
 
 .app {
-  max-width: 1100px;
+  width: 100%;
+  max-width: var(--app-max-width);
   margin: 0 auto;
-  padding: 1.5rem 1rem 3rem;
+  padding: var(--page-pad-y) var(--page-pad-x) 3rem;
+  overflow-x: clip;
+  min-width: 0;
 }
 
 .header {
@@ -96,8 +109,10 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.35rem;
-  height: 2.35rem;
+  width: var(--touch-min);
+  height: var(--touch-min);
+  min-width: var(--touch-min);
+  min-height: var(--touch-min);
   border: 1px solid var(--border);
   border-radius: 999px;
   background: var(--bg-card);
@@ -170,8 +185,10 @@ body {
   font-family: inherit;
   font-size: 1.5rem;
   line-height: 1;
-  width: 2rem;
-  height: 2rem;
+  width: var(--touch-min);
+  height: var(--touch-min);
+  min-width: var(--touch-min);
+  min-height: var(--touch-min);
   border: none;
   border-radius: 0.5rem;
   background: transparent;
@@ -200,6 +217,7 @@ body {
   border-radius: 0.75rem;
   background: var(--bg);
   padding: 0.75rem 0.85rem;
+  min-height: var(--touch-min);
   cursor: pointer;
   transition: all 0.15s;
 }
@@ -268,6 +286,7 @@ body {
   border-radius: 0.75rem;
   background: var(--bg);
   padding: 0.7rem 0.8rem;
+  min-height: var(--touch-min);
   cursor: pointer;
   transition: all 0.15s;
 }
@@ -345,6 +364,93 @@ body {
 
 .schedule-table-card--alternate {
   overflow: visible;
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* Day Scheduler — same layout/overflow/readable Tamil patterns as Patchi Schedule */
+.schedule-table-card--alternate .patchi-schedule-sheet-picker {
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.35rem;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.schedule-table-card--alternate .patchi-schedule-sheet-picker .sheet-picker__btn {
+  min-height: var(--touch-min);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: normal;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.schedule-table-card--alternate .patchi-schedule-sheet-picker .sheet-picker__label {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  line-height: 1.45;
+}
+
+.schedule-table-card--alternate > .patchi-schedule-patchi-picker,
+.schedule-table-card--alternate .patchi-filter-chips.patchi-schedule-patchi-picker {
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.35rem;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.schedule-table-card--alternate .patchi-submenu__btn {
+  min-height: var(--touch-min);
+  white-space: normal;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.schedule-table-card--alternate .patchi-pivot-wrap,
+.schedule-table-card--alternate .sheet-table-wrap {
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+
+.schedule-table-card--alternate .patchi-pivot-table__jamam,
+.schedule-table-card--alternate .patchi-pivot-table__status,
+.schedule-table-card--alternate .alternate-valarpirai-day-table__activity,
+.schedule-table-card--alternate .alternate-all-chip-table__period-label,
+.schedule-table-card--alternate .alternate-all-chip-table__active-day,
+.schedule-table-card--alternate .patchi-schedule-patchi-section__title {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  line-height: 1.45;
+}
+
+.schedule-table-card--alternate .patchi-pivot-table__time {
+  white-space: nowrap;
+}
+
+.schedule-table-card--alternate .patchi-pivot-table td,
+.schedule-table-card--alternate .patchi-pivot-table th {
+  vertical-align: middle;
+}
+
+.schedule-table-card--alternate > .patchi-pivot-tables {
+  max-width: 100%;
+  min-width: 0;
+  padding: 0 0.85rem 0.85rem;
+  box-sizing: border-box;
 }
 
 .schedule-table-card__title {
@@ -358,6 +464,8 @@ body {
 
 .schedule-table-wrap {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
 }
 
 .schedule-table {
@@ -1173,6 +1281,7 @@ body {
   font-size: 0.82rem;
   font-weight: 700;
   padding: 0.45rem 0.7rem;
+  min-height: var(--touch-min);
   border-radius: 999px;
   border: 1px solid var(--border);
   background: var(--bg-card);
@@ -1263,7 +1372,7 @@ body {
   white-space: nowrap;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 767px) {
   .patchi-picker-block {
     column-gap: 0.35rem;
     padding: 0.48rem 0.55rem;
@@ -1282,9 +1391,9 @@ body {
 
   .patchi-picker-block .patchi-submenu__btn {
     min-width: 3.15rem;
-    min-height: 1.32rem;
-    padding: 0.12rem 0.24rem;
-    font-size: 0.58rem;
+    min-height: var(--touch-min);
+    padding: 0.35rem 0.4rem;
+    font-size: 0.7rem;
     line-height: 1.1;
   }
 }
@@ -1522,35 +1631,40 @@ body {
   border-top: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
 }
 
-@media (max-width: 720px) {
+@media (max-width: 767px) {
   .alternate-all-chip-table.patchi-pivot-table thead .alternate-all-chip-table__activity-col,
   .alternate-all-chip-table.patchi-pivot-table tbody th.patchi-pivot-table__day,
   .alternate-all-chip-table.patchi-pivot-table tbody th.alternate-all-chip-table__period-label {
     text-align: left;
-    padding-left: 0.35rem;
-    padding-right: 0.2rem;
+    padding-left: 0.4rem;
+    padding-right: 0.3rem;
   }
 
   .alternate-all-chip-table tbody .patchi-pivot-table__day,
   .alternate-all-chip-table tbody .alternate-all-chip-table__period-label {
-    min-width: 3.35rem;
-    max-width: 4.25rem;
-    width: 3.75rem;
+    min-width: 4.25rem;
+    max-width: 6.5rem;
+    width: 5rem;
     white-space: normal;
-    line-height: 1.15;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    line-height: 1.4;
   }
 
   .alternate-all-chip-table thead .alternate-all-chip-table__activity-col {
-    min-width: 3.35rem;
-    max-width: 4.25rem;
-    width: 3.75rem;
+    min-width: 4.25rem;
+    max-width: 6.5rem;
+    width: 5rem;
     white-space: normal;
-    line-height: 1.15;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    line-height: 1.4;
   }
 
   .alternate-all-chip-table tbody .patchi-pivot-table__day .bi-ta,
   .alternate-all-chip-table thead .alternate-all-chip-table__activity-col .bi-ta {
-    font-size: 0.72rem;
+    font-size: 0.82rem;
+    line-height: 1.4;
   }
 
   .alternate-all-chip-table tbody .patchi-pivot-table__day .bi-en,
@@ -1559,7 +1673,8 @@ body {
   }
 
   .alternate-all-chip-table .alternate-all-chip-table__period-label {
-    font-size: 0.68rem;
+    font-size: 0.78rem;
+    line-height: 1.4;
   }
 
   .alternate-all-chip-table .alternate-all-chip-table__header-sep {
@@ -1567,16 +1682,26 @@ body {
   }
 
   .alternate-all-chip-table .alternate-all-chip-table__active-day {
-    font-size: 0.72rem;
+    font-size: 0.82rem;
+    line-height: 1.4;
   }
 
   .alternate-all-chip-table thead th:not(.patchi-pivot-table__day-col) {
-    padding: 0.45rem 0.25rem;
+    padding: 0.5rem 0.3rem;
   }
 
   .alternate-all-chip-table td:not(.alternate-all-chip-table__period-spacer) {
-    padding: 0.45rem 0.2rem;
-    min-width: 3.15rem;
+    padding: 0.5rem 0.28rem;
+    min-width: 3.5rem;
+  }
+
+  .schedule-table-card--alternate .patchi-schedule-sheet-picker {
+    flex-wrap: wrap;
+  }
+
+  .schedule-table-card--alternate .patchi-submenu__btn {
+    flex: 1 1 auto;
+    min-width: 4.5rem;
   }
 }
 
@@ -1696,8 +1821,10 @@ body {
   font-family: inherit;
   font-size: 0.8rem;
   font-weight: 700;
-  width: 2.1rem;
-  height: 2.1rem;
+  width: var(--touch-min);
+  height: var(--touch-min);
+  min-width: var(--touch-min);
+  min-height: var(--touch-min);
   padding: 0;
   border-radius: 999px;
   border: 1px solid var(--border);
@@ -1813,6 +1940,8 @@ body {
   background: var(--bg);
   color: var(--text);
   min-width: 8.5rem;
+  min-height: var(--touch-min);
+  box-sizing: border-box;
 }
 
 .datetime-field__input:focus {
@@ -1874,8 +2003,8 @@ body {
 .datetime-field__sunrise-value {
   display: flex;
   align-items: center;
-  height: 2.05rem;
-  min-height: 2.05rem;
+  height: var(--touch-min);
+  min-height: var(--touch-min);
   box-sizing: border-box;
   padding: 0.45rem 0.55rem;
   border: 1px solid var(--border);
@@ -1917,7 +2046,8 @@ body {
 .datetime-field__coord-input {
   min-width: 5.5rem;
   width: 5.5rem;
-  height: 2.05rem;
+  height: var(--touch-min);
+  min-height: var(--touch-min);
   box-sizing: border-box;
 }
 
@@ -1933,8 +2063,10 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.35rem;
-  height: 2.35rem;
+  width: var(--touch-min);
+  height: var(--touch-min);
+  min-width: var(--touch-min);
+  min-height: var(--touch-min);
   padding: 0;
   border: 1px solid var(--border);
   border-radius: 999px;
@@ -1970,6 +2102,7 @@ body {
   font-size: 0.85rem;
   font-weight: 700;
   padding: 0.5rem 0.85rem;
+  min-height: var(--touch-min);
   border: 1px solid var(--border);
   border-radius: 0.6rem;
   background: var(--bg-card);
@@ -1996,6 +2129,7 @@ body {
   font-size: 0.85rem;
   font-weight: 700;
   padding: 0.5rem 0.85rem;
+  min-height: var(--touch-min);
   border: 1px solid var(--accent);
   border-radius: 0.6rem;
   background: var(--accent);
@@ -2083,6 +2217,9 @@ body {
   border-radius: 1rem;
   padding: 1rem;
   box-shadow: 0 2px 12px rgba(45, 35, 25, 0.06);
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: clip;
 }
 
 .status {
@@ -2097,6 +2234,8 @@ body {
 
 .sheet-table-wrap {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
 }
 
 .days-view {
@@ -2115,7 +2254,7 @@ body {
   gap: 1.25rem;
 }
 
-@media (min-width: 720px) {
+@media (min-width: 768px) {
   .days-view__thithi-sections {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: start;
@@ -2130,7 +2269,7 @@ body {
   gap: 1.25rem;
 }
 
-@media (min-width: 720px) {
+@media (min-width: 768px) {
   .days-view__two-col-tables {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: start;
@@ -2394,41 +2533,37 @@ body {
   font-weight: 600;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 767px) {
   .header__toolbar {
     grid-template-columns: auto minmax(0, 1fr) auto;
     gap: 0.4rem;
-    min-height: 2.6rem;
+    min-height: var(--touch-min);
   }
 
   .header h1 {
     max-width: 100%;
-    font-size: 1.55rem;
-  }
-
-  .language-toggle__btn {
-    width: 1.95rem;
-    height: 1.95rem;
-    font-size: 0.74rem;
-  }
-
-  .app-menu__toggle {
-    width: 2.15rem;
-    height: 2.15rem;
+    font-size: clamp(1.05rem, 4.6vw, 1.45rem);
   }
 
   :root {
-    --app-header-offset: 3.45rem;
+    --app-header-offset: 3.75rem;
+    --page-pad-x: 0.65rem;
+    --page-pad-y: 1rem;
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 767px) {
   .app {
-    padding: 1rem 0.5rem 2rem;
+    padding: var(--page-pad-y) var(--page-pad-x) 2rem;
   }
 
   .header h1 {
-    font-size: 1.3rem;
+    font-size: clamp(1.05rem, 4.6vw, 1.3rem);
+  }
+
+  .datetime-card {
+    padding: 0.85rem 0.75rem;
+    margin-bottom: 1rem;
   }
 
   .datetime-card__row {
@@ -2478,13 +2613,15 @@ body {
     min-width: 0;
     width: 100%;
     padding-inline: 0.35rem;
-    font-size: 0.82rem;
+    font-size: 0.85rem;
+    min-height: var(--touch-min);
   }
 
   .datetime-field--time .datetime-field__input {
     min-width: 5.25rem;
     width: auto;
     padding-inline: 0.35rem;
+    min-height: var(--touch-min);
   }
 
   .datetime-card__weekday .bi-ta {
@@ -2538,8 +2675,8 @@ body {
   .datetime-field__sunrise-value {
     width: 100%;
     min-width: 0;
-    height: 2.05rem;
-    min-height: 2.05rem;
+    height: var(--touch-min);
+    min-height: var(--touch-min);
     box-sizing: border-box;
   }
 
@@ -2561,6 +2698,7 @@ body {
   .datetime-card__refresh,
   .datetime-card__submit {
     flex: 1 1 0;
+    min-height: var(--touch-min);
   }
 
   .datetime-field--location .datetime-field__input,
@@ -2579,7 +2717,7 @@ body {
   }
 
   .content {
-    padding: 0.5rem;
+    padding: 0.65rem;
     border-radius: 0.75rem;
   }
 
@@ -2605,8 +2743,9 @@ body {
   }
 
   .jamam-pair__cell .thozhil-value-btn {
-    font-size: 0.6rem;
-    padding: 0.24rem 0.32rem;
+    font-size: 0.7rem;
+    padding: 0.45rem 0.5rem;
+    min-height: var(--touch-min);
     gap: 0.2rem;
   }
 
@@ -2684,9 +2823,12 @@ body {
   max-width: var(--home-label-width);
   font-size: var(--home-label-size);
   font-weight: 600;
-  line-height: 1.25;
+  line-height: 1.45;
   color: var(--muted);
   text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
 }
 
 .context-card--home .context-row--home-thithi {
@@ -2717,9 +2859,12 @@ body {
 .context-card--home .context-value--home-pirai {
   font-size: var(--home-label-size);
   font-weight: 600;
-  line-height: 1.25;
+  line-height: 1.45;
   color: var(--muted);
   min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
 }
 
 .context-card--home .context-row--home-athikara,
@@ -2748,15 +2893,18 @@ body {
   font-size: var(--home-value-size);
   font-weight: 700;
   color: var(--accent);
-  line-height: 1.25;
+  line-height: 1.45;
   min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
 }
 
 .context-card--home .context-value--home-athikara,
 .context-card--home .context-value--home-naal,
 .context-card--home .context-value--home-padu,
 .context-card--home .context-value--home-day {
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .context-card--home .context-value--home-athikara .bi-ta,
@@ -2780,9 +2928,9 @@ body {
 .context-card--home .context-row--home-chips .patchi-filter-chips {
   display: flex;
   flex: 1 1 auto;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: stretch;
-  gap: 0.3rem;
+  gap: 0.35rem;
   padding: 0;
   min-width: 0;
   width: 100%;
@@ -2792,14 +2940,16 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex: 1 1 0;
+  flex: 1 1 calc(33.333% - 0.35rem);
   box-sizing: border-box;
-  min-width: 0;
-  min-height: 2rem;
-  padding: 0.32rem 0.3rem;
+  min-width: 4.5rem;
+  min-height: var(--touch-min);
+  padding: 0.4rem 0.35rem;
   font-size: 0.8rem;
-  line-height: 1.15;
-  white-space: nowrap;
+  line-height: 1.45;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
 }
 
 .context-card--home .context-row--home-chips .patchi-submenu__btn .bilingual,
@@ -2871,7 +3021,10 @@ body {
   font-size: var(--home-value-size);
   font-weight: 700;
   color: var(--accent);
-  line-height: 1.25;
+  line-height: 1.45;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
 }
 
 .context-card--home .jamam-pair__cell--home-inline .thozhil-value-btn {
@@ -2885,7 +3038,7 @@ body {
 }
 
 /* Home — mobile: even type scale, aligned label column, readable chips */
-@media (max-width: 640px) {
+@media (max-width: 767px) {
   .context-card--home {
     --home-label-width: 6.75rem;
     --home-label-gap: 0.5rem;
@@ -2916,13 +3069,13 @@ body {
   }
 
   .context-card--home .context-row--home-chips .patchi-filter-chips {
-    gap: 0.22rem;
+    gap: 0.35rem;
   }
 
   .context-card--home .context-row--home-chips .patchi-submenu__btn {
-    min-height: 1.75rem;
-    padding: 0.22rem 0.18rem;
-    font-size: 0.72rem;
+    min-height: var(--touch-min);
+    padding: 0.4rem 0.3rem;
+    font-size: 0.8rem;
     border-radius: 0.4rem;
   }
 
@@ -2936,7 +3089,8 @@ body {
   }
 
   .context-card--home .jamam-pair__cell--home-inline .thozhil-value-btn {
-    padding: 0.12rem 0.28rem;
+    padding: 0.45rem 0.5rem;
+    min-height: var(--touch-min);
     max-width: 100%;
   }
 
@@ -2950,34 +3104,405 @@ body {
     padding: 0.7rem 0.65rem;
     border-radius: 0.65rem;
   }
-
-  .datetime-card--home .datetime-field__input {
-    font-size: 0.9rem;
-    min-height: 2.1rem;
-  }
-
-  .datetime-card--home .datetime-card__weekday .bi-ta {
-    font-size: 0.82rem;
-  }
-
-  .datetime-card--home .datetime-field__coord-label,
-  .datetime-card--home .datetime-field__label {
-    font-size: 0.78rem;
-  }
 }
 
 @media (max-width: 400px) {
   .context-card--home {
-    --home-label-width: 6.1rem;
-    --home-label-size: 0.74rem;
-    --home-value-size: 0.86rem;
+    --home-label-width: 6.5rem;
+    --home-label-size: 0.8rem;
+    --home-value-size: 0.9rem;
     padding: 0.6rem 0.55rem;
   }
 
   .context-card--home .context-row--home-chips .patchi-submenu__btn {
-    min-height: 1.6rem;
-    font-size: 0.66rem;
-    padding: 0.16rem 0.12rem;
+    min-height: var(--touch-min);
+    font-size: 0.78rem;
+    padding: 0.4rem 0.3rem;
+  }
+}
+
+/* —— Home datetime form: CSS Grid (explicit areas, no clip/overlap) —— */
+.datetime-card--home {
+  max-width: 100%;
+  min-width: 0;
+  overflow: visible;
+  box-sizing: border-box;
+}
+
+.datetime-card--home .datetime-card__row {
+  display: grid;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  gap: 12px 16px;
+  align-items: end;
+}
+
+/* Flatten wrappers so date/time/coords land in separate grid cells */
+.datetime-card--home .datetime-card__datetime-row,
+.datetime-card--home .datetime-field--coords,
+.datetime-card--home .datetime-field__coords-row {
+  display: contents;
+}
+
+.datetime-card--home .datetime-field,
+.datetime-card--home .datetime-field--date,
+.datetime-card--home .datetime-field--time,
+.datetime-card--home .datetime-field--location,
+.datetime-card--home .datetime-field__coord,
+.datetime-card--home .datetime-field__coord--sunrise,
+.datetime-card--home .datetime-field__coord--lat,
+.datetime-card--home .datetime-field__coord--lng,
+.datetime-card--home .datetime-card__actions {
+  box-sizing: border-box;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+}
+
+.datetime-card--home .datetime-field,
+.datetime-card--home .datetime-field__coord,
+.datetime-card--home .datetime-field__coord--sunrise,
+.datetime-card--home .datetime-field__coord--lat,
+.datetime-card--home .datetime-field__coord--lng {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.datetime-card--home .datetime-field__label,
+.datetime-card--home .datetime-field__coord-label {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  line-height: 1.45;
+  max-width: 100%;
+}
+
+.datetime-card--home .datetime-field__date-row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.25rem;
+  box-sizing: border-box;
+  min-width: 0;
+  width: 100%;
+}
+
+.datetime-card--home .datetime-field--location .datetime-field__location-autocomplete {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+}
+
+.datetime-card--home .datetime-field__input,
+.datetime-card--home .datetime-field__sunrise-value,
+.datetime-card--home .datetime-field__coord-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  height: 48px;
+  line-height: 1.45;
+}
+
+/* Date / time / sunrise / lat / lng: single line; room for native picker icons */
+.datetime-card--home .datetime-field--date .datetime-field__input,
+.datetime-card--home .datetime-field--time .datetime-field__input {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+  padding-right: 2.25rem;
+}
+
+.datetime-card--home .datetime-field--date .datetime-field__input {
+  flex: 1 1 auto;
+}
+
+.datetime-card--home .datetime-field__coord-input,
+.datetime-card--home .datetime-field__sunrise-value {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+}
+
+.datetime-card--home .datetime-field__sunrise-value {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* Location may wrap to 2 lines */
+.datetime-card--home .datetime-field--location .datetime-field__input {
+  height: auto;
+  min-height: 48px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
+  padding-top: 0.55rem;
+  padding-bottom: 0.55rem;
+  overflow-x: hidden;
+  text-overflow: clip;
+}
+
+.datetime-card--home .datetime-card__actions {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.datetime-card--home .datetime-card__refresh,
+.datetime-card--home .datetime-card__submit {
+  box-sizing: border-box;
+  min-height: 48px;
+  height: 48px;
+  white-space: nowrap;
+  line-height: 1.45;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.datetime-card--home .datetime-card__permission {
+  box-sizing: border-box;
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  min-height: 48px;
+  flex-shrink: 0;
+}
+
+.datetime-card--home .datetime-card__weekday {
+  line-height: 1.45;
+  flex-shrink: 0;
+}
+
+.datetime-card--home .datetime-card__weekday .bi-ta,
+.datetime-card--home .datetime-card__weekday .bi-en {
+  line-height: 1.45;
+}
+
+/* Desktop / laptop ≥1280px — EXACTLY TWO ROWS */
+@media (min-width: 1280px) {
+  .datetime-card--home .datetime-card__row {
+    grid-template-columns:
+      220px
+      185px
+      minmax(300px, 1fr)
+      135px
+      145px
+      145px;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      "date time location sunrise lat lng"
+      "actions actions actions actions actions actions";
+    column-gap: 16px;
+    row-gap: 12px;
+    align-items: end;
+  }
+
+  .datetime-card--home .datetime-field--date {
+    grid-area: date;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .datetime-card--home .datetime-field--time {
+    grid-area: time;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .datetime-card--home .datetime-field--location {
+    grid-area: location;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .datetime-card--home .datetime-field__coord--sunrise {
+    grid-area: sunrise;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .datetime-card--home .datetime-field__coord--lat {
+    grid-area: lat;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .datetime-card--home .datetime-field__coord--lng {
+    grid-area: lng;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .datetime-card--home .datetime-field--date .datetime-field__input,
+  .datetime-card--home .datetime-field--time .datetime-field__input {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .datetime-card--home .datetime-card__actions {
+    grid-area: actions;
+    justify-self: start;
+    width: auto;
+    max-width: 100%;
+  }
+}
+
+/* Tablet / small laptop 768–1279px — two balanced field rows; actions end of row 2 */
+@media (min-width: 768px) and (max-width: 1279px) {
+  .datetime-card--home .datetime-card__row {
+    grid-template-columns:
+      minmax(220px, 1.2fr)
+      minmax(185px, 1fr)
+      minmax(0, 1.2fr)
+      auto;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      "date time location location"
+      "sunrise lat lng actions";
+    column-gap: 14px;
+    row-gap: 12px;
+    align-items: end;
+  }
+
+  .datetime-card--home .datetime-field--date {
+    grid-area: date;
+    min-width: 0;
+  }
+
+  .datetime-card--home .datetime-field--time {
+    grid-area: time;
+    min-width: 0;
+  }
+
+  .datetime-card--home .datetime-field--location {
+    grid-area: location;
+    min-width: 0;
+  }
+
+  .datetime-card--home .datetime-field__coord--sunrise {
+    grid-area: sunrise;
+    min-width: 135px;
+  }
+
+  .datetime-card--home .datetime-field__coord--lat {
+    grid-area: lat;
+    min-width: 145px;
+  }
+
+  .datetime-card--home .datetime-field__coord--lng {
+    grid-area: lng;
+    min-width: 145px;
+  }
+
+  .datetime-card--home .datetime-card__actions {
+    grid-area: actions;
+    justify-self: end;
+    width: auto;
+    max-width: 100%;
+  }
+
+  .context-card--home .context-row--home-chips .patchi-filter-chips {
+    flex-wrap: wrap;
+  }
+}
+
+/* Phone <768px — single column; labels above fields; actions in one row */
+@media (max-width: 767px) {
+  .datetime-card--home .datetime-card__row {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    grid-template-areas:
+      "date"
+      "time"
+      "location"
+      "sunrise"
+      "lat"
+      "lng"
+      "actions";
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .datetime-card--home .datetime-field--date {
+    grid-area: date;
+  }
+
+  .datetime-card--home .datetime-field--time {
+    grid-area: time;
+  }
+
+  .datetime-card--home .datetime-field--location {
+    grid-area: location;
+  }
+
+  .datetime-card--home .datetime-field__coord--sunrise {
+    grid-area: sunrise;
+  }
+
+  .datetime-card--home .datetime-field__coord--lat {
+    grid-area: lat;
+  }
+
+  .datetime-card--home .datetime-field__coord--lng {
+    grid-area: lng;
+  }
+
+  .datetime-card--home .datetime-field,
+  .datetime-card--home .datetime-field__coord,
+  .datetime-card--home .datetime-field__coord--sunrise,
+  .datetime-card--home .datetime-field__coord--lat,
+  .datetime-card--home .datetime-field__coord--lng {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .datetime-card--home .datetime-field__label,
+  .datetime-card--home .datetime-field__coord-label {
+    font-size: 0.82rem;
+    line-height: 1.45;
+  }
+
+  .datetime-card--home .datetime-card__actions {
+    grid-area: actions;
+    width: 100%;
+    justify-content: stretch;
+    gap: 12px;
+  }
+
+  .datetime-card--home .datetime-card__refresh,
+  .datetime-card--home .datetime-card__submit {
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .datetime-card--home .datetime-field--date .datetime-field__input,
+  .datetime-card--home .datetime-field--time .datetime-field__input {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .datetime-card--home .datetime-card__weekday {
+    align-self: center;
+  }
+
+  .datetime-card--home .datetime-card__weekday .bi-ta {
+    font-size: 0.9rem;
   }
 }
 
@@ -3372,7 +3897,7 @@ body {
 }
 
 /* Anthara dialog — mobile: fit viewport, wrap headers, no horizontal scroll */
-@media (max-width: 720px) {
+@media (max-width: 767px) {
   .anthara-dialog-overlay {
     padding: 0.4rem;
     align-items: center;
@@ -3784,7 +4309,8 @@ body {
 .paksha-toggle button {
   font-family: inherit;
   font-size: 0.78rem;
-  padding: 0.35rem 0.6rem;
+  padding: 0.45rem 0.75rem;
+  min-height: var(--touch-min);
   border-radius: 999px;
   border: 1px solid var(--border);
   background: var(--bg-card);
@@ -3936,7 +4462,811 @@ th .bilingual .bi-en,
   font-size: 0.65em;
 }
 
+.find-patchi-result {
+  text-align: center;
+  padding: 0.35rem 0.15rem 0.5rem;
+}
+
+.find-patchi-result__panel {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  max-width: 26rem;
+  margin: 0 auto 1rem;
+  padding: 0.85rem 0.75rem;
+  border-radius: 18px;
+}
+
+.find-patchi-result__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.85rem 0.9rem;
+  border-radius: 16px;
+  text-align: center;
+}
+
+.find-patchi-result__divider {
+  height: 1px;
+  margin: 0.65rem auto;
+  width: min(100%, 12rem);
+  background: #c4932f;
+  opacity: 0.65;
+}
+
+.find-patchi-result__label {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #71645a;
+  line-height: 1.3;
+}
+
+.find-patchi-result__value {
+  margin: 0;
+  font-size: 2.1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.25;
+  width: 100%;
+}
+
+.find-patchi-result__value .inline-emoji-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  vertical-align: middle;
+}
+
+.find-patchi-result__value .bi-en {
+  font-size: 0.55em;
+}
+
+.find-patchi-result__value--thithi {
+  color: #8c2f2b;
+}
+
+.find-patchi-result__value--jamam {
+  color: #d0601d;
+}
+
+.find-patchi-result__meta {
+  display: grid;
+  gap: 0.4rem;
+  max-width: 26rem;
+  margin: 0 auto;
+  text-align: left;
+  padding: 0.85rem 0.95rem;
+  border-radius: 16px;
+}
+
+.find-patchi-result__meta-row {
+  display: grid;
+  grid-template-columns: minmax(5.5rem, auto) 1fr;
+  gap: 0.5rem 0.75rem;
+  align-items: baseline;
+}
+
+.find-patchi-result__meta-label {
+  color: #71645a;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.find-patchi-result__meta-value {
+  font-weight: 600;
+  color: #2c1b13;
+  font-size: 0.95rem;
+}
+
+.find-patchi-result__meta-value--time {
+  color: #d0601d;
+  font-variant-numeric: tabular-nums;
+}
+
+.find-patchi-hint {
+  text-align: center;
+}
+
 .header h1 .bi-en {
   font-size: 0.55em;
   letter-spacing: 0.02em;
+}
+
+/* —— Responsive layout bands (mobile / tablet / desktop) —— */
+
+@media (max-width: 767px) {
+  .find-patchi-result {
+    padding: 0.25rem 0 0.5rem;
+  }
+
+  .find-patchi-result__panel {
+    padding: 0.7rem 0.55rem;
+    max-width: 100%;
+  }
+
+  .find-patchi-result__card {
+    padding: 0.75rem 0.7rem;
+  }
+
+  .find-patchi-result__label {
+    font-size: 0.95rem;
+  }
+
+  .find-patchi-result__value {
+    font-size: clamp(1.55rem, 7vw, 1.95rem);
+  }
+
+  .find-patchi-result__meta {
+    max-width: 100%;
+    padding: 0.75rem 0.8rem;
+  }
+
+  .find-patchi-result__meta-row {
+    grid-template-columns: minmax(4.75rem, auto) minmax(0, 1fr);
+    gap: 0.35rem 0.55rem;
+  }
+
+  .sheet-picker__btn {
+    min-height: var(--touch-min);
+  }
+
+  .patchi-submenu__btn {
+    min-height: var(--touch-min);
+  }
+
+  .schedule-table-wrap,
+  .patchi-pivot-wrap,
+  .sheet-table-wrap {
+    overscroll-behavior-x: contain;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  :root {
+    --page-pad-x: 1.15rem;
+    --page-pad-y: 1.35rem;
+  }
+
+  .header h1 {
+    font-size: 1.65rem;
+  }
+
+  .datetime-card__row {
+    flex-wrap: wrap;
+  }
+
+  .content {
+    padding: 1.1rem;
+  }
+
+  .find-patchi-result__value {
+    font-size: 2.15rem;
+  }
+
+  .context-card--home .context-row--home-chips .patchi-submenu__btn {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --page-pad-x: 1.25rem;
+    --page-pad-y: 1.5rem;
+    --app-max-width: 1100px;
+  }
+
+  .app {
+    max-width: var(--app-max-width);
+  }
+
+  .header__toolbar {
+    min-height: 3rem;
+  }
+
+  .header h1 {
+    font-size: 1.85rem;
+  }
+
+  .content {
+    padding: 1.25rem;
+  }
+
+  .datetime-card {
+    padding: 1.1rem 1.25rem;
+  }
+
+  .context-card--home .context-row--home-chips .patchi-filter-chips {
+    flex-wrap: wrap;
+  }
+
+  .context-card--home .context-row--home-chips .patchi-submenu__btn {
+    flex: 1 1 auto;
+    min-width: 4.5rem;
+  }
+}
+
+@media (min-width: 1366px) {
+  :root {
+    --app-max-width: 1180px;
+  }
+}
+
+@media (min-width: 1920px) {
+  :root {
+    --app-max-width: 1240px;
+  }
+}
+
+/* —— Home page: Tamil-art inspired palette (colors / borders / shadows only) —— */
+
+body:has(.app--home) {
+  background: #f8f4ec;
+  color: #3e342d;
+}
+
+.app--home {
+  --bg: #f8f4ec;
+  --bg-header: #fff9f0;
+  --bg-card: #ffffff;
+  --bg-panel: #f5ebdd;
+  --bg-input: #fffdf8;
+  --border: #ded0bd;
+  --text: #3e342d;
+  --text-heading: #2d1b12;
+  --muted: #75685d;
+  --accent: #8e2f2b;
+  --accent-hover: #70211f;
+  --accent-soft: rgba(142, 47, 43, 0.12);
+  --accent-saffron: #d46a1f;
+  --accent-saffron-hover: #b85714;
+  --accent-saffron-soft: rgba(212, 106, 31, 0.14);
+  --highlight-gold: #c7942e;
+  --highlight-gold-soft: rgba(199, 148, 46, 0.16);
+  --success: #287a48;
+  --success-soft: rgba(40, 122, 72, 0.14);
+  --warning: #c78118;
+  --error: #b43a36;
+  --card-shadow: 0 6px 20px rgba(69, 45, 28, 0.08);
+  --control-shadow: 0 2px 8px rgba(69, 45, 28, 0.1);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.app--home .header {
+  background: var(--bg-header);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 0 rgba(69, 45, 28, 0.04);
+}
+
+.app--home .header h1 {
+  color: var(--accent);
+}
+
+.app--home .header h1 .bi-ta {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.app--home .header h1 .bi-en {
+  color: var(--accent-hover);
+}
+
+.app--home .language-toggle__btn,
+.app--home .app-menu__toggle {
+  background: var(--bg-card);
+  border-color: var(--border);
+  color: var(--text-heading);
+  box-shadow: var(--control-shadow);
+}
+
+.app--home .language-toggle__btn:hover,
+.app--home .app-menu__toggle:hover,
+.app--home .app-menu__toggle[aria-expanded="true"] {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.app--home .language-toggle__btn--active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: var(--control-shadow);
+}
+
+.app--home .language-toggle__btn:focus-visible,
+.app--home .app-menu__toggle:focus-visible,
+.app--home .header-home-btn:focus-visible,
+.app--home .datetime-card__submit:focus-visible,
+.app--home .datetime-card__refresh:focus-visible,
+.app--home .datetime-card__permission:focus-visible,
+.app--home .patchi-submenu__btn:focus-visible,
+.app--home .datetime-field__input:focus-visible {
+  outline: 2px solid var(--accent-saffron);
+  outline-offset: 2px;
+}
+
+.app--home .header-home-btn--active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: var(--control-shadow);
+}
+
+.app--home .datetime-card,
+.app--home .content {
+  background: var(--bg-card);
+  border-color: var(--border);
+  box-shadow: var(--card-shadow);
+}
+
+.app--home .datetime-field__label,
+.app--home .datetime-field__coord-label {
+  color: var(--muted);
+}
+
+.app--home .datetime-field__input,
+.app--home .datetime-field__sunrise-value,
+.app--home .datetime-field__coord-input {
+  background: var(--bg-input);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.app--home .datetime-field__input:focus {
+  outline: 2px solid var(--accent-saffron-soft);
+  border-color: var(--accent-saffron);
+}
+
+.app--home .datetime-card__weekday .bi-ta {
+  color: var(--accent);
+}
+
+.app--home .datetime-card__weekday .bi-en {
+  color: var(--muted);
+}
+
+.app--home .datetime-card__submit {
+  background: var(--accent-saffron);
+  border-color: var(--accent-saffron);
+  color: #fff;
+}
+
+.app--home .datetime-card__submit:hover {
+  background: var(--accent-saffron-hover);
+  border-color: var(--accent-saffron-hover);
+}
+
+.app--home .datetime-card__refresh {
+  background: var(--bg-card);
+  border-color: var(--border);
+  color: var(--text-heading);
+  box-shadow: var(--control-shadow);
+}
+
+.app--home .datetime-card__refresh:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.app--home .datetime-card__permission--on {
+  color: var(--success);
+  border-color: color-mix(in srgb, var(--success) 45%, var(--border));
+  background: var(--success-soft);
+  box-shadow: var(--control-shadow);
+}
+
+.app--home .datetime-card__permission--off {
+  color: var(--error);
+  border-color: color-mix(in srgb, var(--error) 40%, var(--border));
+  background: color-mix(in srgb, var(--error) 10%, var(--bg-card));
+  box-shadow: var(--control-shadow);
+}
+
+.app--home .datetime-card__permission:hover {
+  border-color: var(--success);
+}
+
+.app--home .content {
+  background: var(--bg-card);
+}
+
+.app--home .context-card--home {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+
+.app--home .context-card--home .context-label,
+.app--home .context-card--home .context-label--athikara,
+.app--home .context-card--home .context-label--naal,
+.app--home .context-card--home .context-label--padu,
+.app--home .context-card--home .context-label--antharam,
+.app--home .context-card--home .context-value--home-pirai {
+  color: var(--muted);
+}
+
+.app--home .context-card--home .context-value--home-thithi-name,
+.app--home .context-card--home .context-value--home-athikara,
+.app--home .context-card--home .context-value--home-naal,
+.app--home .context-card--home .context-value--home-padu,
+.app--home .context-card--home .context-value--home-day,
+.app--home .context-card--home .jamam-pair__cell--home-antharam .context-value--home-antharam {
+  color: var(--accent-saffron);
+}
+
+.app--home .context-card--home .context-value--home-athikara {
+  color: var(--accent);
+}
+
+.app--home .context-card--home .jamam-pair__cell--home-inline .thozhil-value-btn {
+  color: var(--accent);
+  border-color: var(--border);
+  background: var(--bg-card);
+}
+
+.app--home .context-card--home .jamam-pair__cell--home-inline .thozhil-value-btn:hover,
+.app--home .context-card--home .jamam-pair__cell--home-inline .thozhil-value-btn[aria-expanded="true"] {
+  border-color: var(--highlight-gold);
+  background: var(--highlight-gold-soft);
+  color: var(--accent-hover);
+}
+
+.app--home .context-card--home .patchi-submenu__btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-heading);
+  box-shadow: none;
+}
+
+.app--home .context-card--home .patchi-submenu__btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.app--home .context-card--home .patchi-submenu__btn--active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.app--home .status--error {
+  color: var(--error);
+}
+
+.app--home .app-menu__panel {
+  background: var(--bg-card);
+  border-left-color: var(--border);
+}
+
+.app--home .app-menu__panel-title {
+  color: var(--accent);
+}
+
+.app--home .app-menu__item {
+  background: var(--bg-panel);
+  border-color: var(--border);
+  color: var(--text-heading);
+}
+
+.app--home .app-menu__item:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.app--home .app-menu__item--active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.app--home .app-menu__item--active:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: #fff;
+}
+
+
+
+/* --- Find Patchi page: spiritual Tamil palette (colors / borders / shadows only) --- */
+
+body:has(.app--find-patchi) {
+  background: #f7f2e8;
+  color: #2c1b13;
+}
+
+.app--find-patchi {
+  --bg: #f7f2e8;
+  --bg-header: #fffefb;
+  --bg-card: #fffefb;
+  --bg-panel: #faf4e9;
+  --bg-input: #fffdf8;
+  --border: #ded1bf;
+  --text: #2c1b13;
+  --text-heading: #2c1b13;
+  --muted: #71645a;
+  --accent: #8c2f2b;
+  --accent-hover: #6f211e;
+  --accent-soft: rgba(140, 47, 43, 0.12);
+  --accent-saffron: #d0601d;
+  --accent-saffron-hover: #b04f14;
+  --accent-saffron-soft: rgba(208, 96, 29, 0.14);
+  --highlight-gold: #c4932f;
+  --highlight-gold-soft: rgba(196, 147, 47, 0.18);
+  --success: #287a49;
+  --success-soft: rgba(40, 122, 73, 0.14);
+  --error: #b43a36;
+  --card-shadow: 0 6px 20px rgba(65, 43, 27, 0.08);
+  --control-shadow: 0 2px 8px rgba(65, 43, 27, 0.1);
+  --radius-card: 18px;
+  --radius-control: 14px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.app--find-patchi .header {
+  background: var(--bg-header);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 0 rgba(65, 43, 27, 0.04);
+}
+
+.app--find-patchi .header h1 {
+  color: var(--accent);
+}
+
+.app--find-patchi .header h1 .bi-ta {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.app--find-patchi .header h1 .bi-en {
+  color: var(--accent-hover);
+}
+
+.app--find-patchi .language-toggle__btn,
+.app--find-patchi .app-menu__toggle {
+  background: var(--bg-card);
+  border-color: var(--border);
+  color: var(--text-heading);
+  box-shadow: var(--control-shadow);
+  border-radius: 999px;
+}
+
+.app--find-patchi .language-toggle__btn:hover,
+.app--find-patchi .app-menu__toggle:hover,
+.app--find-patchi .app-menu__toggle[aria-expanded="true"] {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.app--find-patchi .language-toggle__btn--active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.app--find-patchi .language-toggle__btn:focus-visible,
+.app--find-patchi .app-menu__toggle:focus-visible,
+.app--find-patchi .header-home-btn:focus-visible,
+.app--find-patchi .datetime-card__submit:focus-visible,
+.app--find-patchi .datetime-card__refresh:focus-visible,
+.app--find-patchi .datetime-card__permission:focus-visible,
+.app--find-patchi .datetime-field__input:focus-visible {
+  outline: 2px solid var(--accent-saffron);
+  outline-offset: 2px;
+}
+
+.app--find-patchi .header-home-btn--active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: var(--control-shadow);
+}
+
+.app--find-patchi .datetime-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--card-shadow);
+}
+
+.app--find-patchi .datetime-card__row {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  padding: 0.75rem 0.7rem;
+}
+
+.app--find-patchi .datetime-field__label,
+.app--find-patchi .datetime-field__coord-label {
+  color: var(--muted);
+}
+
+.app--find-patchi .datetime-field__input,
+.app--find-patchi .datetime-field__sunrise-value,
+.app--find-patchi .datetime-field__coord-input {
+  background: var(--bg-input);
+  border-color: var(--border);
+  color: var(--text);
+  border-radius: 12px;
+}
+
+.app--find-patchi .datetime-field__input:focus {
+  outline: 2px solid var(--accent-saffron-soft);
+  border-color: var(--accent-saffron);
+}
+
+.app--find-patchi .datetime-card__weekday .bi-ta {
+  color: var(--accent);
+}
+
+.app--find-patchi .datetime-card__weekday .bi-en {
+  color: var(--muted);
+}
+
+.app--find-patchi .datetime-card__submit {
+  background: var(--accent-saffron);
+  border-color: var(--accent-saffron);
+  color: #fff;
+  border-radius: var(--radius-control);
+}
+
+.app--find-patchi .datetime-card__submit:hover {
+  background: var(--accent-saffron-hover);
+  border-color: var(--accent-saffron-hover);
+}
+
+.app--find-patchi .datetime-card__submit:active {
+  background: var(--accent-saffron-hover);
+  transform: translateY(1px);
+}
+
+.app--find-patchi .datetime-card__refresh {
+  background: var(--bg-card);
+  border-color: var(--border);
+  color: var(--text-heading);
+  border-radius: var(--radius-control);
+  box-shadow: var(--control-shadow);
+}
+
+.app--find-patchi .datetime-card__refresh:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.app--find-patchi .datetime-card__permission--on {
+  color: var(--success);
+  border-color: color-mix(in srgb, var(--success) 45%, var(--border));
+  background: var(--success-soft);
+  box-shadow: var(--control-shadow);
+}
+
+.app--find-patchi .datetime-card__permission--off {
+  color: var(--error);
+  border-color: color-mix(in srgb, var(--error) 40%, var(--border));
+  background: color-mix(in srgb, var(--error) 10%, var(--bg-card));
+  box-shadow: var(--control-shadow);
+}
+
+.app--find-patchi .datetime-card__permission:hover {
+  border-color: var(--success);
+}
+
+.app--find-patchi .content {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--card-shadow);
+}
+
+.app--find-patchi .find-patchi-result__panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.app--find-patchi .find-patchi-result__card--thithi {
+  background: rgba(140, 47, 43, 0.08);
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border));
+}
+
+.app--find-patchi .find-patchi-result__card--jamam {
+  background: rgba(208, 96, 29, 0.1);
+  border: 1px solid color-mix(in srgb, var(--accent-saffron) 24%, var(--border));
+}
+
+.app--find-patchi .find-patchi-result__divider {
+  background: var(--highlight-gold);
+  opacity: 0.75;
+}
+
+.app--find-patchi .find-patchi-result__label {
+  color: var(--muted);
+}
+
+.app--find-patchi .find-patchi-result__value--thithi {
+  color: var(--accent);
+}
+
+.app--find-patchi .find-patchi-result__value--jamam {
+  color: var(--accent-saffron);
+}
+
+.app--find-patchi .find-patchi-result__meta {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+
+.app--find-patchi .find-patchi-result__meta-label {
+  color: var(--muted);
+}
+
+.app--find-patchi .find-patchi-result__meta-value {
+  color: var(--text-heading);
+}
+
+.app--find-patchi .find-patchi-result__meta-value--time {
+  color: var(--accent-saffron);
+  font-weight: 700;
+}
+
+.app--find-patchi .find-patchi-hint {
+  color: var(--muted);
+}
+
+.app--find-patchi .status--error {
+  color: var(--error);
+}
+
+.app--find-patchi .app-menu__panel {
+  background: var(--bg-card);
+  border-left-color: var(--border);
+}
+
+.app--find-patchi .app-menu__panel-title {
+  color: var(--accent);
+}
+
+.app--find-patchi .app-menu__item {
+  background: var(--bg-panel);
+  border-color: var(--border);
+  color: var(--text-heading);
+  border-radius: var(--radius-control);
+}
+
+.app--find-patchi .app-menu__item:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.app--find-patchi .app-menu__item--active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.app--find-patchi .app-menu__item--active:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: #fff;
+}
+
+.app--find-patchi .datetime-card__submit:disabled,
+.app--find-patchi .datetime-card__refresh:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
 }

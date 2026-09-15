@@ -344,6 +344,19 @@ export function getPatchiDaysDayForAthikaraPatchi(
   return null;
 }
 
+/**
+ * Day Scheduler / All Chips weekday column for a bird under that pirai
+ * (reverse of Patchi Days Athikara mapping).
+ */
+export function getPatchiDaysWeekdayForAthikaraPatchi(
+  pakshaId: AlternatePakshaId,
+  patchi: (typeof PATCHI_ORDER)[number],
+): number | null {
+  const day = getPatchiDaysDayForAthikaraPatchi(pakshaId, patchi);
+  if (!day) return null;
+  return weekdayFromTamilDay(day.ta);
+}
+
 /** Padu Patchi: bird that Dies (சாவு) in the given jamam / period for that weekday. */
 export function getAlternatePaduPatchiForJamam(
   pakshaId: AlternatePakshaId,

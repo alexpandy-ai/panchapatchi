@@ -47,6 +47,9 @@ export const UI = {
   date: bi("தேதி", "Date"),
   time: bi("நேரம்", "Time"),
   location: bi("இடம்", "Location"),
+  selectDate: bi("தேதியைத் தேர்ந்தெடு", "Select Date"),
+  selectTime: bi("நேரத்தைத் தேர்ந்தெடு", "Select Time"),
+  selectLocation: bi("இடத்தைத் தேர்ந்தெடு", "Select Location"),
   searchingPlaces: bi("தேடுகிறது…", "Searching…"),
   coordinates: bi("இடம் ஆயங்கள்", "Coordinates"),
   latitude: bi("அட்சரேகை", "Lat"),
@@ -65,6 +68,12 @@ export const UI = {
   period: bi("பகுதி", "Period"),
   patchi: bi("பட்சி", "Bird"),
   myPatchi: bi("உங்கள் பட்சி", "Your Patchi"),
+  yourPatchiIs: bi("உங்கள் திதி பட்சி", "Your Thithi Patchi"),
+  yourJamamPatchi: bi("உங்கள் ஜாமம் பட்சி", "Your Jamam Patchi"),
+  findPatchiHint: bi(
+    "தேதி, இடம், நேரம் தேர்ந்து சமர்ப்பிக்கவும்.",
+    "Select date, location, and time, then Submit.",
+  ),
   selectOurPatchi: bi("பட்சியைத் தேர்ந்தெடு", "Select Patchi"),
   all: bi("அனைத்தும்", "All"),
   status: bi("நிலை", "Status"),
@@ -248,7 +257,7 @@ export const MENU_ITEMS: { id: string; label: Bilingual }[] = [
   },
   {
     id: "status",
-    label: bi("பட்சி நிலை", "Patchi status"),
+    label: bi("பட்சி அறிக", "Find Patchi"),
   },
   {
     id: "schedule",

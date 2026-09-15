@@ -18,6 +18,7 @@ import {
   isValidCoords,
   parseCoordInput,
   resolveCountryInput,
+  type GeoCoords,
 } from "../utils/location";
 import { formatPlaceLabel, geocodePlace, searchPlaces, type PlaceSuggestion } from "../utils/geocode";
 
@@ -34,6 +35,12 @@ interface DateTimeCardProps {
 
   /** Home: hide the visible Time field label; input stays. */
   hideTimeLabel?: boolean;
+
+  /** Find Patchi: use “Select Date / Location / Time” labels. */
+  selectFieldLabels?: boolean;
+
+  /** Called after Submit applies date, time, and location. */
+  onSubmit?: (payload: { date: Date; coords: GeoCoords | null }) => void;
 
 }
 
@@ -122,11 +129,17 @@ export function DateTimeCard({
   onChange,
   hideDateLabel = false,
   hideTimeLabel = false,
+  selectFieldLabels = false,
+  onSubmit,
 }: DateTimeCardProps) {
 
   const { coords, geoCoords, manualCoords, source, locationDisplay, applyLocation, requestGeolocation, geoPermission } =
     useLocation();
   const { language } = useLanguage();
+
+  const dateLabel = selectFieldLabels ? UI.selectDate : UI.date;
+  const timeLabel = selectFieldLabels ? UI.selectTime : UI.time;
+  const locationLabel = selectFieldLabels ? UI.selectLocation : UI.location;
 
   const listId = useId();
 
@@ -377,6 +390,10 @@ export function DateTimeCard({
     }
 
     draftDirtyRef.current = false;
+
+    const submittedCoords: GeoCoords | null =
+      lat !== null && lng !== null && isValidCoords(lat, lng) ? { lat, lng } : null;
+    onSubmit?.({ date: nextDateTime, coords: submittedCoords });
   };
 
   const handleRefresh = () => {
@@ -413,7 +430,7 @@ export function DateTimeCard({
           {hideDateLabel ? null : (
             <span className="datetime-field__label">
 
-              <BilingualText text={UI.date} />
+              <BilingualText text={dateLabel} />
 
             </span>
           )}
@@ -434,7 +451,7 @@ export function DateTimeCard({
 
               value={dateInput}
 
-              aria-label={hideDateLabel ? pickBilingual(UI.date, language) : undefined}
+              aria-label={hideDateLabel ? pickBilingual(dateLabel, language) : undefined}
 
               onChange={(event) => {
                 draftDirtyRef.current = true;
@@ -454,7 +471,7 @@ export function DateTimeCard({
           {hideTimeLabel ? null : (
             <span className="datetime-field__label">
 
-              <BilingualText text={UI.time} />
+              <BilingualText text={timeLabel} />
 
             </span>
           )}
@@ -467,7 +484,7 @@ export function DateTimeCard({
 
             value={timeInput}
 
-            aria-label={hideTimeLabel ? pickBilingual(UI.time, language) : undefined}
+            aria-label={hideTimeLabel ? pickBilingual(timeLabel, language) : undefined}
 
             onChange={(event) => {
               draftDirtyRef.current = true;
@@ -486,7 +503,7 @@ export function DateTimeCard({
 
           <span className="datetime-field__label">
 
-            <BilingualText text={UI.location} />
+            <BilingualText text={locationLabel} />
 
           </span>
 
@@ -529,9 +546,9 @@ export function DateTimeCard({
 
               onKeyDown={handleLocationKeyDown}
 
-              placeholder={pickBilingual(UI.location, language)}
+              placeholder={pickBilingual(locationLabel, language)}
 
-              aria-label={pickBilingual(UI.location, language)}
+              aria-label={pickBilingual(locationLabel, language)}
 
               autoComplete="off"
 
@@ -637,7 +654,7 @@ export function DateTimeCard({
 
             </div>
 
-            <label className="datetime-field__coord">
+            <label className="datetime-field__coord datetime-field__coord--lat">
 
               <span className="datetime-field__coord-label">
 
@@ -673,7 +690,7 @@ export function DateTimeCard({
 
             </label>
 
-            <label className="datetime-field__coord">
+            <label className="datetime-field__coord datetime-field__coord--lng">
 
               <span className="datetime-field__coord-label">
 

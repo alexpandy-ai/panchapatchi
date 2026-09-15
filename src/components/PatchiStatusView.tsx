@@ -463,6 +463,7 @@ export function PatchiStatusView({
                   <InlineEmojiLabel
                     text={patchiLabelBilingual(athikaraPatchi)}
                     emoji={patchiEmoji(athikaraPatchi)}
+                    emojiPosition="after"
                   />
                 </span>
               </span>
@@ -491,6 +492,7 @@ export function PatchiStatusView({
                     <InlineEmojiLabel
                       text={patchiLabelBilingual(paduPatchi)}
                       emoji={patchiEmoji(paduPatchi)}
+                      emojiPosition="after"
                     />
                   </span>
                 </span>
