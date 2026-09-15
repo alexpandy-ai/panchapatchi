@@ -16,6 +16,7 @@ import {
   ANTHARA_DAY_SEGMENT_COUNT,
   ANTHARA_NIGHT_SEGMENT_COUNT,
   getAntharaSegmentIndex,
+  getAntharaSlots,
   JAMAM_ANTHARA_SEGMENT_COUNT,
 } from "../utils/anthara";
 
@@ -47,16 +48,19 @@ import {
 import {
   ALTERNATE_ANTHARA_SEGMENT_COUNT,
   alternatePakshaSupportsNight,
+  getAlternateEatingPatchi,
   getAlternateJamamActivitySlots,
-  getAlternatePaduPatchi,
+  getAlternatePaduPatchiForJamam,
   getAlternatePatchiJamamActivityForWeekday,
+  getPatchiDaysDayForAthikaraPatchi,
 } from "../utils/alternateCalculation";
 
 import { derivePatchiStatusFromSchedule } from "../utils/patchi";
 
 import { getPakshaFromDate, type PakshaId } from "../utils/paksha";
 import {
-  getNextThithiPatchiEntryForDate,
+  getNextThithiPatchiEntry,
+  getNightThithiPatchiEntryForDate,
   getThithiPatchiEntryForDate,
 } from "../utils/thithi";
 
@@ -100,16 +104,41 @@ export function PatchiStatusView({
   }, [homeChipSelection, isHome]);
 
   const weekday = selectedDateTime.getDay();
-  const currentPakshaId = isHome ? getPakshaFromDate(selectedDateTime) : navigationPakshaId;
-  const pakshaId = currentPakshaId;
 
-  const thithiPatchiEntry = useMemo(
-    () => getThithiPatchiEntryForDate(selectedDateTime, pakshaId),
-    [selectedDateTime, pakshaId],
+  /** Home: Night Thithi + pirai at sunset drive all alternate lookups. */
+  const nightThithiEntry = useMemo(
+    () => (isHome ? getNightThithiPatchiEntryForDate(selectedDateTime, coords) : null),
+    [isHome, selectedDateTime, coords],
   );
 
+  const currentPakshaId = isHome
+    ? (nightThithiEntry?.pakshaId ?? getPakshaFromDate(selectedDateTime))
+    : navigationPakshaId;
+  const pakshaId = currentPakshaId;
+
+  const thithiPatchiEntry = useMemo(() => {
+    if (isHome && nightThithiEntry) return nightThithiEntry;
+    return getThithiPatchiEntryForDate(selectedDateTime, pakshaId);
+  }, [isHome, nightThithiEntry, selectedDateTime, pakshaId]);
+
   const thithiScheduleWeekday = thithiPatchiEntry.weekday;
-  const athikaraPatchi = thithiPatchiEntry.patchi;
+
+  /** Home: Athikara = night jamam 1 eating patchi (alternate schedule). Status: Thithi table. */
+  const athikaraPatchi = useMemo(() => {
+    if (
+      isHome &&
+      (pakshaId === "valarpirai" || pakshaId === "theipirai")
+    ) {
+      const nightFirstEating = getAlternateEatingPatchi(
+        pakshaId,
+        thithiScheduleWeekday,
+        1,
+        "night",
+      );
+      if (nightFirstEating) return nightFirstEating;
+    }
+    return thithiPatchiEntry.patchi;
+  }, [isHome, pakshaId, thithiPatchiEntry.patchi, thithiScheduleWeekday]);
 
   const homePatchi = homeChipSelection ?? athikaraPatchi;
   const showHomeJamamValue = homeChipSelection != null;
@@ -185,10 +214,17 @@ export function PatchiStatusView({
     thithiScheduleWeekday,
   ]);
 
+  /** Home: Padu = Die bird in the same jamam as Athikara (night jamam 1). */
   const paduPatchi = useMemo(() => {
     if (!isHome || (pakshaId !== "valarpirai" && pakshaId !== "theipirai")) return null;
-    return getAlternatePaduPatchi(pakshaId, thithiScheduleWeekday);
+    return getAlternatePaduPatchiForJamam(pakshaId, thithiScheduleWeekday, 1, "night");
   }, [isHome, pakshaId, thithiScheduleWeekday]);
+
+  /** Home: Naal = Patchi Days weekday for current Athikara under current pirai. */
+  const athikaraNaal = useMemo(() => {
+    if (!isHome || (pakshaId !== "valarpirai" && pakshaId !== "theipirai")) return null;
+    return getPatchiDaysDayForAthikaraPatchi(pakshaId, athikaraPatchi);
+  }, [athikaraPatchi, isHome, pakshaId]);
 
   const derivedNext = useMemo(() => {
     if (isHome) return { myPatchiActivity: null };
@@ -233,7 +269,7 @@ export function PatchiStatusView({
       const supportsNight = alternatePakshaSupportsNight(pakshaId);
       const nextThithiMorning =
         period === "night" && supportsNight
-          ? getNextThithiPatchiEntryForDate(selectedDateTime, pakshaId)
+          ? getNextThithiPatchiEntry(pakshaId, thithiPatchiEntry.thithiNumber)
           : null;
 
       return {
@@ -319,6 +355,7 @@ export function PatchiStatusView({
   }, [
     activeSlot,
     thithiScheduleWeekday,
+    thithiPatchiEntry.thithiNumber,
     antharaDialogTarget,
     antharaGroup,
     derived.myPatchiActivity,
@@ -335,6 +372,45 @@ export function PatchiStatusView({
   ]);
 
   const currentJamamActivity = isHome ? homeJamamActivity : derived.myPatchiActivity;
+
+  /** Home: current Antharam activity for the selected patchi within the active jamam. */
+  const homeAntharaCurrent = useMemo(() => {
+    if (!isHome || !activeSlot || !homeChipSelection) return null;
+    if (pakshaId !== "valarpirai" && pakshaId !== "theipirai") return null;
+
+    const { yama, period } = yamaFromJamamIndex(activeSlot.index);
+    const jamamSlots = getAlternateJamamActivitySlots(
+      pakshaId,
+      thithiScheduleWeekday,
+      yama,
+      period,
+    );
+    const antharaSlots = getAntharaSlots(
+      jamamSlots,
+      homeChipSelection,
+      period,
+      activeSlot.start,
+      activeSlot.end,
+    );
+    if (antharaSlots.length === 0) return null;
+
+    const time = selectedDateTime.getTime();
+    let current = antharaSlots[0]!;
+    for (const slot of antharaSlots) {
+      if (time >= slot.start.getTime() && time < slot.end.getTime()) {
+        return slot;
+      }
+      if (time >= slot.start.getTime()) current = slot;
+    }
+    return current;
+  }, [
+    isHome,
+    activeSlot,
+    homeChipSelection,
+    pakshaId,
+    thithiScheduleWeekday,
+    selectedDateTime,
+  ]);
 
   if (!isHome && !paksha) {
     return (
@@ -357,15 +433,16 @@ export function PatchiStatusView({
             <div className="context-row context-row--home-thithi">
               <span className="context-inline-item">
                 <span className="context-label">
-                  <BilingualText text={UI.thithi} block={false} />
+                  <BilingualText text={UI.nightThithi} block={false} />
                 </span>
-                <span className="context-value context-value--thithi-paksha">
+                <span className="context-value context-value--home-thithi-name">
                   <BilingualText text={thithiPatchiEntry.thithi} block={false} />
-                  <span className="context-value__sep" aria-hidden="true">
-                    ·
-                  </span>
-                  <BilingualText text={PAKSHA_BI[currentPakshaId]} block={false} />
                 </span>
+              </span>
+            </div>
+            <div className="context-row context-row--home-day">
+              <span className="context-value context-value--home-pirai">
+                <BilingualText text={PAKSHA_BI[currentPakshaId]} block={false} />
               </span>
               <span className="context-value context-value--home-day">
                 <BilingualText text={thithiPatchiEntry.day} block={false} />
@@ -385,6 +462,19 @@ export function PatchiStatusView({
                 </span>
               </span>
             </div>
+
+            {athikaraNaal ? (
+              <div className="context-row context-row--home-naal">
+                <span className="context-inline-item context-inline-item--naal">
+                  <span className="context-label context-label--naal">
+                    <BilingualText text={UI.day} block={false} />
+                  </span>
+                  <span className="context-value context-value--home-naal">
+                    <BilingualText text={athikaraNaal} block={false} />
+                  </span>
+                </span>
+              </div>
+            ) : null}
 
             {paduPatchi ? (
               <div className="context-row context-row--home-padu">
@@ -483,26 +573,55 @@ export function PatchiStatusView({
           <div className="context-row context-row--jamam-pair">
             <div className={isHome ? "jamam-pair jamam-pair--single" : "jamam-pair"}>
               {activeSlot ? (
-                <div
-                  className={[
-                    "jamam-pair__cell",
-                    isHome ? "jamam-pair__cell--home-inline" : "",
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
-                >
-                  <span className="context-label">
-                    <BilingualText
-                      text={
-                        isHome
-                          ? jamamBilingual(activeSlot.index)
-                          : thozhilHeader(activeSlot.index)
-                      }
-                      block={false}
-                    />
-                  </span>
-                  {isHome ? (
-                    showHomeJamamValue && currentJamamActivity ? (
+                isHome ? (
+                  <div className="jamam-pair__cell jamam-pair__cell--home-stack">
+                    <div className="jamam-pair__cell--home-inline">
+                      <span className="context-label">
+                        <BilingualText text={jamamBilingual(activeSlot.index)} block={false} />
+                      </span>
+                      {showHomeJamamValue && currentJamamActivity ? (
+                        <button
+                          type="button"
+                          className="context-value-btn thozhil-value-btn jamam-summary__value"
+                          aria-expanded={antharaDialogTarget === "current"}
+                          onClick={() => setAntharaDialogTarget("current")}
+                        >
+                          <BilingualText
+                            text={thozhilValueWithTime(
+                              displayActivityBi(currentJamamActivity),
+                              formatTimeRange(activeSlot.start, activeSlot.end),
+                            )}
+                            block={false}
+                          />
+                        </button>
+                      ) : null}
+                    </div>
+                    {showHomeJamamValue && homeAntharaCurrent ? (
+                      <div className="jamam-pair__cell--home-inline jamam-pair__cell--home-antharam">
+                        <span className="context-label context-label--antharam">
+                          <BilingualText text={UI.antharaJamam} block={false} />
+                        </span>
+                        <span className="context-value context-value--home-antharam">
+                          <BilingualText
+                            text={thozhilValueWithTime(
+                              displayActivityBi(homeAntharaCurrent.activity),
+                              formatTimeRange(
+                                homeAntharaCurrent.start,
+                                homeAntharaCurrent.end,
+                              ),
+                            )}
+                            block={false}
+                          />
+                        </span>
+                      </div>
+                    ) : null}
+                  </div>
+                ) : (
+                  <div className="jamam-pair__cell">
+                    <span className="context-label">
+                      <BilingualText text={thozhilHeader(activeSlot.index)} block={false} />
+                    </span>
+                    {currentJamamActivity ? (
                       <button
                         type="button"
                         className="context-value-btn thozhil-value-btn jamam-summary__value"
@@ -517,30 +636,15 @@ export function PatchiStatusView({
                           block={false}
                         />
                       </button>
-                    ) : null
-                  ) : currentJamamActivity ? (
-                    <button
-                      type="button"
-                      className="context-value-btn thozhil-value-btn jamam-summary__value"
-                      aria-expanded={antharaDialogTarget === "current"}
-                      onClick={() => setAntharaDialogTarget("current")}
-                    >
-                      <BilingualText
-                        text={thozhilValueWithTime(
-                          displayActivityBi(currentJamamActivity),
-                          formatTimeRange(activeSlot.start, activeSlot.end),
-                        )}
-                        block={false}
-                      />
-                    </button>
-                  ) : (
-                    <span className="context-value jamam-summary__value">
-                      <span className="jamam-summary__time">
-                        {formatTimeRange(activeSlot.start, activeSlot.end)}
+                    ) : (
+                      <span className="context-value jamam-summary__value">
+                        <span className="jamam-summary__time">
+                          {formatTimeRange(activeSlot.start, activeSlot.end)}
+                        </span>
                       </span>
-                    </span>
-                  )}
-                </div>
+                    )}
+                  </div>
+                )
               ) : null}
               {!isHome && nextSlot ? (
                 <div className="jamam-pair__cell">

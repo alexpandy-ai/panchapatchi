@@ -10,6 +10,7 @@ import {
   naalDialogTitle,
 } from "../utils/anthara";
 import {
+  antharaColumnRowLabel,
   antharaJamamHeader,
   antharaMorningJamamHeader,
   PANCHA_ACTIVITY_TA,
@@ -35,12 +36,17 @@ export interface NaalDialogProps {
   period: PeriodId;
   /** When true, keep the start activity on every Naal slot instead of cycling. */
   repeatActivity?: boolean;
-  /** Night Naal: rows 6–10 = next Thithi day jamams 1–5. */
+  /** Night Naal: rows 6–10 = next Thithi day jamams (yama-rotated). */
   appendNextDayMorning?: boolean;
   nextDayMorningByBird?: { patchi: string; activities: string[] }[];
   /** Next-day morning → Naal: rows 1–5 day cycle, 6–10 that day’s night jamams. */
   appendNextDayNight?: boolean;
   nextDayNightByBird?: { patchi: string; activities: string[] }[];
+  /** Day anthara → Naal: rows 6–10 = same-day night jamams (yama-rotated). */
+  appendNightJamam?: boolean;
+  nightJamamByBird?: { patchi: string; activities: string[] }[];
+  /** Display serials for rows 6–10 (morning yamas or night jamam indices). */
+  appendedJamamSerials?: number[];
   onClose: () => void;
 }
 
@@ -58,6 +64,14 @@ function fillDash(count: number): string[] {
   return Array.from({ length: count }, () => "—");
 }
 
+function appendedPart(
+  provided: string[] | undefined,
+): string[] {
+  return provided && provided.length >= ANTHARA_DAY_SEGMENT_COUNT
+    ? provided.slice(0, ANTHARA_DAY_SEGMENT_COUNT)
+    : fillDash(ANTHARA_DAY_SEGMENT_COUNT);
+}
+
 function naalActivitiesForBird(
   startActivity: string,
   period: PeriodId,
@@ -66,6 +80,8 @@ function naalActivitiesForBird(
   nextDayMorningActivities: string[] | undefined,
   appendNextDayNight: boolean,
   nextDayNightActivities: string[] | undefined,
+  appendNightJamam: boolean,
+  nightJamamActivities: string[] | undefined,
 ): string[] {
   if (startActivity === "—" || startActivity === "") {
     return fillDash(JAMAM_ANTHARA_SEGMENT_COUNT);
@@ -79,19 +95,19 @@ function naalActivitiesForBird(
       period,
       ANTHARA_DAY_SEGMENT_COUNT,
     );
-    const morningPart =
-      nextDayMorningActivities && nextDayMorningActivities.length >= ANTHARA_DAY_SEGMENT_COUNT
-        ? nextDayMorningActivities.slice(0, ANTHARA_DAY_SEGMENT_COUNT)
-        : fillDash(ANTHARA_DAY_SEGMENT_COUNT);
-    return [...antharaPart, ...morningPart];
+    return [...antharaPart, ...appendedPart(nextDayMorningActivities)];
   }
   if (appendNextDayNight) {
     const dayPart = naalCycleActivities(startActivity, "day", ANTHARA_DAY_SEGMENT_COUNT);
-    const nightPart =
-      nextDayNightActivities && nextDayNightActivities.length >= ANTHARA_DAY_SEGMENT_COUNT
-        ? nextDayNightActivities.slice(0, ANTHARA_DAY_SEGMENT_COUNT)
-        : fillDash(ANTHARA_DAY_SEGMENT_COUNT);
-    return [...dayPart, ...nightPart];
+    return [...dayPart, ...appendedPart(nextDayNightActivities)];
+  }
+  if (appendNightJamam) {
+    const antharaPart = naalCycleActivities(
+      startActivity,
+      period,
+      ANTHARA_DAY_SEGMENT_COUNT,
+    );
+    return [...antharaPart, ...appendedPart(nightJamamActivities)];
   }
   return naalCycleActivities(startActivity, period, JAMAM_ANTHARA_SEGMENT_COUNT);
 }
@@ -100,14 +116,33 @@ function naalRowLabel(
   index: number,
   appendNextDayMorning: boolean,
   appendNextDayNight: boolean,
+  appendNightJamam: boolean,
+  appendedJamamSerials: number[] | undefined,
 ): Bilingual {
-  if (appendNextDayMorning && index >= ANTHARA_DAY_SEGMENT_COUNT) {
-    return antharaMorningJamamHeader(index - ANTHARA_DAY_SEGMENT_COUNT + 1);
+  const displaySerial = index + 1;
+
+  if (index < ANTHARA_DAY_SEGMENT_COUNT) {
+    // Anthara cycle rows — serial with matching slot number in brackets.
+    return antharaColumnRowLabel(
+      displaySerial,
+      antharaJamamHeader(displaySerial),
+    );
   }
-  if (appendNextDayNight && index >= ANTHARA_DAY_SEGMENT_COUNT) {
-    return antharaJamamHeader(index + 1); // jamam 6–10
-  }
-  return { ta: String(index + 1), en: String(index + 1) };
+
+  const serialOffset = index - ANTHARA_DAY_SEGMENT_COUNT;
+  const jamamValue =
+    appendedJamamSerials?.[serialOffset] ??
+    (appendNextDayMorning
+      ? serialOffset + 1
+      : appendNextDayNight || appendNightJamam
+        ? ANTHARA_DAY_SEGMENT_COUNT + serialOffset + 1
+        : index + 1);
+
+  const jamamLabel = appendNextDayMorning
+    ? antharaMorningJamamHeader(jamamValue)
+    : antharaJamamHeader(jamamValue);
+
+  return antharaColumnRowLabel(displaySerial, jamamLabel);
 }
 
 export function NaalDialog({
@@ -124,10 +159,13 @@ export function NaalDialog({
   nextDayMorningByBird,
   appendNextDayNight = false,
   nextDayNightByBird,
+  appendNightJamam = false,
+  nightJamamByBird,
+  appendedJamamSerials,
   onClose,
 }: NaalDialogProps) {
   const singleBird = birdRows.length <= 1;
-  const showSplitLabels = appendNextDayMorning || appendNextDayNight;
+  const showSplitLabels = appendNextDayMorning || appendNextDayNight || appendNightJamam;
   const title = singleBird
     ? naalDialogTitle(antharaSerial, patchi, activity)
     : naalAllBirdsDialogTitle(antharaSerial);
@@ -142,6 +180,7 @@ export function NaalDialog({
       birdRows.map((row) => {
         const morning = nextDayMorningByBird?.find((entry) => entry.patchi === row.patchi);
         const night = nextDayNightByBird?.find((entry) => entry.patchi === row.patchi);
+        const sameDayNight = nightJamamByBird?.find((entry) => entry.patchi === row.patchi);
         return {
           patchi: row.patchi,
           activities: naalActivitiesForBird(
@@ -152,15 +191,19 @@ export function NaalDialog({
             morning?.activities,
             appendNextDayNight,
             night?.activities,
+            appendNightJamam,
+            sameDayNight?.activities,
           ),
         };
       }),
     [
       appendNextDayMorning,
       appendNextDayNight,
+      appendNightJamam,
       birdRows,
       nextDayMorningByBird,
       nextDayNightByBird,
+      nightJamamByBird,
       period,
       repeatActivity,
     ],
@@ -222,10 +265,20 @@ export function NaalDialog({
                 "jamam-segments-table",
                 "jamam-segments-table--matrix",
                 singleBird ? "jamam-segments-table--home-compact" : "",
+                showSplitLabels ? "" : "jamam-segments-table--time-first",
               ]
                 .filter(Boolean)
                 .join(" ")}
             >
+              <colgroup>
+                {showSplitLabels ? (
+                  <col className="jamam-segments-table__col-segment-number" />
+                ) : null}
+                <col className="jamam-segments-table__col-segment-time" />
+                {birdActivityRows.map((row) => (
+                  <col key={`col-${row.patchi}`} className="jamam-segments-table__col-patchi" />
+                ))}
+              </colgroup>
               <thead>
                 <tr>
                   {showSplitLabels ? (
@@ -266,6 +319,8 @@ export function NaalDialog({
                               index,
                               appendNextDayMorning,
                               appendNextDayNight,
+                              appendNightJamam,
+                              appendedJamamSerials,
                             )}
                           />
                         </span>

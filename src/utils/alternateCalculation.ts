@@ -1,6 +1,6 @@
 import type { ActivitySlot } from "../types";
 import { PATCHI_DAYS_TABLE, PANCHA_ACTIVITY_TA } from "./bilingual";
-import type { PATCHI_ORDER } from "./bilingual";
+import type { Bilingual, PATCHI_ORDER } from "./bilingual";
 import { getPanchaDisplayWeekday, TAMIL_WEEKDAYS } from "./dayGroup";
 import type { PeriodId } from "./jamam";
 import type { PakshaId } from "./paksha";
@@ -48,6 +48,8 @@ export const VALARPIRAI_ALTERNATE_GROUP_KEYS = ["செ", "பு", "வி", "�
 export const THEIPIRAI_ALTERNATE_GROUP_KEYS = ["செ", "பு", "வி", "வெ", "ச"] as const;
 
 const DIE_ACTIVITY_INDEX = 4;
+/** Night cycle: Die → Sleep → Rule → Walk → Eat. */
+const NIGHT_DIE_ACTIVITY_INDEX = 0;
 const NIGHT_WALK_ACTIVITY_INDEX = 3;
 const NIGHT_EAT_ACTIVITY_INDEX = 4;
 
@@ -327,12 +329,40 @@ export function getAlternateValarpiraiNextMorningWalkBird(
   return getAlternateValarpiraiNightBirdForActivity(weekday, jamam, NIGHT_EAT_ACTIVITY_INDEX);
 }
 
+/**
+ * Day name (Patchi Days table) for an Athikara bird under the given pirai column.
+ * Valarpirai / Theipirai each map each bird to one weekday in Information → Patchi Days.
+ */
+export function getPatchiDaysDayForAthikaraPatchi(
+  pakshaId: AlternatePakshaId,
+  patchi: (typeof PATCHI_ORDER)[number],
+): Bilingual | null {
+  const key = ALTERNATE_PAKSHA_CONFIG[pakshaId].patchiDaysKey;
+  for (const column of PATCHI_DAYS_TABLE) {
+    if (column[key] === patchi) return column.day;
+  }
+  return null;
+}
+
+/** Padu Patchi: bird that Dies (சாவு) in the given jamam / period for that weekday. */
+export function getAlternatePaduPatchiForJamam(
+  pakshaId: AlternatePakshaId,
+  weekday: number,
+  yama: number,
+  period: PeriodId,
+): (typeof PATCHI_ORDER)[number] | null {
+  const activityIndex = period === "day" ? DIE_ACTIVITY_INDEX : NIGHT_DIE_ACTIVITY_INDEX;
+  return period === "day"
+    ? getAlternateDayBirdForActivity(pakshaId, weekday, yama, activityIndex)
+    : getAlternateNightBirdForActivity(pakshaId, weekday, yama, activityIndex);
+}
+
 /** Padu Patchi: bird that Dies (சாவு) in jamam 1 morning for that weekday. */
 export function getAlternatePaduPatchi(
   pakshaId: AlternatePakshaId,
   weekday: number,
 ): (typeof PATCHI_ORDER)[number] | null {
-  return getAlternateDayBirdForActivity(pakshaId, weekday, 1, DIE_ACTIVITY_INDEX);
+  return getAlternatePaduPatchiForJamam(pakshaId, weekday, 1, "day");
 }
 
 /** Anthara dialog splits each jamam into ten weighted anthara time sections. */
@@ -389,4 +419,18 @@ export function getAlternateJamamActivitySlots(
       bird: bird ?? "—",
     };
   });
+}
+
+/** Patchi with Eating (ஊண்) activity for a given paksha / weekday / period / yama. */
+export function getAlternateEatingPatchi(
+  pakshaId: AlternatePakshaId,
+  weekday: number,
+  yama: number,
+  period: PeriodId,
+): (typeof PATCHI_ORDER)[number] | null {
+  const activityIndex =
+    period === "day" ? 0 /* ஊண் in PANCHA_ACTIVITY_TA */ : NIGHT_EAT_ACTIVITY_INDEX;
+  return period === "day"
+    ? getAlternateDayBirdForActivity(pakshaId, weekday, yama, activityIndex)
+    : getAlternateNightBirdForActivity(pakshaId, weekday, yama, activityIndex);
 }

@@ -715,7 +715,7 @@ body {
 }
 
 .jamam-segments-table__col-segment-number {
-  width: 3.5rem;
+  width: 7.5rem;
 }
 
 .jamam-segments-table__col-segment-time {
@@ -964,13 +964,13 @@ body {
   z-index: 1;
   text-align: center !important;
   background: var(--bg-card);
-  width: 3.5rem;
+  width: 7.5rem;
   white-space: nowrap;
 }
 
 .jamam-segments-table__segment-previous-col {
   position: sticky;
-  left: 3.5rem;
+  left: 7.5rem;
   z-index: 1;
   text-align: center !important;
   background: var(--bg-card);
@@ -988,7 +988,7 @@ body {
 }
 
 .jamam-segments-table--matrix:not(.jamam-segments-table--matrix-with-previous) .jamam-segments-table__segment-time-col {
-  left: 3.5rem;
+  left: 7.5rem;
 }
 
 .jamam-segments-table--home-compact.jamam-segments-table--matrix:not(.jamam-segments-table--matrix-with-previous)
@@ -1046,7 +1046,7 @@ body {
 }
 
 .jamam-segments-table--matrix-with-previous .jamam-segments-table__segment-time-col {
-  left: 7.75rem;
+  left: 11.75rem;
 }
 
 .jamam-segments-table__segment-col {
@@ -2670,67 +2670,130 @@ body {
   padding: 0.35rem 0;
 }
 
-.context-card--home .context-row--home-thithi {
-  flex-wrap: nowrap;
-  gap: 0.75rem 1rem;
+.context-card--home {
+  --home-label-width: 8.5rem;
+  --home-label-gap: 0.65rem;
+  --home-label-size: 0.88rem;
+  --home-value-size: 1.02rem;
+  padding: 0.85rem 0.9rem;
 }
 
-.context-card--home .context-row--home-athikara {
-  display: flex;
+.context-card--home .context-row {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.28rem 0;
+  gap: 0;
+}
+
+.context-card--home .context-label,
+.context-card--home .context-label--athikara,
+.context-card--home .context-label--naal,
+.context-card--home .context-label--padu,
+.context-card--home .context-label--antharam {
+  flex: 0 0 var(--home-label-width);
+  width: var(--home-label-width);
+  max-width: var(--home-label-width);
+  font-size: var(--home-label-size);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--muted);
+  text-align: left;
+}
+
+.context-card--home .context-row--home-thithi {
   flex-wrap: nowrap;
+}
+
+.context-card--home .context-row--home-thithi .context-inline-item,
+.context-card--home .context-row--home-athikara .context-inline-item--athikara,
+.context-card--home .context-row--home-naal .context-inline-item--naal,
+.context-card--home .context-row--home-padu .context-inline-item--padu {
+  display: grid;
+  grid-template-columns: var(--home-label-width) minmax(0, 1fr);
+  column-gap: var(--home-label-gap);
   align-items: center;
-  gap: 0.55rem;
+  width: 100%;
   min-width: 0;
 }
 
+.context-card--home .context-row--home-day {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.75rem;
+  padding-top: 0.05rem;
+  padding-bottom: 0.2rem;
+  padding-left: calc(var(--home-label-width) + var(--home-label-gap));
+}
+
+.context-card--home .context-value--home-pirai {
+  font-size: var(--home-value-size);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--text);
+}
+
+.context-card--home .context-row--home-athikara,
+.context-card--home .context-row--home-naal,
 .context-card--home .context-row--home-padu {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  gap: 0.55rem;
   min-width: 0;
-  padding-top: 0.1rem;
-}
-
-.context-card--home .context-row--home-athikara .context-inline-item--athikara,
-.context-card--home .context-row--home-padu .context-inline-item--padu {
-  flex: 0 1 auto;
-  min-width: 0;
-  align-items: center;
 }
 
 .context-card--home .context-row--home-athikara .context-label--athikara,
-.context-card--home .context-row--home-padu .context-label--padu {
-  display: inline;
+.context-card--home .context-row--home-naal .context-label--naal,
+.context-card--home .context-row--home-padu .context-label--padu,
+.context-card--home .context-row--home-thithi .context-label {
+  width: auto;
+  max-width: none;
+  flex: unset;
+}
+
+.context-card--home .context-value--home-thithi-name,
+.context-card--home .context-value--home-athikara,
+.context-card--home .context-value--home-naal,
+.context-card--home .context-value--home-padu,
+.context-card--home .context-value--home-day {
+  font-size: var(--home-value-size);
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1.25;
+  min-width: 0;
 }
 
 .context-card--home .context-value--home-athikara,
-.context-card--home .context-value--home-padu {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--accent);
-  line-height: 1.2;
+.context-card--home .context-value--home-naal,
+.context-card--home .context-value--home-padu,
+.context-card--home .context-value--home-day {
   white-space: nowrap;
 }
 
 .context-card--home .context-value--home-athikara .bi-ta,
-.context-card--home .context-value--home-padu .bi-ta {
+.context-card--home .context-value--home-naal .bi-ta,
+.context-card--home .context-value--home-padu .bi-ta,
+.context-card--home .context-value--home-thithi-name .bi-ta,
+.context-card--home .context-value--home-day .bi-ta,
+.context-card--home .context-value--home-pirai .bi-ta {
   font-weight: 700;
+  font-size: inherit;
+  line-height: inherit;
 }
 
 .context-card--home .context-row--home-chips {
   display: flex;
   align-items: center;
   min-width: 0;
-  padding: 0.15rem 0 0.25rem;
+  padding: 0.35rem 0 0.3rem;
 }
 
 .context-card--home .context-row--home-chips .patchi-filter-chips {
   display: flex;
   flex: 1 1 auto;
   flex-wrap: nowrap;
-  align-items: center;
-  gap: 0.28rem;
+  align-items: stretch;
+  gap: 0.3rem;
   padding: 0;
   min-width: 0;
   width: 100%;
@@ -2743,9 +2806,9 @@ body {
   flex: 1 1 0;
   box-sizing: border-box;
   min-width: 0;
-  min-height: 1.85rem;
-  padding: 0.28rem 0.35rem;
-  font-size: 0.78rem;
+  min-height: 2rem;
+  padding: 0.32rem 0.3rem;
+  font-size: 0.8rem;
   line-height: 1.15;
   white-space: nowrap;
 }
@@ -2760,32 +2823,7 @@ body {
   margin: 0;
 }
 
-@media (max-width: 640px) {
-  .context-card--home .context-value--home-athikara,
-  .context-card--home .context-value--home-padu {
-    font-size: 0.95rem;
-  }
-
-  .context-card--home .context-row--home-chips .patchi-submenu__btn {
-    min-height: 1.55rem;
-    padding: 0.12rem 0.2rem;
-    font-size: 0.68rem;
-  }
-}
-
-.context-card--home .context-value--home-day {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--accent);
-  line-height: 1.2;
-  flex-shrink: 0;
-}
-
 .context-card--home .context-inline-item {
-  display: inline-flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  gap: 0.35rem 0.5rem;
   min-width: 0;
 }
 
@@ -2805,22 +2843,154 @@ body {
   width: 100%;
 }
 
+.context-card--home .context-row--jamam-pair {
+  padding-top: 0.35rem;
+}
+
+.context-card--home .jamam-pair__cell--home-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.28rem;
+  width: 100%;
+}
+
 .context-card--home .jamam-pair__cell--home-inline {
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: var(--home-label-width) minmax(0, 1fr);
+  column-gap: var(--home-label-gap);
   align-items: center;
-  flex-wrap: nowrap;
-  gap: 0.35rem 0.5rem;
+  width: 100%;
+  min-width: 0;
 }
 
 .context-card--home .jamam-pair__cell--home-inline .context-label {
-  flex-shrink: 0;
+  width: auto;
+  max-width: none;
+  flex: unset;
 }
 
 .context-card--home .jamam-pair__cell--home-inline .context-value-btn,
 .context-card--home .jamam-pair__cell--home-inline .context-value {
   width: auto;
-  flex: 1 1 auto;
   min-width: 0;
+  justify-self: start;
+  text-align: left;
+}
+
+.context-card--home .jamam-pair__cell--home-antharam .context-value--home-antharam {
+  font-size: var(--home-value-size);
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1.25;
+}
+
+.context-card--home .jamam-pair__cell--home-inline .thozhil-value-btn {
+  font-size: var(--home-value-size);
+  font-weight: 700;
+}
+
+.context-card--home .jamam-pair__cell--home-inline .thozhil-value-btn .bi-ta {
+  font-size: inherit;
+  font-weight: 700;
+}
+
+/* Home — mobile: even type scale, aligned label column, readable chips */
+@media (max-width: 640px) {
+  .context-card--home {
+    --home-label-width: 6.75rem;
+    --home-label-gap: 0.5rem;
+    --home-label-size: 0.8rem;
+    --home-value-size: 0.92rem;
+    padding: 0.7rem 0.65rem;
+    border-radius: 0.65rem;
+  }
+
+  .context-card--home .context-row {
+    padding: 0.22rem 0;
+  }
+
+  .context-card--home .context-row--home-day {
+    gap: 0.3rem 0.55rem;
+    padding-left: calc(var(--home-label-width) + var(--home-label-gap));
+  }
+
+  .context-card--home .context-value--home-athikara,
+  .context-card--home .context-value--home-naal,
+  .context-card--home .context-value--home-padu,
+  .context-card--home .context-value--home-day,
+  .context-card--home .jamam-pair__cell--home-antharam .context-value--home-antharam {
+    font-size: var(--home-value-size);
+  }
+
+  .context-card--home .context-row--home-chips {
+    padding: 0.3rem 0 0.2rem;
+  }
+
+  .context-card--home .context-row--home-chips .patchi-filter-chips {
+    gap: 0.22rem;
+  }
+
+  .context-card--home .context-row--home-chips .patchi-submenu__btn {
+    min-height: 1.75rem;
+    padding: 0.22rem 0.18rem;
+    font-size: 0.72rem;
+    border-radius: 0.4rem;
+  }
+
+  .context-card--home .jamam-pair__cell--home-stack {
+    gap: 0.22rem;
+  }
+
+  .context-card--home .jamam-pair__cell--home-inline .thozhil-value-btn,
+  .context-card--home .jamam-pair__cell--home-inline .context-value {
+    font-size: var(--home-value-size);
+  }
+
+  .context-card--home .jamam-pair__cell--home-inline .thozhil-value-btn {
+    padding: 0.12rem 0.28rem;
+    max-width: 100%;
+  }
+
+  .context-card--home .jamam-pair__cell--home-inline .thozhil-value-btn .bi-ta,
+  .context-card--home .jamam-pair__cell--home-antharam .context-value--home-antharam .bi-ta {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .datetime-card--home {
+    padding: 0.7rem 0.65rem;
+    border-radius: 0.65rem;
+  }
+
+  .datetime-card--home .datetime-field__input {
+    font-size: 0.9rem;
+    min-height: 2.1rem;
+  }
+
+  .datetime-card--home .datetime-card__weekday .bi-ta {
+    font-size: 0.82rem;
+  }
+
+  .datetime-card--home .datetime-field__coord-label,
+  .datetime-card--home .datetime-field__label {
+    font-size: 0.78rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .context-card--home {
+    --home-label-width: 6.1rem;
+    --home-label-size: 0.74rem;
+    --home-value-size: 0.86rem;
+    padding: 0.6rem 0.55rem;
+  }
+
+  .context-card--home .context-row--home-chips .patchi-submenu__btn {
+    min-height: 1.6rem;
+    font-size: 0.66rem;
+    padding: 0.16rem 0.12rem;
+  }
 }
 
 .context-label {
@@ -3098,6 +3268,25 @@ body {
 
 .naal-dialog {
   max-width: min(100%, 28rem);
+  /* Keep sticky columns working — scroll only inside the panel. */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: min(90vh, 100%);
+}
+
+.naal-dialog .jamam-segments-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: min(90vh, 100%);
+}
+
+.naal-dialog .jamam-segments-panel__scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .naal-dialog--all-birds {
@@ -3106,6 +3295,70 @@ body {
 
 .naal-dialog--with-next-day {
   max-width: min(100%, 56rem);
+}
+
+/* Naal without Antharam serial column: Time is the first sticky column. */
+.naal-dialog .jamam-segments-table--time-first .jamam-segments-table__segment-time-col {
+  left: 0;
+  width: 5.25rem;
+}
+
+.naal-dialog .jamam-segments-table--time-first .jamam-segments-table__col-segment-time {
+  width: 5.25rem;
+}
+
+/* Naal with Antharam + Time: shorter serial labels (`1 (2)`), tighter sticky offsets. */
+.naal-dialog
+  .jamam-segments-table:not(.jamam-segments-table--time-first)
+  .jamam-segments-table__segment-number-col {
+  width: 4.75rem;
+}
+
+.naal-dialog
+  .jamam-segments-table:not(.jamam-segments-table--time-first)
+  .jamam-segments-table__col-segment-number {
+  width: 4.75rem;
+}
+
+.naal-dialog
+  .jamam-segments-table:not(.jamam-segments-table--time-first)
+  .jamam-segments-table__segment-time-col {
+  left: 4.75rem;
+  width: 5rem;
+}
+
+.naal-dialog
+  .jamam-segments-table:not(.jamam-segments-table--time-first)
+  .jamam-segments-table__col-segment-time {
+  width: 5rem;
+}
+
+.naal-dialog .jamam-segments-table__col-patchi {
+  width: 5.25rem;
+  min-width: 5.25rem;
+}
+
+.naal-dialog .jamam-segments-table th,
+.naal-dialog .jamam-segments-table td {
+  padding: 0.28rem 0.35rem;
+}
+
+.naal-dialog .jamam-segments-table__jamam-time {
+  font-size: 0.72rem;
+  letter-spacing: 0.01em;
+}
+
+.naal-dialog .jamam-segments-table--matrix thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--bg-card);
+  box-shadow: 0 1px 0 var(--border);
+}
+
+.naal-dialog .jamam-segments-table--matrix thead .jamam-segments-table__segment-number-col,
+.naal-dialog .jamam-segments-table--matrix thead .jamam-segments-table__segment-time-col {
+  z-index: 4;
 }
 
 .jamam-segments-table__activity-btn {
@@ -3202,35 +3455,35 @@ body {
   .anthara-dialog
     .jamam-segments-table--matrix:not(.jamam-segments-table--matrix-with-previous)
     .jamam-segments-table__col-segment-number {
-    width: 13%;
+    width: 18%;
   }
 
   .anthara-dialog
     .jamam-segments-table--matrix:not(.jamam-segments-table--matrix-with-previous)
     .jamam-segments-table__col-segment-time {
-    width: 17%;
+    width: 15%;
   }
 
   .anthara-dialog
     .jamam-segments-table--matrix:not(.jamam-segments-table--matrix-with-previous)
     .jamam-segments-table__col-patchi {
-    width: 14%;
+    width: 13.4%;
   }
 
   .anthara-dialog .jamam-segments-table--matrix-with-previous .jamam-segments-table__col-segment-number {
-    width: 11%;
+    width: 16%;
   }
 
   .anthara-dialog .jamam-segments-table--matrix-with-previous .jamam-segments-table__col-segment-previous {
-    width: 14%;
+    width: 12%;
   }
 
   .anthara-dialog .jamam-segments-table--matrix-with-previous .jamam-segments-table__col-segment-time {
-    width: 14%;
+    width: 12%;
   }
 
   .anthara-dialog .jamam-segments-table--matrix-with-previous .jamam-segments-table__col-patchi {
-    width: 12.2%;
+    width: 12%;
   }
 
   /* Drop sticky positioning so all columns share the fixed grid */
@@ -3242,6 +3495,45 @@ body {
     left: auto;
     width: auto;
     white-space: nowrap;
+  }
+
+  /* Naal: keep Time (and Antharam) sticky + readable padding on small screens */
+  .naal-dialog.anthara-dialog {
+    overflow: hidden;
+  }
+
+  .naal-dialog .jamam-segments-panel__scroll {
+    overflow-x: auto;
+  }
+
+  .naal-dialog .jamam-segments-table--time-first .jamam-segments-table__segment-time-col {
+    position: sticky;
+    left: 0;
+    width: 5rem;
+    background: var(--bg-card);
+  }
+
+  .naal-dialog
+    .jamam-segments-table:not(.jamam-segments-table--time-first)
+    .jamam-segments-table__segment-number-col {
+    position: sticky;
+    left: 0;
+    width: 4.5rem;
+    background: var(--bg-card);
+  }
+
+  .naal-dialog
+    .jamam-segments-table:not(.jamam-segments-table--time-first)
+    .jamam-segments-table__segment-time-col {
+    position: sticky;
+    left: 4.5rem;
+    width: 5rem;
+    background: var(--bg-card);
+  }
+
+  .naal-dialog .jamam-segments-table th,
+  .naal-dialog .jamam-segments-table td {
+    padding: 0.22rem 0.28rem;
   }
 
   /* Header cells: single-line titles */
@@ -3414,35 +3706,35 @@ body {
   .anthara-dialog
     .jamam-segments-table--matrix:not(.jamam-segments-table--matrix-with-previous)
     .jamam-segments-table__col-segment-number {
-    width: 12%;
+    width: 17%;
   }
 
   .anthara-dialog
     .jamam-segments-table--matrix:not(.jamam-segments-table--matrix-with-previous)
     .jamam-segments-table__col-segment-time {
-    width: 16%;
+    width: 14%;
   }
 
   .anthara-dialog
     .jamam-segments-table--matrix:not(.jamam-segments-table--matrix-with-previous)
     .jamam-segments-table__col-patchi {
-    width: 14.4%;
+    width: 13.8%;
   }
 
   .anthara-dialog .jamam-segments-table--matrix-with-previous .jamam-segments-table__col-segment-number {
-    width: 10%;
+    width: 15%;
   }
 
   .anthara-dialog .jamam-segments-table--matrix-with-previous .jamam-segments-table__col-segment-previous {
-    width: 13%;
+    width: 11%;
   }
 
   .anthara-dialog .jamam-segments-table--matrix-with-previous .jamam-segments-table__col-segment-time {
-    width: 13%;
+    width: 11%;
   }
 
   .anthara-dialog .jamam-segments-table--matrix-with-previous .jamam-segments-table__col-patchi {
-    width: 12.8%;
+    width: 12.6%;
   }
 
   .anthara-dialog .jamam-segments-table__jamam-time {

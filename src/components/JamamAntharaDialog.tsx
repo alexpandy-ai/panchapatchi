@@ -113,6 +113,9 @@ export function JamamAntharaDialog({
           nextDayMorningByBird={naalSelection.nextDayMorningByBird}
           appendNextDayNight={naalSelection.appendNextDayNight}
           nextDayNightByBird={naalSelection.nextDayNightByBird}
+          appendNightJamam={naalSelection.appendNightJamam}
+          nightJamamByBird={naalSelection.nightJamamByBird}
+          appendedJamamSerials={naalSelection.appendedJamamSerials}
           onClose={() => setNaalSelection(null)}
         />
       ) : null}

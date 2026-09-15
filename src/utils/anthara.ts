@@ -12,7 +12,7 @@ import {
   type Bilingual,
 } from "./bilingual";
 import type { JamamSlot, PeriodId } from "./jamam";
-import { formatTimeWithSeconds, splitJamamStartTimes, yamaFromJamamIndex } from "./jamam";
+import { formatTimeWithSeconds, jamamIndexForYama, splitJamamStartTimes, yamaFromJamamIndex } from "./jamam";
 
 export const JAMAM_ANTHARA_SEGMENT_COUNT = 10;
 
@@ -271,23 +271,47 @@ function getMorningPatchiJamamActivity(
   return match ? displayActivity(match.activity) : "—";
 }
 
-/** Day click: ten equal time parts within the jamam; rows 6–10 carry night jamam activities. */
-function buildDayAntharaColumnsWithNightJamamRows(
-  jamamStart: Date,
-  jamamEnd: Date,
+/** Yamas 1–5 rotated so `startYama` comes first, then wrap (e.g. 2 → 2,3,4,5,1). */
+export function yamasRotatedFrom(startYama: number): number[] {
+  return rotateFrom([1, 2, 3, 4, 5], startYama);
+}
+
+/** Night schedule jamam indices (6–10) in yama-rotated order. */
+export function nightJamamIndicesRotatedFromYama(startYama: number): number[] {
+  return yamasRotatedFrom(startYama).map((yama) => jamamIndexForYama(yama, "night"));
+}
+
+/** Night jamam slots (6–10) rotated so the matching yama comes first, then wrap. */
+function nightJamamSlotsRotatedFromYama(
   allJamamSlots: JamamSlot[],
-): PatchiAntharaColumn[] {
-  const columns = getAntharaSegmentColumns(
-    jamamStart,
-    jamamEnd,
-    JAMAM_ANTHARA_SEGMENT_COUNT,
-  );
+  startYama: number,
+): JamamSlot[] {
   const nightSlots = allJamamSlots
     .filter(
       (slot) =>
         slot.index >= NIGHT_JAMAM_SCHEDULE_START && slot.index <= NIGHT_JAMAM_SCHEDULE_END,
     )
     .sort((a, b) => a.index - b.index);
+  const startIndex = nightSlots.findIndex(
+    (slot) => yamaFromJamamIndex(slot.index).yama === startYama,
+  );
+  if (startIndex < 0) return nightSlots;
+  return [...nightSlots.slice(startIndex), ...nightSlots.slice(0, startIndex)];
+}
+
+/** Day click: ten equal time parts within the jamam; rows 6–10 carry night jamam activities. */
+function buildDayAntharaColumnsWithNightJamamRows(
+  jamamStart: Date,
+  jamamEnd: Date,
+  allJamamSlots: JamamSlot[],
+  startYama: number,
+): PatchiAntharaColumn[] {
+  const columns = getAntharaSegmentColumns(
+    jamamStart,
+    jamamEnd,
+    JAMAM_ANTHARA_SEGMENT_COUNT,
+  );
+  const nightSlots = nightJamamSlotsRotatedFromYama(allJamamSlots, startYama);
 
   return columns.map((column, index) => {
     const nightSlot = nightSlots[index - ANTHARA_DAY_SEGMENT_COUNT];
@@ -298,20 +322,22 @@ function buildDayAntharaColumnsWithNightJamamRows(
   });
 }
 
-/** Night click: ten equal time parts; rows 6–10 carry next-day morning jamams 1–5. */
+/** Night click: ten equal time parts; rows 6–10 carry next-day morning jamams, rotated from clicked yama. */
 function buildNightAntharaColumnsWithNextDayMorningRows(
   jamamStart: Date,
   jamamEnd: Date,
+  startYama: number,
 ): PatchiAntharaColumn[] {
   const columns = getAntharaSegmentColumns(
     jamamStart,
     jamamEnd,
     JAMAM_ANTHARA_SEGMENT_COUNT,
   );
+  const morningYamas = yamasRotatedFrom(startYama);
 
   return columns.map((column, index) => {
     if (index >= ANTHARA_DAY_SEGMENT_COUNT) {
-      const yama = index - ANTHARA_DAY_SEGMENT_COUNT + 1;
+      const yama = morningYamas[index - ANTHARA_DAY_SEGMENT_COUNT] ?? 1;
       return { ...column, jamamIndex: yama, appendedMorning: true };
     }
     return column;
@@ -348,7 +374,7 @@ export function getPatchiAntharaMatrix(
   segmentCount?: number,
   options: PatchiAntharaMatrixOptions = {},
 ): PatchiAntharaMatrix {
-  const { period } = yamaFromJamamIndex(jamamIndex);
+  const { yama, period } = yamaFromJamamIndex(jamamIndex);
   const appendNightJamamRows =
     options.appendNightJamamRows === true &&
     period === "day" &&
@@ -372,17 +398,20 @@ export function getPatchiAntharaMatrix(
       jamamStart,
       jamamEnd,
       options.allJamamSlots,
+      yama,
     );
     antharaColumnCount = ANTHARA_DAY_SEGMENT_COUNT;
   } else if (appendNextDayMorningJamamRows) {
-    columns = buildNightAntharaColumnsWithNextDayMorningRows(jamamStart, jamamEnd);
+    columns = buildNightAntharaColumnsWithNextDayMorningRows(
+      jamamStart,
+      jamamEnd,
+      yama,
+    );
     antharaColumnCount = ANTHARA_DAY_SEGMENT_COUNT;
   } else {
     columns = getAntharaSegmentColumns(jamamStart, jamamEnd, antharaSegmentCount);
     antharaColumnCount = antharaSegmentCount;
   }
-
-  const { yama } = yamaFromJamamIndex(jamamIndex);
   const slots = getActivitySlots(yama, period);
   const activityOrder = antharaThozhilCycleOrder(period);
 

@@ -397,7 +397,12 @@ export function DateTimeCard({
 
   return (
 
-    <section className="datetime-card" aria-label={pickBilingual(UI.dateTime, language)}>
+    <section
+      className={["datetime-card", hideDateLabel && hideTimeLabel ? "datetime-card--home" : ""]
+        .filter(Boolean)
+        .join(" ")}
+      aria-label={pickBilingual(UI.dateTime, language)}
+    >
 
       <div className="datetime-card__row">
 

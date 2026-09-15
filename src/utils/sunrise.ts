@@ -2,6 +2,7 @@ import * as SunCalc from "suncalc";
 import type { GeoCoords } from "./location";
 
 export const FIXED_SUNRISE_HOUR = 6;
+export const FIXED_SUNSET_HOUR = 18;
 
 /** Use local noon so SunCalc picks the correct calendar day across time zones. */
 function atLocalNoon(date: Date): Date {
@@ -23,6 +24,12 @@ function fixedSunriseOnDate(date: Date): Date {
   return sunrise;
 }
 
+function fixedSunsetOnDate(date: Date): Date {
+  const sunset = new Date(date);
+  sunset.setHours(FIXED_SUNSET_HOUR, 0, 0, 0);
+  return sunset;
+}
+
 /** `coords === null` uses a fixed 6:00 AM local sunrise (no SunCalc). */
 export function getSunrise(date: Date, coords: GeoCoords | null): Date {
   if (coords === null) {
@@ -34,9 +41,10 @@ export function getSunrise(date: Date, coords: GeoCoords | null): Date {
   );
 }
 
+/** `coords === null` uses a fixed 6:00 PM local sunset (no SunCalc). */
 export function getSunset(date: Date, coords: GeoCoords | null): Date {
   if (coords === null) {
-    throw new Error("Sunset is not available when using the fixed 6:00 AM sunrise fallback.");
+    return fixedSunsetOnDate(date);
   }
   return requireTime(
     SunCalc.getTimes(atLocalNoon(date), coords.lat, coords.lng).sunset,

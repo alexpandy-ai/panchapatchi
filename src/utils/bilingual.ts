@@ -102,6 +102,7 @@ export const UI = {
   natchathiraPatchi: bi("நட்சத்திர பட்சி", "Natchathira Patchi"),
   natchathira: bi("நட்சத்திரம்", "Natchathira"),
   thithi: bi("திதி", "Thithi"),
+  nightThithi: bi("இரவு திதி", "Night Thithi"),
   theipiraiPlanets: bi("தேய்பிறை கிரகம்", "Theipirai planet"),
   valarpiraiPlanets: bi("வளர்பிறை கிரகம்", "Valarpirai planet"),
   planet: bi("கிரகம்", "Planet"),
@@ -142,14 +143,25 @@ export function antharaStartTimeHeader(jamamIndex: number): Bilingual {
   return bi(`ஜாமம் ${jamamIndex} — நேரம்`, `Jamam ${jamamIndex} — time`);
 }
 
+/** Jamam number used inside Antharam column brackets (digits only). */
 export function antharaJamamHeader(segmentNumber: number): Bilingual {
-  const label = String(segmentNumber);
-  return bi(label, label);
+  return bi(`${segmentNumber}`, `${segmentNumber}`);
 }
 
 /** Next-morning jamam label on night Anthara (day jamams of the next Thithi day). */
 export function antharaMorningJamamHeader(yama: number): Bilingual {
-  return bi(`அடுத்த நாள் ${yama}`, `Next day ${yama}`);
+  return bi(`${yama}`, `${yama}`);
+}
+
+/** Antharam column cell: display-order serial with jamam label in brackets. */
+export function antharaColumnRowLabel(
+  displaySerial: number,
+  jamamLabel: Bilingual,
+): Bilingual {
+  return bi(
+    `${displaySerial} (${jamamLabel.ta})`,
+    `${displaySerial} (${jamamLabel.en})`,
+  );
 }
 
 export function thozhilHeader(jamamIndex: number): Bilingual {

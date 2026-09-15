@@ -1,5 +1,7 @@
 import { PATCHI_ORDER } from "./bilingual";
+import type { GeoCoords } from "./location";
 import { getMoonPhase, getPakshaFromDate, type PakshaId } from "./paksha";
+import { getSunset } from "./sunrise";
 import {
   getThithiCellPosition,
   getThithiPlanetDay,
@@ -8,6 +10,28 @@ import {
   THITHI_PATCHI_BY_PAKSHA,
 } from "./thithiPatchi";
 import type { Bilingual } from "./bilingual";
+
+export type ThithiPatchiEntry = {
+  thithi: Bilingual;
+  patchi: (typeof PATCHI_ORDER)[number];
+  day: Bilingual;
+  weekday: number;
+  groupIndex: number;
+  thithiIndex: number;
+  thithiNumber: number;
+  pakshaId: PakshaId;
+};
+
+/**
+ * Reference instant for Home “Night Thithi”: moon phase at sunset on the
+ * selected calendar day (thithi / pirai after sunset).
+ */
+export function getNightThithiReferenceDate(
+  date: Date,
+  coords: GeoCoords | null,
+): Date {
+  return getSunset(date, coords);
+}
 
 export interface CurrentThithiPosition {
   groupIndex: number;
@@ -49,34 +73,29 @@ export function isCurrentThithiRow(
 export function getThithiPatchiEntryForDate(
   date: Date,
   pakshaId: PakshaId,
-): {
-  thithi: Bilingual;
-  patchi: (typeof PATCHI_ORDER)[number];
-  day: Bilingual;
-  weekday: number;
-  groupIndex: number;
-  thithiIndex: number;
-  thithiNumber: number;
-  pakshaId: PakshaId;
-} {
+): ThithiPatchiEntry {
   const thithiNumber = getThithiNumberInPaksha(date);
   return getThithiPatchiEntryForThithiNumber(pakshaId, thithiNumber);
+}
+
+/**
+ * Home Night Thithi: thithi + pirai from moon phase at sunset, then the
+ * matching Thithi Patchi row (athikara / planet day).
+ */
+export function getNightThithiPatchiEntryForDate(
+  date: Date,
+  coords: GeoCoords | null,
+): ThithiPatchiEntry {
+  const nightAt = getNightThithiReferenceDate(date, coords);
+  const pakshaId = getPakshaFromDate(nightAt);
+  return getThithiPatchiEntryForDate(nightAt, pakshaId);
 }
 
 /** Thithi Patchi row for a paksha + lunar day 1–15. */
 export function getThithiPatchiEntryForThithiNumber(
   pakshaId: PakshaId,
   thithiNumber: number,
-): {
-  thithi: Bilingual;
-  patchi: (typeof PATCHI_ORDER)[number];
-  day: Bilingual;
-  weekday: number;
-  groupIndex: number;
-  thithiIndex: number;
-  thithiNumber: number;
-  pakshaId: PakshaId;
-} {
+): ThithiPatchiEntry {
   const clamped = Math.min(15, Math.max(1, thithiNumber));
   const { groupIndex, thithiIndex } = getThithiCellPosition(clamped);
   const group = THITHI_PATCHI_BY_PAKSHA[pakshaId][groupIndex];
@@ -100,16 +119,7 @@ export function getThithiPatchiEntryForThithiNumber(
 export function getNextThithiPatchiEntryForDate(
   date: Date,
   pakshaId: PakshaId,
-): {
-  thithi: Bilingual;
-  patchi: (typeof PATCHI_ORDER)[number];
-  day: Bilingual;
-  weekday: number;
-  groupIndex: number;
-  thithiIndex: number;
-  thithiNumber: number;
-  pakshaId: PakshaId;
-} {
+): ThithiPatchiEntry {
   const thithiNumber = getThithiNumberInPaksha(date);
   return getNextThithiPatchiEntry(pakshaId, thithiNumber);
 }
@@ -118,16 +128,7 @@ export function getNextThithiPatchiEntryForDate(
 export function getNextThithiPatchiEntry(
   pakshaId: PakshaId,
   thithiNumber: number,
-): {
-  thithi: Bilingual;
-  patchi: (typeof PATCHI_ORDER)[number];
-  day: Bilingual;
-  weekday: number;
-  groupIndex: number;
-  thithiIndex: number;
-  thithiNumber: number;
-  pakshaId: PakshaId;
-} {
+): ThithiPatchiEntry {
   if (thithiNumber < 15) {
     return getThithiPatchiEntryForThithiNumber(pakshaId, thithiNumber + 1);
   }
@@ -142,16 +143,7 @@ export function getNextThithiPatchiEntry(
 export function getNextThithiPatchiEntryAfterWeekday(
   pakshaId: PakshaId,
   weekday: number,
-): {
-  thithi: Bilingual;
-  patchi: (typeof PATCHI_ORDER)[number];
-  day: Bilingual;
-  weekday: number;
-  groupIndex: number;
-  thithiIndex: number;
-  thithiNumber: number;
-  pakshaId: PakshaId;
-} | null {
+): ThithiPatchiEntry | null {
   const groups = THITHI_PATCHI_BY_PAKSHA[pakshaId];
   const groupIndex = groups.findIndex(
     (group) => getThithiPlanetWeekday(group.planet) === weekday,
