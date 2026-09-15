@@ -5,7 +5,7 @@ import { useLanguage } from "./context/LanguageContext";
 import { useNavigation } from "./context/NavigationContext";
 import { DateTimeCard } from "./components/DateTimeCard";
 import { DaysView } from "./components/DaysView";
-import { FindPatchiView } from "./components/FindPatchiView";
+import { DaySchedulerView } from "./components/DaySchedulerView";
 import { PatchiStatusView } from "./components/PatchiStatusView";
 import { TimeTableView } from "./components/TimeTableView";
 import { PATCHI_SCHEDULE_DATA } from "./data/patchiScheduleData";
@@ -79,7 +79,6 @@ export default function App() {
       <main className="content">
         {activeView !== "schedule" &&
           activeView !== "alternateSchedule" &&
-          activeView !== "find" &&
           activeView !== "home" &&
           activeView !== "status" && (
           <h2 className="content__section-title">
@@ -99,20 +98,14 @@ export default function App() {
           />
         )}
 
-        {activeView === "find" && (
-          <FindPatchiView selectedDateTime={selectedDateTime} />
-        )}
-
         {activeView === "schedule" && (
           <TimeTableView selectedDateTime={selectedDateTime} />
         )}
 
         {activeView === "alternateSchedule" && (
-          <TimeTableView
+          <DaySchedulerView
             selectedDateTime={selectedDateTime}
-            data={PATCHI_SCHEDULE_DATA}
             subtitle={UI.alternateCalculation}
-            alternateCalculation
           />
         )}
 

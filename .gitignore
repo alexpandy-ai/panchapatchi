@@ -11,8 +11,6 @@ node_modules
 dist
 dist-ssr
 *.local
-server/pancha-pakshi.db
-server/pancha-pakshi.db-*
 
 # Editor directories and files
 .vscode/*

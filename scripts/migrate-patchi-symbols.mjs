@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync } from "fs";
-import { formatPatchiName } from "../server/patchiSymbols.mjs";
+import { formatPatchiName } from "./patchiSymbols.mjs";
 
 function migrateSlots(slots) {
   return slots.map((slot) => ({
@@ -22,11 +22,7 @@ function migratePaksha(paksha) {
   };
 }
 
-const jsonPaths = [
-  "src/data/pancha-pakshi.json",
-  "public/api/valarpirai.json",
-  "public/api/theipirai.json",
-];
+const jsonPaths = ["src/data/pancha-pakshi.json"];
 
 for (const jsonPath of jsonPaths) {
   const data = JSON.parse(readFileSync(jsonPath, "utf8"));

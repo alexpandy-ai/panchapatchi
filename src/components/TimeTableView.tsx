@@ -13,18 +13,15 @@ type PatchiName = (typeof PATCHI_ORDER)[number];
 
 interface TimeTableViewProps {
   selectedDateTime: Date;
-  /** Patchi Schedule paksha tables. Day Scheduler may pass the same for jamam times only. */
+  /** Patchi Schedule paksha tables (Schedule / Find Patchi). */
   data?: Record<PakshaId, PakshaData | null>;
   subtitle?: Bilingual;
-  /** Day Scheduler only — never set for Patchi Schedule. */
-  alternateCalculation?: boolean;
 }
 
 export function TimeTableView({
   selectedDateTime,
   data = PATCHI_SCHEDULE_DATA,
   subtitle,
-  alternateCalculation = false,
 }: TimeTableViewProps) {
   const { coords } = useLocation();
   const { patchi: selectedPatchi, setPatchi: setSelectedPatchi } = useNavigation();
@@ -60,8 +57,6 @@ export function TimeTableView({
           selectedPatchi={selectedPatchi}
           onSelectPatchi={setSelectedPatchi}
           subtitle={subtitle}
-          alternateCalculation={alternateCalculation}
-          selectedDateTime={selectedDateTime}
         />
       ) : (
         <p className="status">

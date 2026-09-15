@@ -251,10 +251,6 @@ export const MENU_ITEMS: { id: string; label: Bilingual }[] = [
     label: bi("பட்சி நிலை", "Patchi status"),
   },
   {
-    id: "find",
-    label: bi("பட்சி அறிக", "Know patchi"),
-  },
-  {
     id: "schedule",
     label: bi("பட்சி அட்டவணை", "Patchi Schedule"),
   },

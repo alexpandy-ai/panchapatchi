@@ -1,6 +1,6 @@
 import XLSX from "xlsx";
 import { writeFileSync, mkdirSync } from "fs";
-import { formatPatchiName } from "../server/patchiSymbols.mjs";
+import { formatPatchiName } from "./patchiSymbols.mjs";
 
 const excelPath = "c:\\Users\\radhi\\Downloads\\Copy of பஞ்சபட்சி.xlsx";
 const wb = XLSX.readFile(excelPath);

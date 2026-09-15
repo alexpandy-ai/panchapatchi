@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { BilingualText } from "./BilingualText";
 import { MENU_ITEMS, UI, type Bilingual } from "../utils/bilingual";
 
-export type AppView = "home" | "status" | "find" | "schedule" | "alternateSchedule" | "days";
+export type AppView = "home" | "status" | "schedule" | "alternateSchedule" | "days";
 
 interface AppMenuProps {
   activeView: AppView;

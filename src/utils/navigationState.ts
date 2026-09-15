@@ -18,11 +18,10 @@ export interface NavigationState {
   daysSection: InformationSection;
   paksha: PakshaId;
   patchi: PatchiSelection;
-  findPatchi: PatchiName;
   myPatchi: PatchiSelection;
 }
 
-const APP_VIEWS: AppView[] = ["home", "status", "find", "schedule", "alternateSchedule", "days"];
+const APP_VIEWS: AppView[] = ["home", "status", "schedule", "alternateSchedule", "days"];
 
 const INFORMATION_SECTIONS: InformationSection[] = [
   "patchiDays",
@@ -42,7 +41,6 @@ export const DEFAULT_NAVIGATION: NavigationState = {
   daysSection: "patchiDays",
   paksha: "valarpirai",
   patchi: "all",
-  findPatchi: PATCHI_ORDER[0],
   myPatchi: PATCHI_ORDER[0],
 };
 
@@ -81,9 +79,6 @@ function parseParams(source: string): Partial<NavigationState> {
 
   const patchi = params.get("patchi");
   if (patchi && isPatchiSelection(patchi)) parsed.patchi = patchi;
-
-  const findPatchi = params.get("findPatchi");
-  if (findPatchi && isPatchiName(findPatchi)) parsed.findPatchi = findPatchi;
 
   const myPatchi = params.get("myPatchi");
   if (myPatchi && isPatchiSelection(myPatchi)) parsed.myPatchi = myPatchi;
@@ -128,10 +123,6 @@ export function normalizeNavigationState(
       partial.patchi && isPatchiSelection(partial.patchi)
         ? partial.patchi
         : DEFAULT_NAVIGATION.patchi,
-    findPatchi:
-      partial.findPatchi && isPatchiName(partial.findPatchi)
-        ? partial.findPatchi
-        : DEFAULT_NAVIGATION.findPatchi,
     myPatchi:
       partial.myPatchi && isPatchiSelection(partial.myPatchi)
         ? partial.myPatchi
@@ -161,11 +152,6 @@ export function saveNavigationState(state: NavigationState): void {
 
   if (state.view === "days") {
     params.set("daysSection", state.daysSection);
-  }
-
-  if (state.view === "find") {
-    params.set("paksha", state.paksha);
-    params.set("findPatchi", state.findPatchi);
   }
 
   if (state.view === "schedule" || state.view === "alternateSchedule") {

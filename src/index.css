@@ -221,17 +221,6 @@ body {
   font-weight: 700;
 }
 
-.find-patchi {
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-  text-align: left;
-}
-
-.find-patchi .tabs {
-  margin-bottom: 1rem;
-}
-
 .athikara-panel {
   border: 1px solid var(--border);
   border-radius: 0.75rem;
