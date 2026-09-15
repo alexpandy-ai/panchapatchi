@@ -123,19 +123,24 @@ export function PatchiStatusView({
 
   const thithiScheduleWeekday = thithiPatchiEntry.weekday;
 
-  /** Home: Athikara = night jamam 1 eating patchi (alternate schedule). Status: Thithi table. */
+  /**
+   * Home: Athikara = jamam-1 Eat bird for Night Thithi weekday + pirai (Patchi Days /
+   * day schedule). Matches Excel night jamam-1 Eat (same bird as day Eat). Using
+   * alternate period "night" would return day-Die (Die→…→Eat cycle) — wrong Athikara.
+   * Status: Thithi table patchi.
+   */
   const athikaraPatchi = useMemo(() => {
     if (
       isHome &&
       (pakshaId === "valarpirai" || pakshaId === "theipirai")
     ) {
-      const nightFirstEating = getAlternateEatingPatchi(
+      const jamam1Eating = getAlternateEatingPatchi(
         pakshaId,
         thithiScheduleWeekday,
         1,
-        "night",
+        "day",
       );
-      if (nightFirstEating) return nightFirstEating;
+      if (jamam1Eating) return jamam1Eating;
     }
     return thithiPatchiEntry.patchi;
   }, [isHome, pakshaId, thithiPatchiEntry.patchi, thithiScheduleWeekday]);
@@ -214,10 +219,10 @@ export function PatchiStatusView({
     thithiScheduleWeekday,
   ]);
 
-  /** Home: Padu = Die bird in the same jamam as Athikara (night jamam 1). */
+  /** Home: Padu = Die bird in the same jamam as Athikara (jamam 1 day / Patchi Days). */
   const paduPatchi = useMemo(() => {
     if (!isHome || (pakshaId !== "valarpirai" && pakshaId !== "theipirai")) return null;
-    return getAlternatePaduPatchiForJamam(pakshaId, thithiScheduleWeekday, 1, "night");
+    return getAlternatePaduPatchiForJamam(pakshaId, thithiScheduleWeekday, 1, "day");
   }, [isHome, pakshaId, thithiScheduleWeekday]);
 
   /** Home: Naal = Patchi Days weekday for current Athikara under current pirai. */

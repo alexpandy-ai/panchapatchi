@@ -421,16 +421,23 @@ export function getAlternateJamamActivitySlots(
   });
 }
 
-/** Patchi with Eating (ஊண்) activity for a given paksha / weekday / period / yama. */
+/**
+ * Patchi with Eating (ஊண்) for a paksha / weekday / period / yama.
+ * Resolves by scanning activity slots (label match), not a hardcoded index —
+ * night cycle lists Die first, so Eat is not index 0.
+ *
+ * Note: alternate night maps day-Eat → night-Die and day-Die → night-Eat.
+ * Home Athikara uses the Patchi Days / day jamam-1 Eat bird (Excel night jamam-1
+ * Eat matches that bird); do not use period "night" for Athikara.
+ */
 export function getAlternateEatingPatchi(
   pakshaId: AlternatePakshaId,
   weekday: number,
   yama: number,
   period: PeriodId,
 ): (typeof PATCHI_ORDER)[number] | null {
-  const activityIndex =
-    period === "day" ? 0 /* ஊண் in PANCHA_ACTIVITY_TA */ : NIGHT_EAT_ACTIVITY_INDEX;
-  return period === "day"
-    ? getAlternateDayBirdForActivity(pakshaId, weekday, yama, activityIndex)
-    : getAlternateNightBirdForActivity(pakshaId, weekday, yama, activityIndex);
+  const slots = getAlternateJamamActivitySlots(pakshaId, weekday, yama, period);
+  const eatSlot = slots.find((slot) => slot.activity === "ஊண்");
+  if (!eatSlot || eatSlot.bird === "—") return null;
+  return eatSlot.bird as (typeof PATCHI_ORDER)[number];
 }
