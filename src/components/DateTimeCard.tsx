@@ -415,7 +415,11 @@ export function DateTimeCard({
   return (
 
     <section
-      className={["datetime-card", hideDateLabel && hideTimeLabel ? "datetime-card--home" : ""]
+      className={[
+        "datetime-card",
+        // Shared responsive grid: Home + Find Patchi (date/time/place/sunrise + lat/lng/actions)
+        (hideDateLabel && hideTimeLabel) || selectFieldLabels ? "datetime-card--home" : "",
+      ]
         .filter(Boolean)
         .join(" ")}
       aria-label={pickBilingual(UI.dateTime, language)}

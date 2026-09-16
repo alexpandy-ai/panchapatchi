@@ -2562,70 +2562,99 @@ body {
   }
 
   .datetime-card {
-    padding: 0.85rem 0.75rem;
+    padding: 0.85rem 0.5rem;
     margin-bottom: 1rem;
   }
 
   .datetime-card__row {
-    flex-wrap: wrap;
-    align-items: flex-end;
-    gap: 0.55rem;
-  }
-
-  .datetime-card__datetime-row {
-    display: flex;
-    flex: 1 1 100%;
-    flex-wrap: nowrap;
-    align-items: flex-end;
-    gap: 0.45rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      "date date"
+      "time sunrise"
+      "location location"
+      "lat lng"
+      "actions actions";
+    column-gap: 0.4rem;
+    row-gap: 0.55rem;
+    align-items: end;
+    width: 100%;
     min-width: 0;
   }
 
-  .datetime-field--date,
-  .datetime-field--time {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 0.35rem;
-    min-width: 0;
+  .datetime-card__datetime-row,
+  .datetime-field--coords,
+  .datetime-field__coords-row {
+    display: contents;
   }
 
   .datetime-field--date {
-    flex: 1 1 auto;
+    grid-area: date;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.25rem;
+    min-width: 0;
+    width: 100%;
   }
 
   .datetime-field--time {
-    flex: 0 0 auto;
+    grid-area: time;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.25rem;
+    min-width: 0;
+    width: 100%;
   }
 
   .datetime-field--date .datetime-field__label,
   .datetime-field--time .datetime-field__label {
     flex-shrink: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .datetime-field__date-row {
-    flex: 1 1 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: stretch;
+    gap: 0.4rem;
     min-width: 0;
-    gap: 0.35rem;
+    width: 100%;
   }
 
   .datetime-field--date .datetime-field__input {
     min-width: 0;
     width: 100%;
     padding-inline: 0.35rem;
+    padding-right: 1.75rem;
     font-size: 0.85rem;
     min-height: var(--touch-min);
   }
 
   .datetime-field--time .datetime-field__input {
-    min-width: 5.25rem;
-    width: auto;
+    min-width: 0;
+    width: 100%;
     padding-inline: 0.35rem;
+    padding-right: 1.75rem;
+    min-height: var(--touch-min);
+  }
+
+  .datetime-card__weekday {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
     min-height: var(--touch-min);
   }
 
   .datetime-card__weekday .bi-ta {
     font-size: 0.82rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .datetime-card__weekday .bi-en {
@@ -2633,11 +2662,13 @@ body {
   }
 
   .datetime-field--location {
-    flex: 1 1 100%;
-    flex-direction: row;
-    align-items: center;
-    gap: 0.45rem;
+    grid-area: location;
+    flex: unset;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.25rem;
     min-width: 0;
+    width: 100%;
   }
 
   .datetime-field--location .datetime-field__label {
@@ -2648,27 +2679,42 @@ body {
   .datetime-field--location .datetime-field__location-autocomplete {
     flex: 1 1 auto;
     min-width: 0;
+    width: 100%;
   }
 
-  .datetime-field--coords {
-    flex: 1 1 100%;
-  }
-
-  .datetime-field__coords-row {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    align-items: end;
-    gap: 0.35rem;
-  }
-
-  .datetime-field__coord--sunrise,
-  .datetime-field__coord {
+  .datetime-field__coord--sunrise {
+    grid-area: sunrise;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
     min-width: 0;
+    width: 100%;
+  }
+
+  .datetime-field__coord--lat {
+    grid-area: lat;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .datetime-field__coord--lng {
+    grid-area: lng;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+    width: 100%;
   }
 
   .datetime-field__coord-label {
-    min-height: 1.15rem;
+    min-height: 1.1rem;
     line-height: 1.15;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .datetime-field__coord-input,
@@ -2678,15 +2724,17 @@ body {
     height: var(--touch-min);
     min-height: var(--touch-min);
     box-sizing: border-box;
+    padding-inline: 0.35rem;
+    font-size: 0.85rem;
   }
 
   .datetime-field__sunrise-value {
-    justify-content: center;
-    padding-inline: 0.35rem;
+    justify-content: flex-start;
   }
 
   .datetime-card__actions {
-    flex: 1 1 100%;
+    grid-area: actions;
+    flex: unset;
     width: 100%;
     justify-content: stretch;
   }
@@ -3101,7 +3149,7 @@ body {
   }
 
   .datetime-card--home {
-    padding: 0.7rem 0.65rem;
+    padding: 0.7rem 0.45rem;
     border-radius: 0.65rem;
   }
 }
@@ -3125,7 +3173,7 @@ body {
 .datetime-card--home {
   max-width: 100%;
   min-width: 0;
-  overflow: visible;
+  overflow-x: clip;
   box-sizing: border-box;
 }
 
@@ -3135,7 +3183,7 @@ body {
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  gap: 12px 16px;
+  gap: 12px;
   align-items: end;
 }
 
@@ -3146,7 +3194,7 @@ body {
   display: contents;
 }
 
-.datetime-card--home .datetime-field,
+.datetime-card--home .datetime-field:not(.datetime-field--coords),
 .datetime-card--home .datetime-field--date,
 .datetime-card--home .datetime-field--time,
 .datetime-card--home .datetime-field--location,
@@ -3161,7 +3209,7 @@ body {
   max-width: 100%;
 }
 
-.datetime-card--home .datetime-field,
+.datetime-card--home .datetime-field:not(.datetime-field--coords),
 .datetime-card--home .datetime-field__coord,
 .datetime-card--home .datetime-field__coord--sunrise,
 .datetime-card--home .datetime-field__coord--lat,
@@ -3202,6 +3250,7 @@ body {
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
+  max-width: 100%;
   min-height: 48px;
   height: 48px;
   line-height: 1.45;
@@ -3250,10 +3299,12 @@ body {
 
 .datetime-card--home .datetime-card__actions {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: center;
   gap: 12px;
   min-width: 0;
+  width: 100%;
+  max-width: 100%;
 }
 
 .datetime-card--home .datetime-card__refresh,
@@ -3261,11 +3312,13 @@ body {
   box-sizing: border-box;
   min-height: 48px;
   height: 48px;
+  min-width: 0;
   white-space: nowrap;
   line-height: 1.45;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex: 1 1 auto;
 }
 
 .datetime-card--home .datetime-card__permission {
@@ -3287,132 +3340,86 @@ body {
   line-height: 1.45;
 }
 
-/* Desktop / laptop ≥1280px — EXACTLY TWO ROWS */
+/* Shared area placement for tablet + desktop home form */
+.datetime-card--home .datetime-field--date {
+  grid-area: date;
+}
+
+.datetime-card--home .datetime-field--time {
+  grid-area: time;
+}
+
+.datetime-card--home .datetime-field--location {
+  grid-area: location;
+}
+
+.datetime-card--home .datetime-field__coord--sunrise {
+  grid-area: sunrise;
+}
+
+.datetime-card--home .datetime-field__coord--lat {
+  grid-area: lat;
+}
+
+.datetime-card--home .datetime-field__coord--lng {
+  grid-area: lng;
+}
+
+.datetime-card--home .datetime-card__actions {
+  grid-area: actions;
+}
+
+/* Desktop / laptop ≥1280px — row1 fields, row2 lat/lng + actions */
 @media (min-width: 1280px) {
+  .datetime-card--home {
+    padding: 1rem 1.25rem;
+  }
+
   .datetime-card--home .datetime-card__row {
-    grid-template-columns:
-      220px
-      185px
-      minmax(300px, 1fr)
-      135px
-      145px
-      145px;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.2fr) minmax(0, 2fr) minmax(0, 0.85fr);
     grid-template-rows: auto auto;
     grid-template-areas:
-      "date time location sunrise lat lng"
-      "actions actions actions actions actions actions";
-    column-gap: 16px;
+      "date time location sunrise"
+      "lat lng actions actions";
+    column-gap: 12px;
     row-gap: 12px;
     align-items: end;
   }
 
-  .datetime-card--home .datetime-field--date {
-    grid-area: date;
-    width: 100%;
-    min-width: 0;
-    max-width: 100%;
-  }
-
-  .datetime-card--home .datetime-field--time {
-    grid-area: time;
-    width: 100%;
-    min-width: 0;
-    max-width: 100%;
-  }
-
-  .datetime-card--home .datetime-field--location {
-    grid-area: location;
-    width: 100%;
-    min-width: 0;
-  }
-
-  .datetime-card--home .datetime-field__coord--sunrise {
-    grid-area: sunrise;
-    width: 100%;
-    min-width: 0;
-    max-width: 100%;
-  }
-
-  .datetime-card--home .datetime-field__coord--lat {
-    grid-area: lat;
-    width: 100%;
-    min-width: 0;
-    max-width: 100%;
-  }
-
-  .datetime-card--home .datetime-field__coord--lng {
-    grid-area: lng;
-    width: 100%;
-    min-width: 0;
-    max-width: 100%;
-  }
-
-  .datetime-card--home .datetime-field--date .datetime-field__input,
-  .datetime-card--home .datetime-field--time .datetime-field__input {
-    width: 100%;
-    min-width: 0;
-  }
-
   .datetime-card--home .datetime-card__actions {
-    grid-area: actions;
-    justify-self: start;
-    width: auto;
-    max-width: 100%;
+    justify-content: flex-start;
+  }
+
+  .datetime-card--home .datetime-card__refresh,
+  .datetime-card--home .datetime-card__submit {
+    flex: 1 1 0;
   }
 }
 
-/* Tablet / small laptop 768–1279px — two balanced field rows; actions end of row 2 */
+/* Tablet / small laptop 768–1279px — same structure, fr columns that can shrink */
 @media (min-width: 768px) and (max-width: 1279px) {
+  .datetime-card--home {
+    padding: 0.9rem 1rem;
+  }
+
   .datetime-card--home .datetime-card__row {
-    grid-template-columns:
-      minmax(220px, 1.2fr)
-      minmax(185px, 1fr)
-      minmax(0, 1.2fr)
-      auto;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.2fr) minmax(0, 2fr) minmax(0, 0.85fr);
     grid-template-rows: auto auto;
     grid-template-areas:
-      "date time location location"
-      "sunrise lat lng actions";
-    column-gap: 14px;
+      "date time location sunrise"
+      "lat lng actions actions";
+    column-gap: 10px;
     row-gap: 12px;
     align-items: end;
   }
 
-  .datetime-card--home .datetime-field--date {
-    grid-area: date;
-    min-width: 0;
-  }
-
-  .datetime-card--home .datetime-field--time {
-    grid-area: time;
-    min-width: 0;
-  }
-
-  .datetime-card--home .datetime-field--location {
-    grid-area: location;
-    min-width: 0;
-  }
-
-  .datetime-card--home .datetime-field__coord--sunrise {
-    grid-area: sunrise;
-    min-width: 135px;
-  }
-
-  .datetime-card--home .datetime-field__coord--lat {
-    grid-area: lat;
-    min-width: 145px;
-  }
-
-  .datetime-card--home .datetime-field__coord--lng {
-    grid-area: lng;
-    min-width: 145px;
-  }
-
   .datetime-card--home .datetime-card__actions {
-    grid-area: actions;
-    justify-self: end;
-    width: auto;
-    max-width: 100%;
+    justify-content: flex-start;
+  }
+
+  .datetime-card--home .datetime-card__refresh,
+  .datetime-card--home .datetime-card__submit {
+    flex: 1 1 0;
   }
 
   .context-card--home .context-row--home-chips .patchi-filter-chips {
@@ -3420,21 +3427,20 @@ body {
   }
 }
 
-/* Phone <768px — single column; labels above fields; actions in one row */
+/* Phone <768px — paired rows: Day|Date, Time|Sunrise, Lat|Lng; location full width */
 @media (max-width: 767px) {
   .datetime-card--home .datetime-card__row {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     grid-template-rows: none;
     grid-template-areas:
-      "date"
-      "time"
-      "location"
-      "sunrise"
-      "lat"
-      "lng"
-      "actions";
-    gap: 12px;
-    align-items: stretch;
+      "date date"
+      "time sunrise"
+      "location location"
+      "lat lng"
+      "actions actions";
+    column-gap: 0.4rem;
+    row-gap: 0.55rem;
+    align-items: end;
   }
 
   .datetime-card--home .datetime-field--date {
@@ -3461,26 +3467,77 @@ body {
     grid-area: lng;
   }
 
-  .datetime-card--home .datetime-field,
+  .datetime-card--home .datetime-field:not(.datetime-field--coords),
   .datetime-card--home .datetime-field__coord,
   .datetime-card--home .datetime-field__coord--sunrise,
   .datetime-card--home .datetime-field__coord--lat,
   .datetime-card--home .datetime-field__coord--lng {
     flex-direction: column;
     align-items: stretch;
+    gap: 0.25rem;
   }
 
   .datetime-card--home .datetime-field__label,
   .datetime-card--home .datetime-field__coord-label {
-    font-size: 0.82rem;
-    line-height: 1.45;
+    font-size: 0.78rem;
+    line-height: 1.3;
+    min-height: 1.1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Day | Date — equal columns inside the date field */
+  .datetime-card--home .datetime-field__date-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: stretch;
+    gap: 0.4rem;
+    width: 100%;
+  }
+
+  .datetime-card--home .datetime-card__weekday {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-self: stretch;
+    min-width: 0;
+    min-height: 48px;
+    max-width: 100%;
+  }
+
+  .datetime-card--home .datetime-card__weekday .bi-ta {
+    font-size: 0.88rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .datetime-card--home .datetime-card__weekday .bi-en {
+    display: none;
+  }
+
+  .datetime-card--home .datetime-field--date .datetime-field__input,
+  .datetime-card--home .datetime-field--time .datetime-field__input,
+  .datetime-card--home .datetime-field__coord-input,
+  .datetime-card--home .datetime-field__sunrise-value {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    padding-inline: 0.35rem;
+    font-size: 0.85rem;
+  }
+
+  .datetime-card--home .datetime-field--date .datetime-field__input,
+  .datetime-card--home .datetime-field--time .datetime-field__input {
+    padding-right: 1.75rem;
   }
 
   .datetime-card--home .datetime-card__actions {
     grid-area: actions;
     width: 100%;
     justify-content: stretch;
-    gap: 12px;
+    gap: 0.45rem;
   }
 
   .datetime-card--home .datetime-card__refresh,
@@ -3489,20 +3546,6 @@ body {
     min-width: 0;
     white-space: normal;
     overflow-wrap: anywhere;
-  }
-
-  .datetime-card--home .datetime-field--date .datetime-field__input,
-  .datetime-card--home .datetime-field--time .datetime-field__input {
-    width: 100%;
-    min-width: 0;
-  }
-
-  .datetime-card--home .datetime-card__weekday {
-    align-self: center;
-  }
-
-  .datetime-card--home .datetime-card__weekday .bi-ta {
-    font-size: 0.9rem;
   }
 }
 
