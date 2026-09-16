@@ -290,8 +290,7 @@ export function JamamSegmentsPanel({
           </thead>
           <tbody>
             {segmentRows.map(({ column, segmentIndex, previousTimeLabel, activities }) => {
-              const rowHighlighted =
-                !compactHomeLayout && highlightSegmentIndex === segmentIndex;
+              const rowHighlighted = highlightSegmentIndex === segmentIndex;
               const serial = antharaSerialNumber(column);
 
               return (
@@ -346,7 +345,8 @@ export function JamamSegmentsPanel({
                   </td>
                   {activities.map((activity, patchiIndex) => {
                     const patchi = matrix.rows[patchiIndex]?.patchi;
-                    const patchiHighlighted = !compactHomeLayout && patchi === highlightPatchi;
+                    const patchiHighlighted =
+                      compactHomeLayout || patchi === highlightPatchi;
                     const cellHighlighted = rowHighlighted && patchiHighlighted;
                     const canOpenNaal =
                       Boolean(onActivityClick) && activity !== "—" && Boolean(patchi);

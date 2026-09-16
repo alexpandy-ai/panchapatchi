@@ -281,7 +281,6 @@ export function nightJamamIndicesRotatedFromYama(startYama: number): number[] {
   return yamasRotatedFrom(startYama).map((yama) => jamamIndexForYama(yama, "night"));
 }
 
-/** Night jamam slots (6–10) rotated so the matching yama comes first, then wrap. */
 function nightJamamSlotsRotatedFromYama(
   allJamamSlots: JamamSlot[],
   startYama: number,
@@ -390,6 +389,8 @@ export function getPatchiAntharaMatrix(
     appendNextDayMorningJamamRows,
   );
 
+  const slots = getActivitySlots(yama, period);
+
   let columns: PatchiAntharaColumn[];
   let antharaColumnCount: number;
 
@@ -412,7 +413,6 @@ export function getPatchiAntharaMatrix(
     columns = getAntharaSegmentColumns(jamamStart, jamamEnd, antharaSegmentCount);
     antharaColumnCount = antharaSegmentCount;
   }
-  const slots = getActivitySlots(yama, period);
   const activityOrder = antharaThozhilCycleOrder(period);
 
   const rows: PatchiAntharaRow[] = PATCHI_ORDER.map((patchi) => {
