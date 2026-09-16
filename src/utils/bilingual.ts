@@ -61,6 +61,7 @@ export const UI = {
   locationPermissionOff: bi("இட அனுமதி அணைக்கப்பட்டுள்ளது", "Location permission off"),
   dateTime: bi("தேதி மற்றும் நேரம்", "Date and time"),
   day: bi("நாள்", "Day"),
+  thithiDay: bi("திதி நாள்", "Thithi Day"),
   group: bi("குழு", "Group"),
   jamam: bi("ஜாமம்", "Jamam"),
   paksha: bi("பக்ஷம்", "Paksha"),

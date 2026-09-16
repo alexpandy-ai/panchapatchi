@@ -2261,12 +2261,11 @@ body {
   }
 }
 
-.days-view__two-col-tables,
-.days-view__relation-tables,
-.days-view__details-tables {
+.days-view__patchi-days {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1.25rem;
+  max-width: 28rem;
 }
 
 @media (min-width: 768px) {
@@ -2847,8 +2846,8 @@ body {
 }
 
 .context-card--home {
-  --home-label-width: 8.5rem;
-  --home-label-gap: 0.65rem;
+  --home-label-width: 7.25rem;
+  --home-label-gap: 0.5rem;
   --home-label-size: 0.88rem;
   --home-value-size: 1.02rem;
   padding: 0.85rem 0.9rem;
@@ -2866,9 +2865,9 @@ body {
 .context-card--home .context-label--naal,
 .context-card--home .context-label--padu,
 .context-card--home .context-label--antharam {
-  flex: 0 0 var(--home-label-width);
-  width: var(--home-label-width);
-  max-width: var(--home-label-width);
+  flex: 0 0 auto;
+  width: auto;
+  max-width: none;
   font-size: var(--home-label-size);
   font-weight: 600;
   line-height: 1.45;
@@ -2877,31 +2876,62 @@ body {
   white-space: normal;
   overflow-wrap: anywhere;
   word-break: normal;
+  min-width: 0;
 }
 
 .context-card--home .context-row--home-thithi {
   flex-wrap: nowrap;
 }
 
-.context-card--home .context-row--home-thithi .context-inline-item,
-.context-card--home .context-row--home-athikara .context-inline-item--athikara,
-.context-card--home .context-row--home-naal .context-inline-item--naal,
-.context-card--home .context-row--home-padu .context-inline-item--padu {
+/* Shared label | value columns so every value shares one left edge */
+.context-card--home .context-row--home-details {
   display: grid;
-  grid-template-columns: var(--home-label-width) minmax(0, 1fr);
+  grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
+  column-gap: var(--home-label-gap);
+  align-items: center;
+  min-width: 0;
+}
+
+.context-card--home .context-row--home-details > .context-row:not(.context-row--jamam-pair) {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: 1 / -1;
   column-gap: var(--home-label-gap);
   align-items: center;
   width: 100%;
   min-width: 0;
 }
 
-.context-card--home .context-row--home-day {
-  display: grid;
-  grid-template-columns: var(--home-label-width) minmax(0, 1fr);
-  column-gap: var(--home-label-gap);
-  align-items: baseline;
-  padding-top: 0.05rem;
-  padding-bottom: 0.2rem;
+.context-card--home .context-row--home-details .context-inline-item,
+.context-card--home .context-row--home-details .context-inline-item--athikara,
+.context-card--home .context-row--home-details .context-inline-item--naal,
+.context-card--home .context-row--home-details .context-inline-item--padu {
+  display: contents;
+}
+
+.context-card--home .context-row--home-details > .context-row--jamam-pair {
+  grid-column: 1 / -1;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding-top: 0.35rem;
+}
+
+.context-card--home .context-row--home-athikara,
+.context-card--home .context-row--home-naal,
+.context-card--home .context-row--home-padu {
+  min-width: 0;
+}
+
+.context-card--home .context-value--home-thithi-name,
+.context-card--home .context-value--home-athikara,
+.context-card--home .context-value--home-naal,
+.context-card--home .context-value--home-padu,
+.context-card--home .context-value--home-day,
+.context-card--home .context-value--home-pirai {
+  justify-self: start;
+  text-align: left;
+  min-width: 0;
 }
 
 .context-card--home .context-value--home-pirai {
@@ -2909,28 +2939,9 @@ body {
   font-weight: 600;
   line-height: 1.45;
   color: var(--muted);
-  min-width: 0;
   white-space: normal;
   overflow-wrap: anywhere;
   word-break: normal;
-}
-
-.context-card--home .context-row--home-athikara,
-.context-card--home .context-row--home-naal,
-.context-card--home .context-row--home-padu {
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  min-width: 0;
-}
-
-.context-card--home .context-row--home-athikara .context-label--athikara,
-.context-card--home .context-row--home-naal .context-label--naal,
-.context-card--home .context-row--home-padu .context-label--padu,
-.context-card--home .context-row--home-thithi .context-label {
-  width: auto;
-  max-width: none;
-  flex: unset;
 }
 
 .context-card--home .context-value--home-thithi-name,
@@ -2942,7 +2953,6 @@ body {
   font-weight: 700;
   color: var(--accent);
   line-height: 1.45;
-  min-width: 0;
   white-space: normal;
   overflow-wrap: anywhere;
   word-break: normal;
@@ -2966,35 +2976,49 @@ body {
   line-height: inherit;
 }
 
+.context-card--home .context-row--home-main {
+  display: grid;
+  grid-template-columns: minmax(4.75rem, 7.25rem) minmax(0, 1fr);
+  column-gap: 0.65rem;
+  align-items: stretch;
+  width: 100%;
+  min-width: 0;
+  padding: 0.1rem 0 0.2rem;
+}
+
 .context-card--home .context-row--home-chips {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   min-width: 0;
-  padding: 0.35rem 0 0.3rem;
+  padding: 0;
 }
 
 .context-card--home .context-row--home-chips .patchi-filter-chips {
   display: flex;
+  flex-direction: column;
   flex: 1 1 auto;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: stretch;
-  gap: 0.35rem;
+  justify-content: space-between;
+  gap: 0.3rem;
   padding: 0;
   min-width: 0;
   width: 100%;
+  height: 100%;
 }
 
 .context-card--home .context-row--home-chips .patchi-submenu__btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex: 1 1 calc(33.333% - 0.35rem);
+  flex: 1 1 0;
   box-sizing: border-box;
-  min-width: 4.5rem;
+  width: 100%;
+  min-width: 0;
   min-height: var(--touch-min);
-  padding: 0.4rem 0.35rem;
+  padding: 0.35rem 0.4rem;
   font-size: 0.8rem;
-  line-height: 1.45;
+  line-height: 1.35;
   white-space: normal;
   overflow-wrap: anywhere;
   word-break: normal;
@@ -3038,30 +3062,29 @@ body {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 0.28rem;
+  gap: 0.35rem;
   width: 100%;
 }
 
-.context-card--home .jamam-pair__cell--home-inline {
-  display: grid;
-  grid-template-columns: var(--home-label-width) minmax(0, 1fr);
-  column-gap: var(--home-label-gap);
-  align-items: center;
+.context-card--home .jamam-pair__cell--home-jamam {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
   width: 100%;
   min-width: 0;
 }
 
-.context-card--home .jamam-pair__cell--home-inline .context-label {
+.context-card--home .jamam-pair__cell--home-jamam .context-label {
   width: auto;
   max-width: none;
   flex: unset;
 }
 
-.context-card--home .jamam-pair__cell--home-inline .context-value-btn,
-.context-card--home .jamam-pair__cell--home-inline .context-value {
-  width: auto;
+.context-card--home .jamam-pair__cell--home-jamam .context-value-btn,
+.context-card--home .jamam-pair__cell--home-jamam .context-value {
+  width: 100%;
   min-width: 0;
-  justify-self: start;
   text-align: left;
 }
 
@@ -3075,12 +3098,12 @@ body {
   word-break: normal;
 }
 
-.context-card--home .jamam-pair__cell--home-inline .thozhil-value-btn {
+.context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn {
   font-size: var(--home-value-size);
   font-weight: 700;
 }
 
-.context-card--home .jamam-pair__cell--home-inline .thozhil-value-btn .bi-ta {
+.context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn .bi-ta {
   font-size: inherit;
   font-weight: 700;
 }
@@ -3112,43 +3135,52 @@ body {
     font-size: var(--home-value-size);
   }
 
+  .context-card--home .context-row--home-main {
+    grid-template-columns: minmax(4.25rem, 6.5rem) minmax(0, 1fr);
+    column-gap: 0.5rem;
+  }
+
   .context-card--home .context-row--home-chips {
-    padding: 0.3rem 0 0.2rem;
+    padding: 0;
   }
 
   .context-card--home .context-row--home-chips .patchi-filter-chips {
-    gap: 0.35rem;
+    gap: 0.28rem;
+    flex-wrap: nowrap;
+    flex-direction: column;
   }
 
   .context-card--home .context-row--home-chips .patchi-submenu__btn {
     min-height: var(--touch-min);
-    padding: 0.4rem 0.3rem;
-    font-size: 0.8rem;
+    padding: 0.35rem 0.3rem;
+    font-size: 0.78rem;
     border-radius: 0.4rem;
+    flex: 1 1 0;
+    width: 100%;
   }
 
   .context-card--home .jamam-pair__cell--home-stack {
-    gap: 0.22rem;
+    gap: 0.28rem;
   }
 
-  .context-card--home .jamam-pair__cell--home-inline .thozhil-value-btn,
-  .context-card--home .jamam-pair__cell--home-inline .context-value {
+  .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn,
+  .context-card--home .jamam-pair__cell--home-jamam .context-value {
     font-size: var(--home-value-size);
   }
 
-  .context-card--home .jamam-pair__cell--home-inline .thozhil-value-btn {
+  .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn {
     padding: 0.45rem 0.5rem;
     min-height: var(--touch-min);
     max-width: 100%;
   }
 
-  .context-card--home .jamam-pair__cell--home-inline .thozhil-value-btn .bi-ta,
+  .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn .bi-ta,
   .context-card--home .jamam-pair__cell--home-antharam .context-value--home-antharam .bi-ta {
     white-space: normal;
     overflow-wrap: anywhere;
   }
 
-  .datetime-card--home {
+  .datetime-card--form-grid {
     padding: 0.7rem 0.45rem;
     border-radius: 0.65rem;
   }
@@ -3169,15 +3201,15 @@ body {
   }
 }
 
-/* —— Home datetime form: CSS Grid (explicit areas, no clip/overlap) —— */
-.datetime-card--home {
+/* —— Shared datetime form grid (Home + Find Patchi): explicit areas, no clip/overlap —— */
+.datetime-card--form-grid {
   max-width: 100%;
   min-width: 0;
   overflow-x: clip;
   box-sizing: border-box;
 }
 
-.datetime-card--home .datetime-card__row {
+.datetime-card--form-grid .datetime-card__row {
   display: grid;
   box-sizing: border-box;
   width: 100%;
@@ -3188,39 +3220,39 @@ body {
 }
 
 /* Flatten wrappers so date/time/coords land in separate grid cells */
-.datetime-card--home .datetime-card__datetime-row,
-.datetime-card--home .datetime-field--coords,
-.datetime-card--home .datetime-field__coords-row {
+.datetime-card--form-grid .datetime-card__datetime-row,
+.datetime-card--form-grid .datetime-field--coords,
+.datetime-card--form-grid .datetime-field__coords-row {
   display: contents;
 }
 
-.datetime-card--home .datetime-field:not(.datetime-field--coords),
-.datetime-card--home .datetime-field--date,
-.datetime-card--home .datetime-field--time,
-.datetime-card--home .datetime-field--location,
-.datetime-card--home .datetime-field__coord,
-.datetime-card--home .datetime-field__coord--sunrise,
-.datetime-card--home .datetime-field__coord--lat,
-.datetime-card--home .datetime-field__coord--lng,
-.datetime-card--home .datetime-card__actions {
+.datetime-card--form-grid .datetime-field:not(.datetime-field--coords),
+.datetime-card--form-grid .datetime-field--date,
+.datetime-card--form-grid .datetime-field--time,
+.datetime-card--form-grid .datetime-field--location,
+.datetime-card--form-grid .datetime-field__coord,
+.datetime-card--form-grid .datetime-field__coord--sunrise,
+.datetime-card--form-grid .datetime-field__coord--lat,
+.datetime-card--form-grid .datetime-field__coord--lng,
+.datetime-card--form-grid .datetime-card__actions {
   box-sizing: border-box;
   min-width: 0;
   width: 100%;
   max-width: 100%;
 }
 
-.datetime-card--home .datetime-field:not(.datetime-field--coords),
-.datetime-card--home .datetime-field__coord,
-.datetime-card--home .datetime-field__coord--sunrise,
-.datetime-card--home .datetime-field__coord--lat,
-.datetime-card--home .datetime-field__coord--lng {
+.datetime-card--form-grid .datetime-field:not(.datetime-field--coords),
+.datetime-card--form-grid .datetime-field__coord,
+.datetime-card--form-grid .datetime-field__coord--sunrise,
+.datetime-card--form-grid .datetime-field__coord--lat,
+.datetime-card--form-grid .datetime-field__coord--lng {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
 }
 
-.datetime-card--home .datetime-field__label,
-.datetime-card--home .datetime-field__coord-label {
+.datetime-card--form-grid .datetime-field__label,
+.datetime-card--form-grid .datetime-field__coord-label {
   white-space: normal;
   overflow-wrap: anywhere;
   word-break: normal;
@@ -3228,7 +3260,7 @@ body {
   max-width: 100%;
 }
 
-.datetime-card--home .datetime-field__date-row {
+.datetime-card--form-grid .datetime-field__date-row {
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -3238,15 +3270,15 @@ body {
   width: 100%;
 }
 
-.datetime-card--home .datetime-field--location .datetime-field__location-autocomplete {
+.datetime-card--form-grid .datetime-field--location .datetime-field__location-autocomplete {
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
 }
 
-.datetime-card--home .datetime-field__input,
-.datetime-card--home .datetime-field__sunrise-value,
-.datetime-card--home .datetime-field__coord-input {
+.datetime-card--form-grid .datetime-field__input,
+.datetime-card--form-grid .datetime-field__sunrise-value,
+.datetime-card--form-grid .datetime-field__coord-input {
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
@@ -3257,8 +3289,8 @@ body {
 }
 
 /* Date / time / sunrise / lat / lng: single line; room for native picker icons */
-.datetime-card--home .datetime-field--date .datetime-field__input,
-.datetime-card--home .datetime-field--time .datetime-field__input {
+.datetime-card--form-grid .datetime-field--date .datetime-field__input,
+.datetime-card--form-grid .datetime-field--time .datetime-field__input {
   display: flex;
   align-items: center;
   white-space: nowrap;
@@ -3267,25 +3299,25 @@ body {
   padding-right: 2.25rem;
 }
 
-.datetime-card--home .datetime-field--date .datetime-field__input {
+.datetime-card--form-grid .datetime-field--date .datetime-field__input {
   flex: 1 1 auto;
 }
 
-.datetime-card--home .datetime-field__coord-input,
-.datetime-card--home .datetime-field__sunrise-value {
+.datetime-card--form-grid .datetime-field__coord-input,
+.datetime-card--form-grid .datetime-field__sunrise-value {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: clip;
 }
 
-.datetime-card--home .datetime-field__sunrise-value {
+.datetime-card--form-grid .datetime-field__sunrise-value {
   display: flex;
   align-items: center;
   justify-content: flex-start;
 }
 
 /* Location may wrap to 2 lines */
-.datetime-card--home .datetime-field--location .datetime-field__input {
+.datetime-card--form-grid .datetime-field--location .datetime-field__input {
   height: auto;
   min-height: 48px;
   white-space: normal;
@@ -3297,7 +3329,7 @@ body {
   text-overflow: clip;
 }
 
-.datetime-card--home .datetime-card__actions {
+.datetime-card--form-grid .datetime-card__actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -3307,8 +3339,8 @@ body {
   max-width: 100%;
 }
 
-.datetime-card--home .datetime-card__refresh,
-.datetime-card--home .datetime-card__submit {
+.datetime-card--form-grid .datetime-card__refresh,
+.datetime-card--form-grid .datetime-card__submit {
   box-sizing: border-box;
   min-height: 48px;
   height: 48px;
@@ -3321,7 +3353,7 @@ body {
   flex: 1 1 auto;
 }
 
-.datetime-card--home .datetime-card__permission {
+.datetime-card--form-grid .datetime-card__permission {
   box-sizing: border-box;
   width: 48px;
   height: 48px;
@@ -3330,52 +3362,52 @@ body {
   flex-shrink: 0;
 }
 
-.datetime-card--home .datetime-card__weekday {
+.datetime-card--form-grid .datetime-card__weekday {
   line-height: 1.45;
   flex-shrink: 0;
 }
 
-.datetime-card--home .datetime-card__weekday .bi-ta,
-.datetime-card--home .datetime-card__weekday .bi-en {
+.datetime-card--form-grid .datetime-card__weekday .bi-ta,
+.datetime-card--form-grid .datetime-card__weekday .bi-en {
   line-height: 1.45;
 }
 
 /* Shared area placement for tablet + desktop home form */
-.datetime-card--home .datetime-field--date {
+.datetime-card--form-grid .datetime-field--date {
   grid-area: date;
 }
 
-.datetime-card--home .datetime-field--time {
+.datetime-card--form-grid .datetime-field--time {
   grid-area: time;
 }
 
-.datetime-card--home .datetime-field--location {
+.datetime-card--form-grid .datetime-field--location {
   grid-area: location;
 }
 
-.datetime-card--home .datetime-field__coord--sunrise {
+.datetime-card--form-grid .datetime-field__coord--sunrise {
   grid-area: sunrise;
 }
 
-.datetime-card--home .datetime-field__coord--lat {
+.datetime-card--form-grid .datetime-field__coord--lat {
   grid-area: lat;
 }
 
-.datetime-card--home .datetime-field__coord--lng {
+.datetime-card--form-grid .datetime-field__coord--lng {
   grid-area: lng;
 }
 
-.datetime-card--home .datetime-card__actions {
+.datetime-card--form-grid .datetime-card__actions {
   grid-area: actions;
 }
 
 /* Desktop / laptop ≥1280px — row1 fields, row2 lat/lng + actions */
 @media (min-width: 1280px) {
-  .datetime-card--home {
+  .datetime-card--form-grid {
     padding: 1rem 1.25rem;
   }
 
-  .datetime-card--home .datetime-card__row {
+  .datetime-card--form-grid .datetime-card__row {
     grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.2fr) minmax(0, 2fr) minmax(0, 0.85fr);
     grid-template-rows: auto auto;
     grid-template-areas:
@@ -3386,23 +3418,23 @@ body {
     align-items: end;
   }
 
-  .datetime-card--home .datetime-card__actions {
+  .datetime-card--form-grid .datetime-card__actions {
     justify-content: flex-start;
   }
 
-  .datetime-card--home .datetime-card__refresh,
-  .datetime-card--home .datetime-card__submit {
+  .datetime-card--form-grid .datetime-card__refresh,
+  .datetime-card--form-grid .datetime-card__submit {
     flex: 1 1 0;
   }
 }
 
 /* Tablet / small laptop 768–1279px — same structure, fr columns that can shrink */
 @media (min-width: 768px) and (max-width: 1279px) {
-  .datetime-card--home {
+  .datetime-card--form-grid {
     padding: 0.9rem 1rem;
   }
 
-  .datetime-card--home .datetime-card__row {
+  .datetime-card--form-grid .datetime-card__row {
     grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.2fr) minmax(0, 2fr) minmax(0, 0.85fr);
     grid-template-rows: auto auto;
     grid-template-areas:
@@ -3413,23 +3445,24 @@ body {
     align-items: end;
   }
 
-  .datetime-card--home .datetime-card__actions {
+  .datetime-card--form-grid .datetime-card__actions {
     justify-content: flex-start;
   }
 
-  .datetime-card--home .datetime-card__refresh,
-  .datetime-card--home .datetime-card__submit {
+  .datetime-card--form-grid .datetime-card__refresh,
+  .datetime-card--form-grid .datetime-card__submit {
     flex: 1 1 0;
   }
 
   .context-card--home .context-row--home-chips .patchi-filter-chips {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    flex-direction: column;
   }
 }
 
 /* Phone <768px — paired rows: Day|Date, Time|Sunrise, Lat|Lng; location full width */
 @media (max-width: 767px) {
-  .datetime-card--home .datetime-card__row {
+  .datetime-card--form-grid .datetime-card__row {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     grid-template-rows: none;
     grid-template-areas:
@@ -3443,42 +3476,42 @@ body {
     align-items: end;
   }
 
-  .datetime-card--home .datetime-field--date {
+  .datetime-card--form-grid .datetime-field--date {
     grid-area: date;
   }
 
-  .datetime-card--home .datetime-field--time {
+  .datetime-card--form-grid .datetime-field--time {
     grid-area: time;
   }
 
-  .datetime-card--home .datetime-field--location {
+  .datetime-card--form-grid .datetime-field--location {
     grid-area: location;
   }
 
-  .datetime-card--home .datetime-field__coord--sunrise {
+  .datetime-card--form-grid .datetime-field__coord--sunrise {
     grid-area: sunrise;
   }
 
-  .datetime-card--home .datetime-field__coord--lat {
+  .datetime-card--form-grid .datetime-field__coord--lat {
     grid-area: lat;
   }
 
-  .datetime-card--home .datetime-field__coord--lng {
+  .datetime-card--form-grid .datetime-field__coord--lng {
     grid-area: lng;
   }
 
-  .datetime-card--home .datetime-field:not(.datetime-field--coords),
-  .datetime-card--home .datetime-field__coord,
-  .datetime-card--home .datetime-field__coord--sunrise,
-  .datetime-card--home .datetime-field__coord--lat,
-  .datetime-card--home .datetime-field__coord--lng {
+  .datetime-card--form-grid .datetime-field:not(.datetime-field--coords),
+  .datetime-card--form-grid .datetime-field__coord,
+  .datetime-card--form-grid .datetime-field__coord--sunrise,
+  .datetime-card--form-grid .datetime-field__coord--lat,
+  .datetime-card--form-grid .datetime-field__coord--lng {
     flex-direction: column;
     align-items: stretch;
     gap: 0.25rem;
   }
 
-  .datetime-card--home .datetime-field__label,
-  .datetime-card--home .datetime-field__coord-label {
+  .datetime-card--form-grid .datetime-field__label,
+  .datetime-card--form-grid .datetime-field__coord-label {
     font-size: 0.78rem;
     line-height: 1.3;
     min-height: 1.1rem;
@@ -3488,7 +3521,7 @@ body {
   }
 
   /* Day | Date — equal columns inside the date field */
-  .datetime-card--home .datetime-field__date-row {
+  .datetime-card--form-grid .datetime-field__date-row {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     align-items: stretch;
@@ -3496,7 +3529,7 @@ body {
     width: 100%;
   }
 
-  .datetime-card--home .datetime-card__weekday {
+  .datetime-card--form-grid .datetime-card__weekday {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -3506,21 +3539,21 @@ body {
     max-width: 100%;
   }
 
-  .datetime-card--home .datetime-card__weekday .bi-ta {
+  .datetime-card--form-grid .datetime-card__weekday .bi-ta {
     font-size: 0.88rem;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  .datetime-card--home .datetime-card__weekday .bi-en {
+  .datetime-card--form-grid .datetime-card__weekday .bi-en {
     display: none;
   }
 
-  .datetime-card--home .datetime-field--date .datetime-field__input,
-  .datetime-card--home .datetime-field--time .datetime-field__input,
-  .datetime-card--home .datetime-field__coord-input,
-  .datetime-card--home .datetime-field__sunrise-value {
+  .datetime-card--form-grid .datetime-field--date .datetime-field__input,
+  .datetime-card--form-grid .datetime-field--time .datetime-field__input,
+  .datetime-card--form-grid .datetime-field__coord-input,
+  .datetime-card--form-grid .datetime-field__sunrise-value {
     width: 100%;
     min-width: 0;
     max-width: 100%;
@@ -3528,20 +3561,20 @@ body {
     font-size: 0.85rem;
   }
 
-  .datetime-card--home .datetime-field--date .datetime-field__input,
-  .datetime-card--home .datetime-field--time .datetime-field__input {
+  .datetime-card--form-grid .datetime-field--date .datetime-field__input,
+  .datetime-card--form-grid .datetime-field--time .datetime-field__input {
     padding-right: 1.75rem;
   }
 
-  .datetime-card--home .datetime-card__actions {
+  .datetime-card--form-grid .datetime-card__actions {
     grid-area: actions;
     width: 100%;
     justify-content: stretch;
     gap: 0.45rem;
   }
 
-  .datetime-card--home .datetime-card__refresh,
-  .datetime-card--home .datetime-card__submit {
+  .datetime-card--form-grid .datetime-card__refresh,
+  .datetime-card--form-grid .datetime-card__submit {
     flex: 1 1 auto;
     min-width: 0;
     white-space: normal;
@@ -4725,12 +4758,14 @@ th .bilingual .bi-en,
   }
 
   .context-card--home .context-row--home-chips .patchi-filter-chips {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    flex-direction: column;
   }
 
   .context-card--home .context-row--home-chips .patchi-submenu__btn {
-    flex: 1 1 auto;
-    min-width: 4.5rem;
+    flex: 1 1 0;
+    min-width: 0;
+    width: 100%;
   }
 }
 
@@ -4949,14 +4984,14 @@ body:has(.app--home) {
   color: var(--accent);
 }
 
-.app--home .context-card--home .jamam-pair__cell--home-inline .thozhil-value-btn {
+.app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn {
   color: var(--accent);
   border-color: var(--border);
   background: var(--bg-card);
 }
 
-.app--home .context-card--home .jamam-pair__cell--home-inline .thozhil-value-btn:hover,
-.app--home .context-card--home .jamam-pair__cell--home-inline .thozhil-value-btn[aria-expanded="true"] {
+.app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn:hover,
+.app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn[aria-expanded="true"] {
   border-color: var(--highlight-gold);
   background: var(--highlight-gold-soft);
   color: var(--accent-hover);

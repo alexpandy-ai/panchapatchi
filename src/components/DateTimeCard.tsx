@@ -417,8 +417,11 @@ export function DateTimeCard({
     <section
       className={[
         "datetime-card",
-        // Shared responsive grid: Home + Find Patchi (date/time/place/sunrise + lat/lng/actions)
-        (hideDateLabel && hideTimeLabel) || selectFieldLabels ? "datetime-card--home" : "",
+        hideDateLabel && hideTimeLabel ? "datetime-card--home" : "",
+        // Shared responsive grid only (Home + Find Patchi); not Home-specific chrome
+        (hideDateLabel && hideTimeLabel) || selectFieldLabels
+          ? "datetime-card--form-grid"
+          : "",
       ]
         .filter(Boolean)
         .join(" ")}

@@ -55,10 +55,10 @@ function PatchiListCell({ birds }: { birds: readonly string[] }) {
 
 function PatchiDaysSection() {
   return (
-    <div className="days-view__two-col-tables">
+    <div className="days-view__patchi-days">
       <section className="schedule-table-card days-view__patchi-days-card">
         <h3 className="schedule-table-card__title">
-          <BilingualText text={UI.valarpiraiPatchi} />
+          <BilingualText text={UI.athikaraPatchi} />
         </h3>
         <div className="sheet-table-wrap">
           <table className="sheet-table days-table days-table--two-col">
@@ -74,44 +74,12 @@ function PatchiDaysSection() {
             </thead>
             <tbody>
               {PATCHI_DAYS_TABLE.map((row) => (
-                <tr key={`valar-${row.planet.en}`}>
+                <tr key={`athikara-${row.planet.en}`}>
                   <td className="days-table__day">
                     <BilingualText text={row.day} />
                   </td>
                   <td>
                     <PatchiCell bird={row.valarpiraiPatchi} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section className="schedule-table-card days-view__patchi-days-card">
-        <h3 className="schedule-table-card__title">
-          <BilingualText text={UI.theipiraiPatchi} />
-        </h3>
-        <div className="sheet-table-wrap">
-          <table className="sheet-table days-table days-table--two-col">
-            <thead>
-              <tr>
-                <th>
-                  <BilingualText text={UI.day} />
-                </th>
-                <th>
-                  <BilingualText text={UI.patchi} />
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {PATCHI_DAYS_TABLE.map((row) => (
-                <tr key={`thei-${row.planet.en}`}>
-                  <td className="days-table__day">
-                    <BilingualText text={row.day} />
-                  </td>
-                  <td>
-                    <PatchiCell bird={row.theipiraiPatchi} />
                   </td>
                 </tr>
               ))}

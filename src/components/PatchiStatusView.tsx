@@ -48,11 +48,11 @@ import {
 import {
   ALTERNATE_ANTHARA_SEGMENT_COUNT,
   alternatePakshaSupportsNight,
-  getAlternateEatingPatchi,
   getAlternateJamamActivitySlots,
   getAlternatePaduPatchiForJamam,
   getAlternatePatchiJamamActivityForWeekday,
   getPatchiDaysDayForAthikaraPatchi,
+  getPatchiDaysWeekdayForAthikaraPatchi,
 } from "../utils/alternateCalculation";
 
 import { derivePatchiStatusFromSchedule } from "../utils/patchi";
@@ -121,29 +121,35 @@ export function PatchiStatusView({
     return getThithiPatchiEntryForDate(selectedDateTime, pakshaId);
   }, [isHome, nightThithiEntry, selectedDateTime, pakshaId]);
 
-  const thithiScheduleWeekday = thithiPatchiEntry.weekday;
+  /**
+   * Athikara Patchi: Thithi Patchi table bird for the current pirai (from input /
+   * Night Thithi on Home). Same source as Information → Thithi Patchi.
+   */
+  const athikaraPatchi = thithiPatchiEntry.patchi;
 
   /**
-   * Home: Athikara = jamam-1 Eat bird for Night Thithi weekday + pirai (Patchi Days /
-   * day schedule). Matches Excel night jamam-1 Eat (same bird as day Eat). Using
-   * alternate period "night" would return day-Die (Die→…→Eat cycle) — wrong Athikara.
-   * Status: Thithi table patchi.
+   * Home schedule column: Patchi Days weekday for that Athikara under current pirai
+   * (Information → Patchi Days). Status keeps Thithi planet weekday for Excel groups.
    */
-  const athikaraPatchi = useMemo(() => {
+  const thithiScheduleWeekday = useMemo(() => {
     if (
       isHome &&
       (pakshaId === "valarpirai" || pakshaId === "theipirai")
     ) {
-      const jamam1Eating = getAlternateEatingPatchi(
+      const fromPatchiDays = getPatchiDaysWeekdayForAthikaraPatchi(
         pakshaId,
-        thithiScheduleWeekday,
-        1,
-        "day",
+        athikaraPatchi,
       );
-      if (jamam1Eating) return jamam1Eating;
+      if (fromPatchiDays !== null) return fromPatchiDays;
     }
-    return thithiPatchiEntry.patchi;
-  }, [isHome, pakshaId, thithiPatchiEntry.patchi, thithiScheduleWeekday]);
+    return thithiPatchiEntry.weekday;
+  }, [athikaraPatchi, isHome, pakshaId, thithiPatchiEntry.weekday]);
+
+  /** Home: day next to Pirai — Patchi Days row for Athikara under current pirai. */
+  const athikaraPatchiDay = useMemo(() => {
+    if (!isHome || (pakshaId !== "valarpirai" && pakshaId !== "theipirai")) return null;
+    return getPatchiDaysDayForAthikaraPatchi(pakshaId, athikaraPatchi);
+  }, [athikaraPatchi, isHome, pakshaId]);
 
   const homePatchi = homeChipSelection ?? athikaraPatchi;
   const showHomeJamamValue = homeChipSelection != null;
@@ -219,17 +225,11 @@ export function PatchiStatusView({
     thithiScheduleWeekday,
   ]);
 
-  /** Home: Padu = Die bird in the same jamam as Athikara (jamam 1 day / Patchi Days). */
+  /** Home: Padu = Die bird in jamam 1 day for Athikara’s Patchi Days weekday. */
   const paduPatchi = useMemo(() => {
     if (!isHome || (pakshaId !== "valarpirai" && pakshaId !== "theipirai")) return null;
     return getAlternatePaduPatchiForJamam(pakshaId, thithiScheduleWeekday, 1, "day");
   }, [isHome, pakshaId, thithiScheduleWeekday]);
-
-  /** Home: Naal = Patchi Days weekday for current Athikara under current pirai. */
-  const athikaraNaal = useMemo(() => {
-    if (!isHome || (pakshaId !== "valarpirai" && pakshaId !== "theipirai")) return null;
-    return getPatchiDaysDayForAthikaraPatchi(pakshaId, athikaraPatchi);
-  }, [athikaraPatchi, isHome, pakshaId]);
 
   const derivedNext = useMemo(() => {
     if (isHome) return { myPatchiActivity: null };
@@ -434,72 +434,8 @@ export function PatchiStatusView({
       <section className={["context-card", isHome ? "context-card--home" : ""].filter(Boolean).join(" ")}>
 
         {isHome ? (
-          <>
-            <div className="context-row context-row--home-thithi">
-              <span className="context-inline-item">
-                <span className="context-label">
-                  <BilingualText text={UI.nightThithi} block={false} />
-                </span>
-                <span className="context-value context-value--home-thithi-name">
-                  <BilingualText text={thithiPatchiEntry.thithi} block={false} />
-                </span>
-              </span>
-            </div>
-            <div className="context-row context-row--home-day">
-              <span className="context-value context-value--home-pirai">
-                <BilingualText text={PAKSHA_BI[currentPakshaId]} block={false} />
-              </span>
-              <span className="context-value context-value--home-day">
-                <BilingualText text={thithiPatchiEntry.day} block={false} />
-              </span>
-            </div>
-
-            <div className="context-row context-row--home-athikara">
-              <span className="context-inline-item context-inline-item--athikara">
-                <span className="context-label context-label--athikara">
-                  <BilingualText text={UI.athikaraPatchi} block={false} />
-                </span>
-                <span className="context-value context-value--home-athikara">
-                  <InlineEmojiLabel
-                    text={patchiLabelBilingual(athikaraPatchi)}
-                    emoji={patchiEmoji(athikaraPatchi)}
-                    emojiPosition="after"
-                  />
-                </span>
-              </span>
-            </div>
-
-            {athikaraNaal ? (
-              <div className="context-row context-row--home-naal">
-                <span className="context-inline-item context-inline-item--naal">
-                  <span className="context-label context-label--naal">
-                    <BilingualText text={UI.day} block={false} />
-                  </span>
-                  <span className="context-value context-value--home-naal">
-                    <BilingualText text={athikaraNaal} block={false} />
-                  </span>
-                </span>
-              </div>
-            ) : null}
-
-            {paduPatchi ? (
-              <div className="context-row context-row--home-padu">
-                <span className="context-inline-item context-inline-item--padu">
-                  <span className="context-label context-label--padu">
-                    <BilingualText text={UI.paduPatchi} block={false} />
-                  </span>
-                  <span className="context-value context-value--home-padu">
-                    <InlineEmojiLabel
-                      text={patchiLabelBilingual(paduPatchi)}
-                      emoji={patchiEmoji(paduPatchi)}
-                      emojiPosition="after"
-                    />
-                  </span>
-                </span>
-              </div>
-            ) : null}
-
-            <div className="context-row context-row--home-chips">
+          <div className="context-row context-row--home-main">
+            <div className="context-row--home-chips">
               <PatchiFilterChips
                 selected={homeChipSelection}
                 onSelect={(patchi) => {
@@ -514,7 +450,123 @@ export function PatchiStatusView({
                 ariaLabel={`${UI.myPatchi.ta} ${UI.myPatchi.en}`}
               />
             </div>
-          </>
+
+            <div className="context-row--home-details">
+              <div className="context-row context-row--home-thithi">
+                <span className="context-inline-item">
+                  <span className="context-label">
+                    <BilingualText text={UI.nightThithi} block={false} />
+                  </span>
+                  <span className="context-value context-value--home-thithi-name">
+                    <BilingualText text={thithiPatchiEntry.thithi} block={false} />
+                  </span>
+                </span>
+              </div>
+              <div className="context-row context-row--home-day">
+                <span className="context-value context-value--home-pirai">
+                  <BilingualText text={PAKSHA_BI[currentPakshaId]} block={false} />
+                </span>
+                <span className="context-value context-value--home-day">
+                  <BilingualText
+                    text={athikaraPatchiDay ?? thithiPatchiEntry.day}
+                    block={false}
+                  />
+                </span>
+              </div>
+
+              <div className="context-row context-row--home-athikara">
+                <span className="context-inline-item context-inline-item--athikara">
+                  <span className="context-label context-label--athikara">
+                    <BilingualText text={UI.athikaraPatchi} block={false} />
+                  </span>
+                  <span className="context-value context-value--home-athikara">
+                    <InlineEmojiLabel
+                      text={patchiLabelBilingual(athikaraPatchi)}
+                      emoji={patchiEmoji(athikaraPatchi)}
+                      emojiPosition="after"
+                    />
+                  </span>
+                </span>
+              </div>
+
+              <div className="context-row context-row--home-naal">
+                <span className="context-inline-item context-inline-item--naal">
+                  <span className="context-label context-label--naal">
+                    <BilingualText text={UI.thithiDay} block={false} />
+                  </span>
+                  <span className="context-value context-value--home-naal">
+                    <BilingualText text={thithiPatchiEntry.day} block={false} />
+                  </span>
+                </span>
+              </div>
+
+              {paduPatchi ? (
+                <div className="context-row context-row--home-padu">
+                  <span className="context-inline-item context-inline-item--padu">
+                    <span className="context-label context-label--padu">
+                      <BilingualText text={UI.paduPatchi} block={false} />
+                    </span>
+                    <span className="context-value context-value--home-padu">
+                      <InlineEmojiLabel
+                        text={patchiLabelBilingual(paduPatchi)}
+                        emoji={patchiEmoji(paduPatchi)}
+                        emojiPosition="after"
+                      />
+                    </span>
+                  </span>
+                </div>
+              ) : null}
+
+              {activeSlot ? (
+                <div className="context-row context-row--jamam-pair">
+                  <div className="jamam-pair jamam-pair--single">
+                    <div className="jamam-pair__cell jamam-pair__cell--home-stack">
+                      <div className="jamam-pair__cell--home-jamam">
+                        <span className="context-label">
+                          <BilingualText text={jamamBilingual(activeSlot.index)} block={false} />
+                        </span>
+                        {showHomeJamamValue && currentJamamActivity ? (
+                          <button
+                            type="button"
+                            className="context-value-btn thozhil-value-btn jamam-summary__value"
+                            aria-expanded={antharaDialogTarget === "current"}
+                            onClick={() => setAntharaDialogTarget("current")}
+                          >
+                            <BilingualText
+                              text={thozhilValueWithTime(
+                                displayActivityBi(currentJamamActivity),
+                                formatTimeRange(activeSlot.start, activeSlot.end),
+                              )}
+                              block={false}
+                            />
+                          </button>
+                        ) : null}
+                      </div>
+                      {showHomeJamamValue && homeAntharaCurrent ? (
+                        <div className="jamam-pair__cell--home-jamam jamam-pair__cell--home-antharam">
+                          <span className="context-label context-label--antharam">
+                            <BilingualText text={UI.antharaJamam} block={false} />
+                          </span>
+                          <span className="context-value context-value--home-antharam">
+                            <BilingualText
+                              text={thozhilValueWithTime(
+                                displayActivityBi(homeAntharaCurrent.activity),
+                                formatTimeRange(
+                                  homeAntharaCurrent.start,
+                                  homeAntharaCurrent.end,
+                                ),
+                              )}
+                              block={false}
+                            />
+                          </span>
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          </div>
         ) : (
           <>
             <div className="context-row">
@@ -576,54 +628,10 @@ export function PatchiStatusView({
           </div>
         ) : null}
 
-        {activeSlot && (isHome || nextSlot) ? (
+        {!isHome && activeSlot && nextSlot ? (
           <div className="context-row context-row--jamam-pair">
-            <div className={isHome ? "jamam-pair jamam-pair--single" : "jamam-pair"}>
+            <div className="jamam-pair">
               {activeSlot ? (
-                isHome ? (
-                  <div className="jamam-pair__cell jamam-pair__cell--home-stack">
-                    <div className="jamam-pair__cell--home-inline">
-                      <span className="context-label">
-                        <BilingualText text={jamamBilingual(activeSlot.index)} block={false} />
-                      </span>
-                      {showHomeJamamValue && currentJamamActivity ? (
-                        <button
-                          type="button"
-                          className="context-value-btn thozhil-value-btn jamam-summary__value"
-                          aria-expanded={antharaDialogTarget === "current"}
-                          onClick={() => setAntharaDialogTarget("current")}
-                        >
-                          <BilingualText
-                            text={thozhilValueWithTime(
-                              displayActivityBi(currentJamamActivity),
-                              formatTimeRange(activeSlot.start, activeSlot.end),
-                            )}
-                            block={false}
-                          />
-                        </button>
-                      ) : null}
-                    </div>
-                    {showHomeJamamValue && homeAntharaCurrent ? (
-                      <div className="jamam-pair__cell--home-inline jamam-pair__cell--home-antharam">
-                        <span className="context-label context-label--antharam">
-                          <BilingualText text={UI.antharaJamam} block={false} />
-                        </span>
-                        <span className="context-value context-value--home-antharam">
-                          <BilingualText
-                            text={thozhilValueWithTime(
-                              displayActivityBi(homeAntharaCurrent.activity),
-                              formatTimeRange(
-                                homeAntharaCurrent.start,
-                                homeAntharaCurrent.end,
-                              ),
-                            )}
-                            block={false}
-                          />
-                        </span>
-                      </div>
-                    ) : null}
-                  </div>
-                ) : (
                   <div className="jamam-pair__cell">
                     <span className="context-label">
                       <BilingualText text={thozhilHeader(activeSlot.index)} block={false} />
@@ -651,9 +659,8 @@ export function PatchiStatusView({
                       </span>
                     )}
                   </div>
-                )
               ) : null}
-              {!isHome && nextSlot ? (
+              {nextSlot ? (
                 <div className="jamam-pair__cell">
                   <span className="context-label">
                     <BilingualText text={thozhilHeader(nextSlot.index)} block={false} />
