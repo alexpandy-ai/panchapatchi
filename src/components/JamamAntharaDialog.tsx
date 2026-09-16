@@ -26,6 +26,8 @@ export interface JamamAntharaDialogProps {
   cycleStart?: Date;
   segmentCount?: number;
   matrixOptions?: PatchiAntharaMatrixOptions;
+  /** Home-only presentation; does not change dialog data or click behavior. */
+  homeLayout?: boolean;
 }
 
 export function JamamAntharaDialog({
@@ -42,6 +44,7 @@ export function JamamAntharaDialog({
   cycleStart,
   segmentCount,
   matrixOptions,
+  homeLayout = false,
 }: JamamAntharaDialogProps) {
   const [naalSelection, setNaalSelection] = useState<NaalActivitySelection | null>(null);
 
@@ -70,12 +73,16 @@ export function JamamAntharaDialog({
   return (
     <>
       <div
-        className="anthara-dialog-overlay"
+        className={["anthara-dialog-overlay", homeLayout ? "anthara-dialog-overlay--home" : ""]
+          .filter(Boolean)
+          .join(" ")}
         role="presentation"
         onClick={onClose}
       >
         <div
-          className="anthara-dialog"
+          className={["anthara-dialog", homeLayout ? "anthara-dialog--home" : ""]
+            .filter(Boolean)
+            .join(" ")}
           role="dialog"
           aria-modal="true"
           onClick={(event) => event.stopPropagation()}
@@ -116,6 +123,7 @@ export function JamamAntharaDialog({
           appendNightJamam={naalSelection.appendNightJamam}
           nightJamamByBird={naalSelection.nightJamamByBird}
           appendedJamamSerials={naalSelection.appendedJamamSerials}
+          homeLayout={homeLayout}
           onClose={() => setNaalSelection(null)}
         />
       ) : null}

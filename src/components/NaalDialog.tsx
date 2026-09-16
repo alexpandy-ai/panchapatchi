@@ -48,6 +48,8 @@ export interface NaalDialogProps {
   /** Display serials for rows 6–10 (morning yamas or night jamam indices). */
   appendedJamamSerials?: number[];
   onClose: () => void;
+  /** Home-only presentation; does not change dialog data or click behavior. */
+  homeLayout?: boolean;
 }
 
 function naalCycleActivities(startActivity: string, period: PeriodId, count: number): string[] {
@@ -163,6 +165,7 @@ export function NaalDialog({
   nightJamamByBird,
   appendedJamamSerials,
   onClose,
+  homeLayout = false,
 }: NaalDialogProps) {
   const singleBird = birdRows.length <= 1;
   const showSplitLabels = appendNextDayMorning || appendNextDayNight || appendNightJamam;
@@ -227,7 +230,13 @@ export function NaalDialog({
 
   return (
     <div
-      className="anthara-dialog-overlay naal-dialog-overlay"
+      className={[
+        "anthara-dialog-overlay",
+        "naal-dialog-overlay",
+        homeLayout ? "anthara-dialog-overlay--home" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
       role="presentation"
       onClick={onClose}
     >
@@ -237,6 +246,7 @@ export function NaalDialog({
           "naal-dialog",
           singleBird ? "naal-dialog--single" : "naal-dialog--all-birds",
           showSplitLabels ? "naal-dialog--with-next-day" : "",
+          homeLayout ? "anthara-dialog--home naal-dialog--home" : "",
         ]
           .filter(Boolean)
           .join(" ")}

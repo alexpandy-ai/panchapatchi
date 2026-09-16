@@ -822,6 +822,7 @@ export function PatchiStatusView({
                 : undefined
           }
           onlyPatchi={isHome ? antharaDialogProps.highlightPatchi : undefined}
+          homeLayout={isHome}
         />
       ) : null}
 
@@ -843,6 +844,7 @@ export function PatchiStatusView({
           appendNightJamam={homeNaalSelection.appendNightJamam}
           nightJamamByBird={homeNaalSelection.nightJamamByBird}
           appendedJamamSerials={homeNaalSelection.appendedJamamSerials}
+          homeLayout
           onClose={() => setHomeNaalSelection(null)}
         />
       ) : null}
