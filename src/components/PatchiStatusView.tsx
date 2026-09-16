@@ -3,9 +3,10 @@ import { useEffect, useMemo, useState } from "react";
 import { BilingualText } from "./BilingualText";
 
 import { JamamAntharaDialog } from "./JamamAntharaDialog";
-
+import { NaalDialog } from "./NaalDialog";
 import { InlineEmojiLabel } from "./InlineEmojiLabel";
 import { PatchiFilterChips } from "./PatchiPickerBlock";
+import type { NaalActivitySelection } from "./JamamSegmentsPanel";
 
 import { useLocation } from "../context/LocationContext";
 import { useNavigation } from "../context/NavigationContext";
@@ -18,9 +19,11 @@ import {
   getAntharaSegmentIndex,
   getAntharaSlots,
   JAMAM_ANTHARA_SEGMENT_COUNT,
+  nightJamamIndicesRotatedFromYama,
+  yamasRotatedFrom,
 } from "../utils/anthara";
 
-import { displayActivityBi } from "../utils/activityLabel";
+import { displayActivity, displayActivityBi } from "../utils/activityLabel";
 
 import {
 
@@ -28,6 +31,7 @@ import {
 
   PATCHI_ORDER,
   jamamBilingual,
+  patchiBaseName,
   patchiEmoji,
   patchiLabelBilingual,
   thozhilHeader,
@@ -96,10 +100,14 @@ export function PatchiStatusView({
   const [antharaDialogTarget, setAntharaDialogTarget] = useState<"current" | "next" | null>(
     null,
   );
+  const [homeNaalSelection, setHomeNaalSelection] = useState<NaalActivitySelection | null>(
+    null,
+  );
 
   useEffect(() => {
     if (isHome && homeChipSelection == null) {
       setAntharaDialogTarget(null);
+      setHomeNaalSelection(null);
     }
   }, [homeChipSelection, isHome]);
 
@@ -417,6 +425,75 @@ export function PatchiStatusView({
     selectedDateTime,
   ]);
 
+  const openHomeNaalFromAntharam = () => {
+    if (!activeSlot || !homeChipSelection || !homeAntharaCurrent) return;
+    if (pakshaId !== "valarpirai" && pakshaId !== "theipirai") return;
+
+    const { yama: parentYama, period } = yamaFromJamamIndex(activeSlot.index);
+    const activity = displayActivity(homeAntharaCurrent.activity);
+    const selection: NaalActivitySelection = {
+      segmentStart: homeAntharaCurrent.start,
+      segmentEnd: homeAntharaCurrent.end,
+      antharaSerial: homeAntharaCurrent.index,
+      patchi: homeChipSelection,
+      activity,
+      birdRows: [{ patchi: homeChipSelection, activity }],
+      period,
+      repeatActivity: false,
+    };
+
+    const supportsNight = alternatePakshaSupportsNight(pakshaId);
+    if (period === "day" && supportsNight) {
+      const nightYamaOrder = yamasRotatedFrom(parentYama);
+      selection.appendNightJamam = true;
+      selection.appendedJamamSerials = nightJamamIndicesRotatedFromYama(parentYama);
+      selection.nightJamamByBird = [
+        {
+          patchi: homeChipSelection,
+          activities: nightYamaOrder.map((yama) => {
+            const slots = getAlternateJamamActivitySlots(
+              pakshaId,
+              thithiScheduleWeekday,
+              yama,
+              "night",
+            );
+            const match = slots.find(
+              (entry) => patchiBaseName(entry.bird) === homeChipSelection,
+            );
+            return match ? displayActivity(match.activity) : "—";
+          }),
+        },
+      ];
+    } else if (period === "night" && supportsNight) {
+      const nextThithiMorning = getNextThithiPatchiEntry(
+        pakshaId,
+        thithiPatchiEntry.thithiNumber,
+      );
+      const morningYamaOrder = yamasRotatedFrom(parentYama);
+      selection.appendNextDayMorning = true;
+      selection.appendedJamamSerials = morningYamaOrder;
+      selection.nextDayMorningByBird = [
+        {
+          patchi: homeChipSelection,
+          activities: morningYamaOrder.map((yama) => {
+            const slots = getAlternateJamamActivitySlots(
+              nextThithiMorning.pakshaId,
+              nextThithiMorning.weekday,
+              yama,
+              "day",
+            );
+            const match = slots.find(
+              (entry) => patchiBaseName(entry.bird) === homeChipSelection,
+            );
+            return match ? displayActivity(match.activity) : "—";
+          }),
+        },
+      ];
+    }
+
+    setHomeNaalSelection(selection);
+  };
+
   if (!isHome && !paksha) {
     return (
       <p className="status">
@@ -547,7 +624,12 @@ export function PatchiStatusView({
                           <span className="context-label context-label--antharam">
                             <BilingualText text={UI.antharaJamam} block={false} />
                           </span>
-                          <span className="context-value context-value--home-antharam">
+                          <button
+                            type="button"
+                            className="context-value-btn thozhil-value-btn jamam-summary__value context-value--home-antharam"
+                            aria-expanded={homeNaalSelection !== null}
+                            onClick={openHomeNaalFromAntharam}
+                          >
                             <BilingualText
                               text={thozhilValueWithTime(
                                 displayActivityBi(homeAntharaCurrent.activity),
@@ -558,7 +640,7 @@ export function PatchiStatusView({
                               )}
                               block={false}
                             />
-                          </span>
+                          </button>
                         </div>
                       ) : null}
                     </div>
@@ -740,6 +822,28 @@ export function PatchiStatusView({
                 : undefined
           }
           onlyPatchi={isHome ? antharaDialogProps.highlightPatchi : undefined}
+        />
+      ) : null}
+
+      {homeNaalSelection ? (
+        <NaalDialog
+          open
+          segmentStart={homeNaalSelection.segmentStart}
+          segmentEnd={homeNaalSelection.segmentEnd}
+          antharaSerial={homeNaalSelection.antharaSerial}
+          patchi={homeNaalSelection.patchi}
+          activity={homeNaalSelection.activity}
+          birdRows={homeNaalSelection.birdRows}
+          period={homeNaalSelection.period}
+          repeatActivity={homeNaalSelection.repeatActivity}
+          appendNextDayMorning={homeNaalSelection.appendNextDayMorning}
+          nextDayMorningByBird={homeNaalSelection.nextDayMorningByBird}
+          appendNextDayNight={homeNaalSelection.appendNextDayNight}
+          nextDayNightByBird={homeNaalSelection.nextDayNightByBird}
+          appendNightJamam={homeNaalSelection.appendNightJamam}
+          nightJamamByBird={homeNaalSelection.nightJamamByBird}
+          appendedJamamSerials={homeNaalSelection.appendedJamamSerials}
+          onClose={() => setHomeNaalSelection(null)}
         />
       ) : null}
 
