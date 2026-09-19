@@ -64,8 +64,8 @@ export const THITHI_PATCHI_THEIPIRAI: ThithiPakshaGroup[] = [
 
 /**
  * வளர்பிறை thithi patchi — five groups of three thithis.
- * Planet/weekday per thithi group matches Theipirai (same lunar days → same Graham day);
- * only the athikara patchi birds differ by pirai.
+ * Planets (Mars, Saturn, Venus, Jupiter, Mercury) and athikara birds are
+ * Valarpirai-specific; they do not follow the Theipirai graham-day order.
  */
 export const THITHI_PATCHI_VALARPIRAI: ThithiPakshaGroup[] = [
   {
@@ -75,22 +75,22 @@ export const THITHI_PATCHI_VALARPIRAI: ThithiPakshaGroup[] = [
   },
   {
     thithis: [bi("துவிதியை", "Dwitiyai"), bi("சப்தமி", "Sapthami"), bi("துவாதசி", "Dwadasi")],
-    planet: bi("பு", "Mercury"),
+    planet: bi("ச", "Saturn"),
     patchi: "ஆந்தை",
   },
   {
     thithis: [bi("திரிதியை", "Trithiyai"), bi("அஷ்டமி", "Ashtami"), bi("திரியோதசி", "Trayodasi")],
-    planet: bi("வி", "Jupiter"),
+    planet: bi("வெ", "Venus"),
     patchi: "காகம்",
   },
   {
     thithis: [bi("சதுர்த்தி", "Chathurthi"), bi("நவமி", "Navami"), bi("சதுர்தசி", "Chaturdasi")],
-    planet: bi("வெ", "Venus"),
+    planet: bi("வி", "Jupiter"),
     patchi: "கோழி",
   },
   {
     thithis: [bi("பஞ்சமி", "Panchami"), bi("தசமி", "Dasami"), bi("பௌர்ணமி", "Pournami")],
-    planet: bi("ச", "Saturn"),
+    planet: bi("பு", "Mercury"),
     patchi: "மயில்",
   },
 ];
