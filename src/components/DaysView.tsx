@@ -23,6 +23,7 @@ import {
   getThithiPlanetDay,
   type ThithiPakshaGroup,
 } from "../utils/thithiPatchi";
+import { getMorningDieNightEatDayForPatchi } from "../utils/alternateCalculation";
 import { getCurrentThithiPosition, isCurrentThithiRow } from "../utils/thithi";
 import type { InformationSection } from "../utils/navigationState";
 import type { PakshaId } from "../utils/paksha";
@@ -125,6 +126,7 @@ function ThithiPakshaTable({
           <tbody>
             {groups.map((group, groupIndex) => {
               const isGroupCurrent = highlightPaksha && currentThithi.groupIndex === groupIndex;
+              const dieEatDay = getMorningDieNightEatDayForPatchi(pakshaId, group.patchi);
 
               return (
                 <tr
@@ -171,7 +173,18 @@ function ThithiPakshaTable({
                     </span>
                   </td>
                   <td className={isGroupCurrent ? "thithi-patchi-table__cell--current" : undefined}>
-                    <PatchiCell bird={group.patchi} />
+                    {dieEatDay ? (
+                      <span className="thithi-patchi-table__athikara">
+                        <PatchiCell bird={group.patchi} />
+                        <span className="thithi-patchi-table__athikara-day">
+                          {" ("}
+                          <BilingualText text={dieEatDay} block={false} />
+                          {")"}
+                        </span>
+                      </span>
+                    ) : (
+                      <PatchiCell bird={group.patchi} />
+                    )}
                   </td>
                 </tr>
               );

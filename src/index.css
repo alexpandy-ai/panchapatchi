@@ -2361,6 +2361,19 @@ body {
   font-weight: 600;
 }
 
+.thithi-patchi-table__athikara {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15em;
+}
+
+.thithi-patchi-table__athikara-day {
+  font-weight: 600;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
 .natchathira-patchi-table thead th,
 .natchathira-patchi-table tbody td {
   text-align: left;

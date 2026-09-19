@@ -1,7 +1,7 @@
 import { PATCHI_ORDER } from "./bilingual";
 import type { GeoCoords } from "./location";
 import { getMoonPhase, getPakshaFromDate, type PakshaId } from "./paksha";
-import { getSunset } from "./sunrise";
+import { getNextSunrise, getSunrise, getSunset } from "./sunrise";
 import {
   getThithiCellPosition,
   getThithiPlanetDay,
@@ -23,14 +23,38 @@ export type ThithiPatchiEntry = {
 };
 
 /**
- * Reference instant for Home “Night Thithi”: moon phase at sunset on the
- * selected calendar day (thithi / pirai after sunset).
+ * Night window used for Home / Find Patchi Night Thithi:
+ * sunset → next sunrise. Before today's sunrise, that is yesterday's sunset.
+ */
+export function getNightThithiWindow(
+  date: Date,
+  coords: GeoCoords | null,
+): { sunset: Date; nextSunrise: Date } {
+  const sunrise = getSunrise(date, coords);
+  if (date < sunrise) {
+    const previousDay = new Date(date);
+    previousDay.setDate(previousDay.getDate() - 1);
+    return { sunset: getSunset(previousDay, coords), nextSunrise: sunrise };
+  }
+  return { sunset: getSunset(date, coords), nextSunrise: getNextSunrise(sunrise, coords) };
+}
+
+/**
+ * Reference instant for Home “Night Thithi”: sunset that starts the night window.
  */
 export function getNightThithiReferenceDate(
   date: Date,
   coords: GeoCoords | null,
 ): Date {
-  return getSunset(date, coords);
+  return getNightThithiWindow(date, coords).sunset;
+}
+
+function thithiEntryAt(moment: Date): ThithiPatchiEntry {
+  return getThithiPatchiEntryForDate(moment, getPakshaFromDate(moment));
+}
+
+function isSameThithiEntry(a: ThithiPatchiEntry, b: ThithiPatchiEntry): boolean {
+  return a.thithiNumber === b.thithiNumber && a.pakshaId === b.pakshaId;
 }
 
 export interface CurrentThithiPosition {
@@ -79,16 +103,19 @@ export function getThithiPatchiEntryForDate(
 }
 
 /**
- * Home Night Thithi: thithi + pirai from moon phase at sunset, then the
- * matching Thithi Patchi row (athikara / planet day).
+ * Home / Find Patchi Night Thithi: moon phase at sunset, unless that night
+ * (sunset → next sunrise) contains two different thithis — then use the next
+ * thithi after the one in force at sunset (the previous day's thithi).
  */
 export function getNightThithiPatchiEntryForDate(
   date: Date,
   coords: GeoCoords | null,
 ): ThithiPatchiEntry {
-  const nightAt = getNightThithiReferenceDate(date, coords);
-  const pakshaId = getPakshaFromDate(nightAt);
-  return getThithiPatchiEntryForDate(nightAt, pakshaId);
+  const { sunset, nextSunrise } = getNightThithiWindow(date, coords);
+  const sunsetEntry = thithiEntryAt(sunset);
+  const dawnEntry = thithiEntryAt(new Date(nextSunrise.getTime() - 1));
+  if (isSameThithiEntry(sunsetEntry, dawnEntry)) return sunsetEntry;
+  return getNextThithiPatchiEntry(sunsetEntry.pakshaId, sunsetEntry.thithiNumber);
 }
 
 /** Thithi Patchi row for a paksha + lunar day 1–15. */

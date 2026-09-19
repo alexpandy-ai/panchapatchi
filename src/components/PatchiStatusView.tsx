@@ -58,6 +58,7 @@ import {
   getAlternateJamamActivitySlots,
   getAlternatePaduPatchiForJamam,
   getAlternatePatchiJamamActivityForWeekday,
+  getDayEatingPatchiOnThithiBracketDay,
   getPatchiDaysDayForAthikaraPatchi,
   getPatchiDaysWeekdayForAthikaraPatchi,
 } from "../utils/alternateCalculation";
@@ -133,10 +134,16 @@ export function PatchiStatusView({
   }, [isHome, nightThithiEntry, selectedDateTime, pakshaId]);
 
   /**
-   * Athikara Patchi: Thithi Patchi table bird for the current pirai (from input /
-   * Night Thithi on Home). Same source as Information → Thithi Patchi.
+   * Home Athikara: bird Eating on the Thithi Patchi bracket day (Day Scheduler
+   * jamam-1 morning Eat). Status keeps the Thithi table bird.
    */
-  const athikaraPatchi = thithiPatchiEntry.patchi;
+  const athikaraPatchi = useMemo(() => {
+    const tablePatchi = thithiPatchiEntry.patchi;
+    if (isHome && (pakshaId === "valarpirai" || pakshaId === "theipirai")) {
+      return getDayEatingPatchiOnThithiBracketDay(pakshaId, tablePatchi) ?? tablePatchi;
+    }
+    return tablePatchi;
+  }, [isHome, pakshaId, thithiPatchiEntry.patchi]);
 
   /**
    * Home schedule column: Patchi Days weekday for that Athikara under current pirai

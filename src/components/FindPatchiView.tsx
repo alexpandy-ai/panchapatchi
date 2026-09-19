@@ -3,6 +3,7 @@ import { BilingualText } from "./BilingualText";
 import { InlineEmojiLabel } from "./InlineEmojiLabel";
 import {
   getAlternateEatingPatchi,
+  getDayEatingPatchiOnThithiBracketDay,
   getPatchiDaysDayForAthikaraPatchi,
   getPatchiDaysWeekdayForAthikaraPatchi,
 } from "../utils/alternateCalculation";
@@ -15,9 +16,8 @@ import {
 } from "../utils/bilingual";
 import { formatTime, getJamamState } from "../utils/jamam";
 import type { GeoCoords } from "../utils/location";
-import { getPakshaFromDate } from "../utils/paksha";
 import { getSunrise } from "../utils/sunrise";
-import { getThithiPatchiEntryForDate } from "../utils/thithi";
+import { getNightThithiPatchiEntryForDate } from "../utils/thithi";
 
 export interface FindPatchiQuery {
   date: Date;
@@ -29,23 +29,25 @@ interface FindPatchiViewProps {
 }
 
 /**
- * Find Patchi page:
- * 1. Sunrise → pirai + thithi → Your Thithi Patchi (Information Thithi table)
- * 2. That bird → Day Scheduler pirai → Patchi Days / All Chips day column
- * 3. Jamam for selected time → Eating bird → Your Jamam Patchi
+ * Find Patchi page (same thithi path as Home):
+ * 1. Sunset → Night Thithi + pirai → Thithi Patchi table row
+ * 2. Bracket day on that row → jamam-1 morning Eat bird (Home Athikara)
+ * 3. That bird’s Day Scheduler weekday → Eating bird in the selected jamam
  */
 export function FindPatchiView({ query }: FindPatchiViewProps) {
   const result = useMemo(() => {
     if (!query) return null;
 
     const sunrise = getSunrise(query.date, query.coords);
-    const pakshaId = getPakshaFromDate(sunrise);
-    const entry = getThithiPatchiEntryForDate(sunrise, pakshaId);
+    const entry = getNightThithiPatchiEntryForDate(query.date, query.coords);
+    const pakshaId = entry.pakshaId;
+    const athikaraPatchi =
+      getDayEatingPatchiOnThithiBracketDay(pakshaId, entry.patchi) ?? entry.patchi;
 
-    const scheduleDay = getPatchiDaysDayForAthikaraPatchi(pakshaId, entry.patchi);
+    const scheduleDay = getPatchiDaysDayForAthikaraPatchi(pakshaId, athikaraPatchi);
     const scheduleWeekday = getPatchiDaysWeekdayForAthikaraPatchi(
       pakshaId,
-      entry.patchi,
+      athikaraPatchi,
     );
     const jamam = getJamamState(query.date, query.coords);
 
@@ -63,6 +65,7 @@ export function FindPatchiView({ query }: FindPatchiViewProps) {
       sunrise,
       pakshaId,
       entry,
+      athikaraPatchi,
       scheduleDay,
       activeJamamIndex: jamam.jamamIndex,
       jamamPatchi,
@@ -81,6 +84,7 @@ export function FindPatchiView({ query }: FindPatchiViewProps) {
     sunrise,
     pakshaId,
     entry,
+    athikaraPatchi,
     scheduleDay,
     activeJamamIndex,
     jamamPatchi,
@@ -95,8 +99,8 @@ export function FindPatchiView({ query }: FindPatchiViewProps) {
           </p>
           <p className="find-patchi-result__value find-patchi-result__value--thithi">
             <InlineEmojiLabel
-              text={patchiLabelBilingual(entry.patchi)}
-              emoji={patchiEmoji(entry.patchi)}
+              text={patchiLabelBilingual(athikaraPatchi)}
+              emoji={patchiEmoji(athikaraPatchi)}
               emojiPosition="after"
             />
           </p>
@@ -140,7 +144,7 @@ export function FindPatchiView({ query }: FindPatchiViewProps) {
         </div>
         <div className="find-patchi-result__meta-row">
           <span className="find-patchi-result__meta-label">
-            <BilingualText text={UI.thithi} block={false} />
+            <BilingualText text={UI.nightThithi} block={false} />
           </span>
           <span className="find-patchi-result__meta-value">
             <BilingualText text={entry.thithi} block={false} />

@@ -1,7 +1,7 @@
 import type { ActivitySlot } from "../types";
 import { PATCHI_DAYS_TABLE, PANCHA_ACTIVITY_TA } from "./bilingual";
 import type { Bilingual, PATCHI_ORDER } from "./bilingual";
-import { getPanchaDisplayWeekday, TAMIL_WEEKDAYS } from "./dayGroup";
+import { getPanchaDisplayWeekday, getPakshaGroupDayBilingual, TAMIL_WEEKDAYS } from "./dayGroup";
 import type { PeriodId } from "./jamam";
 import type { PakshaId } from "./paksha";
 
@@ -378,6 +378,34 @@ export function getAlternatePaduPatchi(
   return getAlternatePaduPatchiForJamam(pakshaId, weekday, 1, "day");
 }
 
+/** Weekday where this bird Dies in jamam-1 morning and Eats at night. */
+export function getMorningDieNightEatWeekdayForPatchi(
+  pakshaId: AlternatePakshaId,
+  patchi: (typeof PATCHI_ORDER)[number],
+): number | null {
+  for (const weekday of ALTERNATE_WEEKDAY_ORDER) {
+    const morningDie = getAlternateDayActivity(pakshaId, weekday, 1, patchi);
+    const nightEat = getAlternateNightActivity(pakshaId, weekday, 1, patchi);
+    if (morningDie === "சாவு" && nightEat === "ஊண்") return weekday;
+  }
+  return null;
+}
+
+/**
+ * Day Scheduler column where this bird Dies in jamam-1 morning and Eats at night.
+ * Labels match the Valarpirai / Theipirai Day Scheduler weekday headers.
+ */
+export function getMorningDieNightEatDayForPatchi(
+  pakshaId: AlternatePakshaId,
+  patchi: (typeof PATCHI_ORDER)[number],
+): Bilingual | null {
+  const weekday = getMorningDieNightEatWeekdayForPatchi(pakshaId, patchi);
+  if (weekday === null) return null;
+  const groupKey = getAlternateGroupKey(pakshaId, weekday);
+  if (!groupKey) return null;
+  return getPakshaGroupDayBilingual(pakshaId, groupKey);
+}
+
 /** Anthara dialog splits each jamam into ten weighted anthara time sections. */
 export const ALTERNATE_ANTHARA_SEGMENT_COUNT = 10;
 
@@ -453,4 +481,17 @@ export function getAlternateEatingPatchi(
   const eatSlot = slots.find((slot) => slot.activity === "ஊண்");
   if (!eatSlot || eatSlot.bird === "—") return null;
   return eatSlot.bird as (typeof PATCHI_ORDER)[number];
+}
+
+/**
+ * Home Athikara: jamam-1 morning Eat bird on the Thithi Patchi bracket day
+ * (the Day Scheduler weekday where `tablePatchi` Dies in the morning / Eats at night).
+ */
+export function getDayEatingPatchiOnThithiBracketDay(
+  pakshaId: AlternatePakshaId,
+  tablePatchi: (typeof PATCHI_ORDER)[number],
+): (typeof PATCHI_ORDER)[number] | null {
+  const weekday = getMorningDieNightEatWeekdayForPatchi(pakshaId, tablePatchi);
+  if (weekday === null) return null;
+  return getAlternateEatingPatchi(pakshaId, weekday, 1, "day");
 }
