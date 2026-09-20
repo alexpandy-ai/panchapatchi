@@ -13,6 +13,7 @@ import {
   saveNavigationState,
   type InformationSection,
   type NavigationState,
+  type OthersSection,
   type PatchiSelection,
 } from "../utils/navigationState";
 import type { PakshaId } from "../utils/paksha";
@@ -20,6 +21,7 @@ import type { PakshaId } from "../utils/paksha";
 export interface NavigationContextValue extends NavigationState {
   setView: (view: AppView) => void;
   setDaysSection: (daysSection: InformationSection) => void;
+  setOthersSection: (othersSection: OthersSection) => void;
   setPaksha: (paksha: PakshaId) => void;
   setPatchi: (patchi: PatchiSelection) => void;
   setMyPatchi: (myPatchi: PatchiSelection) => void;
@@ -58,6 +60,7 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
       ...state,
       setView: (view) => updateState({ view }),
       setDaysSection: (daysSection) => updateState({ daysSection }),
+      setOthersSection: (othersSection) => updateState({ othersSection }),
       setPaksha: (paksha) => updateState({ paksha }),
       setPatchi: (patchi) => updateState({ patchi }),
       setMyPatchi: (myPatchi) => updateState({ myPatchi }),

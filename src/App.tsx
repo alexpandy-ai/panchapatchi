@@ -7,6 +7,7 @@ import { DateTimeCard } from "./components/DateTimeCard";
 import { DaysView } from "./components/DaysView";
 import { DaySchedulerView } from "./components/DaySchedulerView";
 import { FindPatchiView, type FindPatchiQuery } from "./components/FindPatchiView";
+import { OthersView } from "./components/OthersView";
 import { PatchiStatusView } from "./components/PatchiStatusView";
 import { TimeTableView } from "./components/TimeTableView";
 import { UI } from "./utils/bilingual";
@@ -24,6 +25,7 @@ export default function App() {
         "app",
         activeView === "home" ? "app--home" : "",
         activeView === "status" ? "app--find-patchi" : "",
+        activeView === "others" ? "app--others" : "",
       ]
         .filter(Boolean)
         .join(" ")}
@@ -109,6 +111,8 @@ export default function App() {
         )}
 
         {activeView === "days" && <DaysView selectedDateTime={selectedDateTime} />}
+
+        {activeView === "others" && <OthersView selectedDateTime={selectedDateTime} />}
       </main>
     </div>
   );

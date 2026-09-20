@@ -5855,3 +5855,169 @@ body:has(.app--find-patchi) {
     max-width: 40rem;
   }
 }
+
+.others-view {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  min-width: 0;
+}
+
+.others-view__submenu {
+  grid-template-columns: minmax(8.5rem, 16rem);
+  margin-bottom: 0;
+}
+
+.others-view__hint {
+  text-align: left;
+  padding: 0.5rem 0.15rem 0.25rem;
+}
+
+.tithi-degree {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.tithi-degree__title {
+  margin: 0;
+  font-size: 1.12rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.35;
+}
+
+.tithi-degree__rule {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.tithi-current-card {
+  border: 1px solid var(--border);
+  border-radius: 0.85rem;
+  background: linear-gradient(180deg, rgba(196, 92, 38, 0.14), var(--bg-card));
+  padding: 0.9rem 1rem 1rem;
+  box-shadow: 0 2px 10px rgba(45, 35, 25, 0.05);
+}
+
+.tithi-current-card__kicker {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.tithi-current-card__name {
+  margin: 0.15rem 0 0.7rem;
+  font-size: 1.28rem;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.tithi-current-card__meta {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.55rem 1rem;
+  margin: 0;
+}
+
+.tithi-current-card__meta dt {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.tithi-current-card__meta dd {
+  margin: 0.05rem 0 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.tithi-degree-table-wrap {
+  overflow: auto;
+  max-height: min(70vh, 46rem);
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background: var(--bg-card);
+}
+
+.tithi-degree-table {
+  width: 100%;
+  min-width: 58rem;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.86rem;
+}
+
+.tithi-degree-table th,
+.tithi-degree-table td {
+  padding: 0.55rem 0.6rem;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.tithi-degree-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: #efe8dc;
+  color: var(--muted);
+  font-weight: 800;
+  text-align: center;
+  box-shadow: 0 1px 0 var(--border);
+}
+
+.tithi-degree-table__num,
+.tithi-degree-table__center {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.tithi-degree-table__name {
+  font-weight: 700;
+}
+
+.tithi-degree-table__row--shukla td {
+  background: #fff8ec;
+}
+
+.tithi-degree-table__row--krishna td {
+  background: #eef2f8;
+}
+
+.tithi-degree-table__row--pournami td {
+  background: #ffe7a8;
+  font-weight: 700;
+}
+
+.tithi-degree-table__row--amavasai td {
+  background: #d9d6ea;
+  font-weight: 700;
+}
+
+.tithi-degree-table__row--current td {
+  background: #f4c29a;
+  box-shadow: inset 0 0 0 2px var(--accent);
+  font-weight: 800;
+}
+
+@media (min-width: 640px) {
+  .tithi-current-card__meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 960px) {
+  .tithi-current-card__meta {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}

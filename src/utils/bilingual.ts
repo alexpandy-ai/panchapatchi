@@ -112,6 +112,32 @@ export const UI = {
   natchathiraPatchi: bi("நட்சத்திர பட்சி", "Natchathira Patchi"),
   natchathira: bi("நட்சத்திரம்", "Natchathira"),
   thithi: bi("திதி", "Thithi"),
+  tithi: bi("திதி", "Tithi"),
+  others: bi("மற்றவை", "Others"),
+  tithiDegreeTable: bi("திதி அளவு மற்றும் நேர அட்டவணை", "Tithi Degree and Time Table"),
+  tithiCycleHint: bi(
+    "ஒரு முழு நிலவுச் சுழற்சி 360°. ஒவ்வொரு திதியும் சூரியன்–சந்திரன் கோண வேறுபாடு 12°. அமாவாசை முதல் அடுத்த அமாவாசை வரை.",
+    "One lunar cycle is 360°. Each Tithi is 12° of Sun–Moon separation, from Amavasai to the next Amavasai.",
+  ),
+  othersTithiHint: bi(
+    "திதி அளவு மற்றும் நேர அட்டவணையைக் காண திதி பொத்தானை அழுத்தவும்.",
+    "Tap the Tithi button to open the Tithi Degree and Time Table.",
+  ),
+  currentTithi: bi("தற்போதைய திதி", "Current Tithi"),
+  currentDegree: bi("தற்போதைய அளவு", "Current Degree"),
+  tithiStart: bi("தொடக்கம்", "Start"),
+  tithiEnd: bi("முடிவு", "End"),
+  remainingTime: bi("மீதமுள்ள நேரம்", "Remaining Time"),
+  serialNo: bi("வ.எண்", "S.No"),
+  tithiName: bi("திதி பெயர்", "Tithi Name"),
+  startDegree: bi("தொடக்க அளவு", "Start Degree"),
+  endDegree: bi("முடிவு அளவு", "End Degree"),
+  degreeRange: bi("அளவு வீச்சு", "Degree Range"),
+  startDate: bi("தொடக்க தேதி", "Start Date"),
+  startTime: bi("தொடக்க நேரம்", "Start Time"),
+  endDate: bi("முடிவு தேதி", "End Date"),
+  endTime: bi("முடிவு நேரம்", "End Time"),
+  duration: bi("கால அளவு", "Duration"),
   nightThithi: bi("இரவு திதி", "Night Thithi"),
   theipiraiPlanets: bi("தேய்பிறை கிரகம்", "Theipirai planet"),
   valarpiraiPlanets: bi("வளர்பிறை கிரகம்", "Valarpirai planet"),
@@ -271,6 +297,10 @@ export const MENU_ITEMS: { id: string; label: Bilingual }[] = [
   {
     id: "days",
     label: bi("தகவல்", "Information"),
+  },
+  {
+    id: "others",
+    label: bi("மற்றவை", "Others"),
   },
 ];
 
