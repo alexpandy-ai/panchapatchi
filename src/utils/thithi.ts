@@ -132,16 +132,21 @@ export function resolveNextMorningThithiContext(
   };
 }
 
-function thithiDebugFields(entry: ThithiPatchiEntry) {
+function bilingualDebug(value: Bilingual | null | undefined) {
+  return { ta: value?.ta ?? "", en: value?.en ?? "" };
+}
+
+function thithiDebugFields(entry: ThithiPatchiEntry | null | undefined) {
+  if (!entry) return null;
   return {
     pakshaId: entry.pakshaId,
     thithiNumber: entry.thithiNumber,
-    thithi: { ta: entry.thithi.ta, en: entry.thithi.en },
+    thithi: bilingualDebug(entry.thithi),
     weekday: entry.weekday,
-    day: { ta: entry.day.ta, en: entry.day.en },
+    day: bilingualDebug(entry.day),
     patchi: entry.patchi,
     athikaraWeekday: entry.athikaraWeekday,
-    athikaraDay: { ta: entry.athikaraDay.ta, en: entry.athikaraDay.en },
+    athikaraDay: bilingualDebug(entry.athikaraDay ?? entry.day),
   };
 }
 
@@ -154,20 +159,25 @@ export function logAntharaThithiDebug(payload: {
   nextMorningThithi?: ThithiPatchiEntry | null;
   finalActivity?: string | string[] | null;
 }): void {
-  const piraiChanged =
-    payload.nextMorningThithi != null &&
-    payload.nextMorningThithi.pakshaId !== payload.originalThithi.pakshaId;
-  console.info("[Antharam]", {
-    selectedJamamType: payload.selectedJamamType,
-    originalDate: payload.originalDate.toISOString(),
-    originalThithi: thithiDebugFields(payload.originalThithi),
-    nextMorningDate: payload.nextMorningDate?.toISOString() ?? null,
-    nextMorningThithi: payload.nextMorningThithi
-      ? thithiDebugFields(payload.nextMorningThithi)
-      : null,
-    piraiChanged,
-    finalActivity: payload.finalActivity ?? null,
-  });
+  try {
+    const piraiChanged =
+      payload.nextMorningThithi != null &&
+      payload.nextMorningThithi.pakshaId !== payload.originalThithi.pakshaId;
+    console.info("[Antharam]", {
+      selectedJamamType: payload.selectedJamamType,
+      originalDate: payload.originalDate.toISOString(),
+      originalThithi: thithiDebugFields(payload.originalThithi),
+      nextMorningDate: payload.nextMorningDate?.toISOString() ?? null,
+      nextMorningThithi: thithiDebugFields(payload.nextMorningThithi),
+      piraiChanged,
+      finalActivity: payload.finalActivity ?? null,
+    });
+  } catch (error) {
+    console.info("[Antharam]", {
+      selectedJamamType: payload.selectedJamamType,
+      debugError: error instanceof Error ? error.message : String(error),
+    });
+  }
 }
 
 function isSameThithiEntry(a: ThithiPatchiEntry, b: ThithiPatchiEntry): boolean {

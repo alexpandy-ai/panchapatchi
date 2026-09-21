@@ -164,17 +164,17 @@ export function JamamSegmentsPanel({
     segmentCount,
     matrixOptions,
   );
+  const wantedPatchi = onlyPatchi ? patchiBaseName(onlyPatchi) : "";
   const matrix = onlyPatchi
     ? {
         ...fullMatrix,
-        rows: fullMatrix.rows.filter((row) => row.patchi === onlyPatchi),
+        rows: fullMatrix.rows.filter((row) => patchiBaseName(row.patchi) === wantedPatchi),
       }
     : fullMatrix;
   const title = antharaDialogTitle(jamamSlot.index, highlightPatchi, highlightThozhil);
-  const compactHomeLayout = Boolean(onlyPatchi);
+  const singleBird = Boolean(onlyPatchi);
 
-  const showPreviousJamamRow =
-    !compactHomeLayout && shouldShowPreviousJamamRow(jamamSlot.index);
+  const showPreviousJamamRow = shouldShowPreviousJamamRow(jamamSlot.index);
 
   const previousJamamSlot = useMemo(() => {
     if (!showPreviousJamamRow) return null;
@@ -218,7 +218,9 @@ export function JamamSegmentsPanel({
   const { period: selectedJamamType } = yamaFromJamamIndex(jamamSlot.index);
 
   useEffect(() => {
-    const highlightRow = matrix.rows.find((row) => row.patchi === highlightPatchi);
+    const highlightRow = matrix.rows.find(
+      (row) => patchiBaseName(row.patchi) === patchiBaseName(highlightPatchi),
+    );
     const context = matrixOptions?.nextMorningThithiContext;
     if (context) {
       logAntharaThithiDebug({
@@ -266,16 +268,14 @@ export function JamamSegmentsPanel({
           className={[
             "jamam-segments-table",
             "jamam-segments-table--matrix",
-            compactHomeLayout ? "jamam-segments-table--home-compact" : "",
+            singleBird ? "jamam-segments-table--single-bird" : "",
             showPreviousJamamRow ? "jamam-segments-table--matrix-with-previous" : "",
           ]
             .filter(Boolean)
             .join(" ")}
         >
           <colgroup>
-            {compactHomeLayout ? null : (
-              <col className="jamam-segments-table__col-segment-number" />
-            )}
+            <col className="jamam-segments-table__col-segment-number" />
             {showPreviousJamamRow ? (
               <col className="jamam-segments-table__col-segment-previous" />
             ) : null}
@@ -286,23 +286,19 @@ export function JamamSegmentsPanel({
           </colgroup>
           <thead>
             <tr>
-              {compactHomeLayout ? null : (
-                <th scope="col" className="jamam-segments-table__segment-number-col">
-                  <BilingualText text={UI.antharaJamam} />
-                </th>
-              )}
+              <th scope="col" className="jamam-segments-table__segment-number-col">
+                <BilingualText text={UI.antharaJamam} />
+              </th>
               {showPreviousJamamRow ? (
                 <th scope="col" className="jamam-segments-table__segment-previous-col">
                   <BilingualText text={UI.antharaPreviousTime} />
                 </th>
               ) : null}
               <th scope="col" className="jamam-segments-table__segment-time-col">
-                <BilingualText
-                  text={compactHomeLayout ? UI.antharaTime : UI.antharaCurrentTime}
-                />
+                <BilingualText text={UI.antharaCurrentTime} />
               </th>
               {matrix.rows.map((row) => {
-                const patchiHighlighted = !compactHomeLayout && row.patchi === highlightPatchi;
+                const patchiHighlighted = !singleBird && row.patchi === highlightPatchi;
 
                 return (
                   <th
@@ -334,21 +330,19 @@ export function JamamSegmentsPanel({
                   key={column.segmentIndex}
                   className={rowHighlighted ? "jamam-segments-table__row--highlight" : ""}
                 >
-                  {compactHomeLayout ? null : (
-                    <th
-                      scope="row"
-                      className={[
-                        "jamam-segments-table__segment-number-col",
-                        rowHighlighted ? "jamam-segments-table__col--highlight" : "",
-                      ]
-                        .filter(Boolean)
-                        .join(" ")}
-                    >
-                      <span className="jamam-segments-table__jamam-label">
-                        <BilingualText text={antharaRowHeader(column, jamamSlot.index)} />
-                      </span>
-                    </th>
-                  )}
+                  <th
+                    scope="row"
+                    className={[
+                      "jamam-segments-table__segment-number-col",
+                      rowHighlighted ? "jamam-segments-table__col--highlight" : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                  >
+                    <span className="jamam-segments-table__jamam-label">
+                      <BilingualText text={antharaRowHeader(column, jamamSlot.index)} />
+                    </span>
+                  </th>
                   {showPreviousJamamRow ? (
                     <td
                       className={[
@@ -374,15 +368,13 @@ export function JamamSegmentsPanel({
                       .join(" ")}
                   >
                     <span className="jamam-segments-table__jamam-time">
-                      {compactHomeLayout
-                        ? `${serial} -- ${column.startTimeLabel}`
-                        : column.startTimeLabel}
+                      {column.startTimeLabel}
                     </span>
                   </td>
                   {activities.map((activity, patchiIndex) => {
                     const patchi = matrix.rows[patchiIndex]?.patchi;
                     const patchiHighlighted =
-                      compactHomeLayout || patchi === highlightPatchi;
+                      singleBird || patchi === highlightPatchi;
                     const cellHighlighted = rowHighlighted && patchiHighlighted;
                     const canOpenNaal =
                       Boolean(onActivityClick) && activity !== "—" && Boolean(patchi);
@@ -419,7 +411,9 @@ export function JamamSegmentsPanel({
                               const isAppendedNightJamam =
                                 column.jamamIndex != null && !isAppendedMorning;
                               const birdSourceRows = onlyPatchi
-                                ? fullMatrix.rows.filter((row) => row.patchi === onlyPatchi)
+                                ? fullMatrix.rows.filter(
+                                    (row) => patchiBaseName(row.patchi) === wantedPatchi,
+                                  )
                                 : fullMatrix.rows;
                               const birdRows = onlyPatchi
                                 ? [{ patchi: patchi!, activity }]

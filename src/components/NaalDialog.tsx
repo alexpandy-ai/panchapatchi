@@ -170,6 +170,7 @@ export function NaalDialog({
 }: NaalDialogProps) {
   const singleBird = birdRows.length <= 1;
   const showSplitLabels = appendNextDayMorning || appendNextDayNight || appendNightJamam;
+  const showSerialColumn = showSplitLabels || homeLayout;
   const title = singleBird
     ? naalDialogTitle(antharaSerial, patchi, activity)
     : naalAllBirdsDialogTitle(antharaSerial);
@@ -275,14 +276,14 @@ export function NaalDialog({
               className={[
                 "jamam-segments-table",
                 "jamam-segments-table--matrix",
-                singleBird ? "jamam-segments-table--home-compact" : "",
-                showSplitLabels ? "" : "jamam-segments-table--time-first",
+                singleBird ? "jamam-segments-table--single-bird" : "",
+                showSerialColumn ? "" : "jamam-segments-table--time-first",
               ]
                 .filter(Boolean)
                 .join(" ")}
             >
               <colgroup>
-                {showSplitLabels ? (
+                {showSerialColumn ? (
                   <col className="jamam-segments-table__col-segment-number" />
                 ) : null}
                 <col className="jamam-segments-table__col-segment-time" />
@@ -292,7 +293,7 @@ export function NaalDialog({
               </colgroup>
               <thead>
                 <tr>
-                  {showSplitLabels ? (
+                  {showSerialColumn ? (
                     <th scope="col" className="jamam-segments-table__segment-number-col">
                       <BilingualText text={UI.antharaJamam} />
                     </th>
@@ -322,7 +323,7 @@ export function NaalDialog({
               <tbody>
                 {columns.map((column, index) => (
                   <tr key={column.segmentIndex}>
-                    {showSplitLabels ? (
+                    {showSerialColumn ? (
                       <th scope="row" className="jamam-segments-table__segment-number-col">
                         <span className="jamam-segments-table__jamam-label">
                           <BilingualText
@@ -340,9 +341,7 @@ export function NaalDialog({
                     ) : null}
                     <td className="jamam-segments-table__segment-time-col">
                       <span className="jamam-segments-table__jamam-time">
-                        {singleBird && !showSplitLabels
-                          ? `${index + 1} -- ${column.startTimeLabel}`
-                          : column.startTimeLabel}
+                        {column.startTimeLabel}
                       </span>
                     </td>
                     {birdActivityRows.map((row) => {

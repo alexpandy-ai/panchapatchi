@@ -3986,7 +3986,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
+  box-sizing: border-box;
+  padding: max(0.75rem, env(safe-area-inset-top, 0px))
+    max(0.75rem, env(safe-area-inset-right, 0px))
+    max(0.75rem, env(safe-area-inset-bottom, 0px))
+    max(0.75rem, env(safe-area-inset-left, 0px));
   background: rgba(0, 0, 0, 0.45);
 }
 
@@ -3995,9 +3999,18 @@ body {
 }
 
 .anthara-dialog {
-  max-width: min(100%, 56rem);
-  max-height: min(90vh, 100%);
-  overflow: auto;
+  --dialog-max-width: 56rem;
+  --dialog-anthara-col: clamp(3.5rem, 20vw, 6.25rem);
+  --dialog-time-col: clamp(4.5rem, 22vw, 6rem);
+  --dialog-patchi-col: clamp(4.75rem, 14vw, 6.5rem);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: min(95vw, var(--dialog-max-width));
+  max-width: min(95vw, var(--dialog-max-width));
+  max-height: min(90dvh, 90vh);
+  margin: 0;
+  overflow: hidden;
   border: 1px solid var(--border);
   border-radius: 0.75rem;
   background: var(--bg-card);
@@ -4005,109 +4018,227 @@ body {
 }
 
 .naal-dialog {
-  --naal-anthara-col: 3.75rem;
-  max-width: min(100%, 28rem);
-  /* Keep sticky columns working — scroll only inside the panel. */
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  max-height: min(90vh, 100%);
+  --naal-anthara-col: var(--dialog-anthara-col);
+  --dialog-max-width: 36rem;
 }
 
-.naal-dialog .jamam-segments-panel {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  max-height: min(90vh, 100%);
-}
-
-.naal-dialog .jamam-segments-panel__scroll {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
+.naal-dialog--single {
+  --dialog-max-width: 36rem;
 }
 
 .naal-dialog--all-birds {
-  max-width: min(100%, 56rem);
+  --dialog-max-width: 56rem;
 }
 
-.naal-dialog--with-next-day {
-  max-width: min(100%, 56rem);
+.anthara-dialog:has(.jamam-segments-table--single-bird) {
+  --dialog-max-width: 36rem;
 }
 
-/* Naal without Antharam serial column: Time is the first sticky column. */
-.naal-dialog .jamam-segments-table--time-first .jamam-segments-table__segment-time-col {
-  left: 0;
-  width: 5.25rem;
+.anthara-dialog .jamam-segments-panel {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 0;
+  padding: clamp(0.4rem, 1.6vw, 0.9rem);
 }
 
-.naal-dialog .jamam-segments-table--time-first .jamam-segments-table__col-segment-time {
-  width: 5.25rem;
+.anthara-dialog .jamam-segments-panel__head {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.65rem;
+  min-width: 0;
+  margin-bottom: 0.45rem;
+  padding: 0.4rem 0.55rem;
+  overflow: visible;
 }
 
-/* Naal with Antharam + Time: keep Time flush so its left border stays visible. */
-.naal-dialog
-  .jamam-segments-table:not(.jamam-segments-table--time-first)
-  .jamam-segments-table__segment-number-col {
-  width: var(--naal-anthara-col);
-  min-width: var(--naal-anthara-col);
+.anthara-dialog .jamam-segments-panel__title {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  font-size: clamp(0.88rem, 2.5vw, 1.08rem);
+  font-weight: 700;
+  line-height: 1.35;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
-.naal-dialog
-  .jamam-segments-table:not(.jamam-segments-table--time-first)
-  .jamam-segments-table__col-segment-number {
-  width: var(--naal-anthara-col);
-  min-width: var(--naal-anthara-col);
+.anthara-dialog .jamam-segments-panel__close {
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  min-width: var(--touch-min);
+  min-height: var(--touch-min);
+  padding: 0.35rem 0.7rem;
+  font-size: clamp(0.78rem, 2vw, 0.88rem);
+  line-height: 1.2;
 }
 
-.naal-dialog
-  .jamam-segments-table:not(.jamam-segments-table--time-first)
-  .jamam-segments-table__segment-time-col {
-  left: var(--naal-anthara-col);
-  width: 5rem;
-  box-shadow: -1px 0 0 var(--border);
+.anthara-dialog .jamam-segments-panel__scroll {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
-.naal-dialog
-  .jamam-segments-table:not(.jamam-segments-table--time-first)
-  .jamam-segments-table__col-segment-time {
-  width: 5rem;
+.anthara-dialog .jamam-segments-table,
+.anthara-dialog .jamam-segments-table--matrix {
+  width: max(100%, max-content);
+  max-width: none;
+  min-width: 100%;
+  table-layout: auto;
+  font-size: clamp(0.8rem, 2.1vw, 0.95rem);
+  line-height: 1.35;
 }
 
-.naal-dialog .jamam-segments-table__col-patchi {
-  width: 5.25rem;
-  min-width: 5.25rem;
+.anthara-dialog .jamam-segments-table--single-bird {
+  width: 100%;
+  min-width: 0;
 }
 
-.naal-dialog .jamam-segments-table th,
-.naal-dialog .jamam-segments-table td {
-  padding: 0.28rem 0.35rem;
+.anthara-dialog .jamam-segments-table th,
+.anthara-dialog .jamam-segments-table td {
+  padding: clamp(0.28rem, 1.2vw, 0.5rem) clamp(0.22rem, 1vw, 0.45rem);
+  font-size: inherit;
+  line-height: 1.3;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: normal;
+  vertical-align: middle;
 }
 
-.naal-dialog .jamam-segments-table__jamam-time {
-  font-size: 0.72rem;
-  letter-spacing: 0.01em;
-}
-
-.naal-dialog .jamam-segments-table--matrix thead th {
+.anthara-dialog .jamam-segments-table--matrix thead th {
   position: sticky;
   top: 0;
   z-index: 3;
-  background: var(--bg-card);
+  background: rgba(196, 92, 38, 0.12);
   box-shadow: 0 1px 0 var(--border);
 }
 
-.naal-dialog .jamam-segments-table--matrix thead .jamam-segments-table__segment-number-col,
-.naal-dialog .jamam-segments-table--matrix thead .jamam-segments-table__segment-time-col {
+.anthara-dialog .jamam-segments-table--matrix thead .jamam-segments-table__segment-number-col,
+.anthara-dialog .jamam-segments-table--matrix thead .jamam-segments-table__segment-previous-col,
+.anthara-dialog .jamam-segments-table--matrix thead .jamam-segments-table__segment-time-col {
   z-index: 4;
 }
 
-.naal-dialog
-  .jamam-segments-table:not(.jamam-segments-table--time-first)
-  thead
+.anthara-dialog .jamam-segments-table__col-segment-number {
+  width: var(--dialog-anthara-col);
+  min-width: var(--dialog-anthara-col);
+}
+
+.anthara-dialog .jamam-segments-table__col-segment-time {
+  width: var(--dialog-time-col);
+  min-width: var(--dialog-time-col);
+}
+
+.anthara-dialog .jamam-segments-table__col-patchi {
+  width: var(--dialog-patchi-col);
+  min-width: var(--dialog-patchi-col);
+}
+
+.anthara-dialog .jamam-segments-table__segment-number-col {
+  width: var(--dialog-anthara-col);
+  min-width: var(--dialog-anthara-col);
+  white-space: nowrap;
+}
+
+.anthara-dialog .jamam-segments-table__segment-time-col {
+  width: var(--dialog-time-col);
+  min-width: var(--dialog-time-col);
+}
+
+.anthara-dialog .jamam-segments-table:not(.jamam-segments-table--time-first):not(.jamam-segments-table--single-bird)
   .jamam-segments-table__segment-time-col {
-  box-shadow: -1px 0 0 var(--border), 0 1px 0 var(--border);
+  left: var(--dialog-anthara-col);
+  box-shadow: -1px 0 0 var(--border);
+}
+
+.anthara-dialog .jamam-segments-table--time-first .jamam-segments-table__segment-time-col {
+  left: 0;
+}
+
+.anthara-dialog .jamam-segments-table--single-bird .jamam-segments-table__segment-number-col,
+.anthara-dialog .jamam-segments-table--single-bird .jamam-segments-table__segment-time-col,
+.anthara-dialog .jamam-segments-table--single-bird .jamam-segments-table__patchi-col {
+  position: sticky;
+  left: auto;
+  width: auto;
+  min-width: 0;
+}
+
+.anthara-dialog .jamam-segments-table--single-bird .jamam-segments-table__col-segment-number {
+  width: 22%;
+  min-width: 0;
+}
+
+.anthara-dialog .jamam-segments-table--single-bird .jamam-segments-table__col-segment-time {
+  width: 30%;
+  min-width: 0;
+}
+
+.anthara-dialog .jamam-segments-table--single-bird .jamam-segments-table__col-patchi {
+  width: 48%;
+  min-width: 0;
+}
+
+.anthara-dialog .jamam-segments-table--single-bird:not(.jamam-segments-table--time-first)
+  .jamam-segments-table__segment-time-col {
+  left: auto;
+  box-shadow: none;
+}
+
+.anthara-dialog .jamam-segments-table__jamam-label,
+.anthara-dialog .jamam-segments-table__jamam-time,
+.anthara-dialog .jamam-segments-table__jamam-time--previous {
+  display: block;
+  font-size: 0.95em;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.anthara-dialog .jamam-segments-panel .bilingual--inline {
+  align-items: flex-start;
+  text-align: inherit;
+}
+
+.anthara-dialog .jamam-segments-panel .inline-emoji-label {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.2rem;
+  max-width: 100%;
+  white-space: normal;
+}
+
+.anthara-dialog .jamam-segments-panel .inline-emoji-label__text,
+.anthara-dialog .jamam-segments-table--matrix tbody .inline-emoji-label__text {
+  font-size: inherit;
+  line-height: 1.25;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  overflow-wrap: break-word;
+  word-break: normal;
+  -webkit-line-clamp: unset;
+}
+
+.anthara-dialog .jamam-segments-table__activity-btn {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--touch-min);
+  padding: 0.35rem 0.4rem;
+  white-space: normal;
+  overflow-wrap: break-word;
 }
 
 .jamam-segments-table__activity-btn {
@@ -4132,409 +4263,58 @@ body {
   outline: none;
 }
 
-/* Anthara dialog — mobile: fit viewport, wrap headers, no horizontal scroll */
 @media (max-width: 767px) {
   .anthara-dialog-overlay {
-    padding: 0.4rem;
-    align-items: center;
+    padding: max(0.5rem, env(safe-area-inset-top, 0px))
+      max(0.5rem, env(safe-area-inset-right, 0px))
+      max(0.5rem, env(safe-area-inset-bottom, 0px))
+      max(0.5rem, env(safe-area-inset-left, 0px));
   }
 
   .anthara-dialog {
-    width: 100%;
-    max-width: 100%;
-    overflow-x: hidden;
-  }
-
-  .anthara-dialog .jamam-segments-panel {
-    width: 100%;
-    max-width: 100%;
-    padding: 0.15rem 0.12rem 0.2rem;
-  }
-
-  .anthara-dialog .jamam-segments-panel__head {
-    padding: 0.18rem 0.2rem;
-    margin-bottom: 0.12rem;
-    overflow-x: auto;
+    width: min(95vw, var(--dialog-max-width));
+    max-height: min(92dvh, 92vh);
   }
 
   .anthara-dialog .jamam-segments-panel__title {
-    font-size: 0.68rem;
-    line-height: 1.2;
-    white-space: normal;
-    overflow-wrap: anywhere;
-    overflow: visible;
-    min-width: 0;
-  }
-
-  .anthara-dialog .jamam-segments-panel__close {
-    font-size: 0.62rem;
-    padding: 0.14rem 0.32rem;
-  }
-
-  .anthara-dialog .jamam-segments-panel__scroll {
-    overflow-x: hidden;
-    max-width: 100%;
-  }
-
-  .anthara-dialog .jamam-segments-table {
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-    table-layout: fixed;
-    font-size: 0.6rem;
-    line-height: 1.12;
-  }
-
-  .anthara-dialog .jamam-segments-table--matrix {
-    min-width: 0;
+    font-size: clamp(0.82rem, 3.6vw, 1rem);
   }
 
   .anthara-dialog .jamam-segments-table th,
   .anthara-dialog .jamam-segments-table td {
-    padding: 0.1rem 0.06rem;
-  }
-
-  .anthara-dialog .jamam-segments-table th {
-    font-size: 0.58rem;
-    line-height: 1.12;
-    padding: 0.12rem 0.06rem;
-  }
-
-  /* Percentage column widths — 3 sticky cols + 5 patchi cols */
-  .anthara-dialog
-    .jamam-segments-table--matrix:not(.jamam-segments-table--matrix-with-previous)
-    .jamam-segments-table__col-segment-number {
-    width: 18%;
-  }
-
-  .anthara-dialog
-    .jamam-segments-table--matrix:not(.jamam-segments-table--matrix-with-previous)
-    .jamam-segments-table__col-segment-time {
-    width: 15%;
-  }
-
-  .anthara-dialog
-    .jamam-segments-table--matrix:not(.jamam-segments-table--matrix-with-previous)
-    .jamam-segments-table__col-patchi {
-    width: 13.4%;
-  }
-
-  .anthara-dialog .jamam-segments-table--matrix-with-previous .jamam-segments-table__col-segment-number {
-    width: 16%;
-  }
-
-  .anthara-dialog .jamam-segments-table--matrix-with-previous .jamam-segments-table__col-segment-previous {
-    width: 12%;
-  }
-
-  .anthara-dialog .jamam-segments-table--matrix-with-previous .jamam-segments-table__col-segment-time {
-    width: 12%;
-  }
-
-  .anthara-dialog .jamam-segments-table--matrix-with-previous .jamam-segments-table__col-patchi {
-    width: 12%;
-  }
-
-  /* Drop sticky positioning so all columns share the fixed grid */
-  .anthara-dialog .jamam-segments-table__segment-number-col,
-  .anthara-dialog .jamam-segments-table__segment-previous-col,
-  .anthara-dialog .jamam-segments-table__segment-time-col,
-  .anthara-dialog .jamam-segments-table__patchi-col {
-    position: static;
-    left: auto;
-    width: auto;
-    white-space: nowrap;
-  }
-
-  /* Naal: keep Time (and Antharam) sticky + readable padding on small screens */
-  .naal-dialog.anthara-dialog {
-    overflow: hidden;
-  }
-
-  .naal-dialog .jamam-segments-panel__scroll {
-    overflow-x: auto;
-  }
-
-  .naal-dialog .jamam-segments-table--time-first .jamam-segments-table__segment-time-col {
-    position: sticky;
-    left: 0;
-    width: 5rem;
-    background: var(--bg-card);
-  }
-
-  .naal-dialog
-    .jamam-segments-table:not(.jamam-segments-table--time-first)
-    .jamam-segments-table__segment-number-col {
-    position: sticky;
-    left: 0;
-    width: var(--naal-anthara-col);
-    min-width: var(--naal-anthara-col);
-    background: var(--bg-card);
-  }
-
-  .naal-dialog.anthara-dialog
-    .jamam-segments-table--matrix:not(.jamam-segments-table--matrix-with-previous)
-    .jamam-segments-table__col-segment-number {
-    width: var(--naal-anthara-col);
-    min-width: var(--naal-anthara-col);
-  }
-
-  .naal-dialog
-    .jamam-segments-table:not(.jamam-segments-table--time-first)
-    .jamam-segments-table__segment-time-col {
-    position: sticky;
-    left: var(--naal-anthara-col);
-    width: 5rem;
-    background: var(--bg-card);
-    box-shadow: -1px 0 0 var(--border);
-  }
-
-  .naal-dialog .jamam-segments-table th,
-  .naal-dialog .jamam-segments-table td {
-    padding: 0.22rem 0.28rem;
-  }
-
-  /* Header cells: single-line titles */
-  .anthara-dialog .jamam-segments-table--matrix thead th {
-    white-space: nowrap;
-    line-height: 1.12;
-    vertical-align: middle;
-    text-align: center;
-  }
-
-  .anthara-dialog .jamam-segments-panel .bilingual--inline {
-    align-items: center;
-    text-align: center;
-  }
-
-  /* Patchi column headers: emoji and name on one line */
-  .anthara-dialog .jamam-segments-table--matrix thead th:not(.jamam-segments-table__segment-number-col):not(
-      .jamam-segments-table__segment-previous-col
-    ):not(.jamam-segments-table__segment-time-col) {
-    width: auto;
-    white-space: nowrap;
-    line-height: 1.1;
-  }
-
-  .anthara-dialog .jamam-segments-panel .inline-emoji-label {
-    flex-direction: row;
-    align-items: center;
-    white-space: nowrap;
-    gap: 0.08em;
-    line-height: 1.08;
-    max-width: 100%;
-  }
-
-  .anthara-dialog .jamam-segments-panel .inline-emoji-label__text {
-    font-size: 0.92em;
-    line-height: 1.08;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-align: center;
-  }
-
-  .anthara-dialog .jamam-segments-table--matrix th:not(.jamam-segments-table__patchi-col):not(
-      .jamam-segments-table__segment-col
-    ):not(.jamam-segments-table__segment-number-col):not(.jamam-segments-table__segment-time-col):not(
-      .jamam-segments-table__segment-previous-col
-    ),
-  .anthara-dialog .jamam-segments-table--matrix td:not(.jamam-segments-table__patchi-col):not(
-      .jamam-segments-table__segment-col
-    ):not(.jamam-segments-table__segment-number-col):not(.jamam-segments-table__segment-time-col):not(
-      .jamam-segments-table__segment-previous-col
-    ) {
-    width: auto;
-    white-space: normal;
-    line-height: 1.08;
-  }
-
-  .anthara-dialog .jamam-segments-table__jamam-label {
-    font-size: 0.62rem;
-    line-height: 1.1;
-  }
-
-  .anthara-dialog .jamam-segments-table__jamam-time {
-    font-size: 0.52rem;
-    white-space: normal;
-    word-break: break-word;
-    line-height: 1.1;
-  }
-
-  .anthara-dialog .jamam-segments-table__jamam-time--previous {
-    font-size: 0.5rem;
+    padding: 0.32rem 0.28rem;
   }
 
   .anthara-dialog .jamam-segments-table--matrix tbody .inline-emoji-label {
-    flex-direction: column;
-    gap: 0.05em;
-  }
-
-  .anthara-dialog .jamam-segments-table--matrix tbody .inline-emoji-label__text {
-    font-size: 0.88em;
-    line-height: 1.05;
-    -webkit-line-clamp: 2;
-  }
-
-  /* Home compact anthara — keep home-scale text on mobile */
-  .anthara-dialog .jamam-segments-table--home-compact {
-    font-size: 0.95rem;
-    line-height: 1.25;
-  }
-
-  .anthara-dialog .jamam-segments-table--home-compact th,
-  .anthara-dialog .jamam-segments-table--home-compact td {
-    padding: 0.26rem 0.08rem;
-  }
-
-  .anthara-dialog .jamam-segments-table--home-compact th {
-    font-size: 0.88rem;
-    padding: 0.28rem 0.08rem;
-  }
-
-  .anthara-dialog .jamam-segments-table--home-compact .jamam-segments-table__jamam-time {
-    font-size: 0.9rem;
-    white-space: nowrap;
-    word-break: normal;
-    line-height: 1.25;
-  }
-
-  .anthara-dialog:has(.jamam-segments-table--home-compact) .jamam-segments-panel__title {
-    font-size: 0.92rem;
-    white-space: normal;
-  }
-
-  .anthara-dialog:has(.jamam-segments-table--home-compact) .jamam-segments-panel__close {
-    font-size: 0.78rem;
-    padding: 0.2rem 0.45rem;
-  }
-
-  .anthara-dialog
-    .jamam-segments-table--home-compact.jamam-segments-table--matrix:not(
-      .jamam-segments-table--matrix-with-previous
-    )
-    .jamam-segments-table__col-segment-time {
-    width: 52%;
-  }
-
-  .anthara-dialog
-    .jamam-segments-table--home-compact.jamam-segments-table--matrix:not(
-      .jamam-segments-table--matrix-with-previous
-    )
-    .jamam-segments-table__col-patchi {
-    width: 48%;
-  }
-
-  .anthara-dialog .jamam-segments-table--home-compact .inline-emoji-label {
     flex-direction: row;
-    gap: 0.2rem;
-    font-size: 0.95rem;
-  }
-
-  .anthara-dialog .jamam-segments-table--home-compact.jamam-segments-table--matrix tbody .inline-emoji-label__text {
-    font-size: 0.95rem;
-    font-weight: 700;
-    line-height: 1.2;
-    -webkit-line-clamp: unset;
+    flex-wrap: wrap;
+    gap: 0.15rem;
   }
 }
 
-@media (max-width: 480px) {
+@media (min-width: 768px) {
   .anthara-dialog-overlay {
-    padding: 0.25rem;
+    padding: 1.25rem;
   }
 
   .anthara-dialog .jamam-segments-panel {
-    padding: 0.1rem 0.06rem 0.15rem;
+    padding: 0.7rem 0.85rem 0.9rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .anthara-dialog {
+    max-height: min(88dvh, 88vh);
   }
 
-  .anthara-dialog .jamam-segments-table {
-    font-size: 0.55rem;
+  .naal-dialog:not(.naal-dialog--all-birds) {
+    --dialog-max-width: 34rem;
   }
+}
 
-  .anthara-dialog .jamam-segments-table th {
-    font-size: 0.52rem;
-    padding: 0.08rem 0.04rem;
-  }
-
-  .anthara-dialog .jamam-segments-table th,
-  .anthara-dialog .jamam-segments-table td {
-    padding: 0.08rem 0.04rem;
-  }
-
-  .anthara-dialog
-    .jamam-segments-table--matrix:not(.jamam-segments-table--matrix-with-previous)
-    .jamam-segments-table__col-segment-number {
-    width: 17%;
-  }
-
-  .anthara-dialog
-    .jamam-segments-table--matrix:not(.jamam-segments-table--matrix-with-previous)
-    .jamam-segments-table__col-segment-time {
-    width: 14%;
-  }
-
-  .anthara-dialog
-    .jamam-segments-table--matrix:not(.jamam-segments-table--matrix-with-previous)
-    .jamam-segments-table__col-patchi {
-    width: 13.8%;
-  }
-
-  .anthara-dialog .jamam-segments-table--matrix-with-previous .jamam-segments-table__col-segment-number {
-    width: 15%;
-  }
-
-  .anthara-dialog .jamam-segments-table--matrix-with-previous .jamam-segments-table__col-segment-previous {
-    width: 11%;
-  }
-
-  .anthara-dialog .jamam-segments-table--matrix-with-previous .jamam-segments-table__col-segment-time {
-    width: 11%;
-  }
-
-  .anthara-dialog .jamam-segments-table--matrix-with-previous .jamam-segments-table__col-patchi {
-    width: 12.6%;
-  }
-
-  .anthara-dialog .jamam-segments-table__jamam-time {
-    font-size: 0.48rem;
-  }
-
-  .anthara-dialog .jamam-segments-table--home-compact {
-    font-size: 0.92rem;
-  }
-
-  .anthara-dialog .jamam-segments-table--home-compact th {
-    font-size: 0.85rem;
-    padding: 0.24rem 0.06rem;
-  }
-
-  .anthara-dialog .jamam-segments-table--home-compact th,
-  .anthara-dialog .jamam-segments-table--home-compact td {
-    padding: 0.24rem 0.06rem;
-  }
-
-  .anthara-dialog .jamam-segments-table--home-compact .jamam-segments-table__jamam-time {
-    font-size: 0.88rem;
-  }
-
-  .anthara-dialog
-    .jamam-segments-table--home-compact.jamam-segments-table--matrix:not(
-      .jamam-segments-table--matrix-with-previous
-    )
-    .jamam-segments-table__col-segment-time {
-    width: 54%;
-  }
-
-  .anthara-dialog
-    .jamam-segments-table--home-compact.jamam-segments-table--matrix:not(
-      .jamam-segments-table--matrix-with-previous
-    )
-    .jamam-segments-table__col-patchi {
-    width: 46%;
-  }
-
-  .anthara-dialog .jamam-segments-table--home-compact.jamam-segments-table--matrix tbody .inline-emoji-label__text {
-    font-size: 0.92rem;
+@media (min-width: 1366px) {
+  .anthara-dialog:not(.naal-dialog) {
+    --dialog-max-width: 58rem;
   }
 }
 
@@ -5604,320 +5384,24 @@ body:has(.app--find-patchi) {
   box-shadow: none;
 }
 
-/* —— Home Naal / Anthara dialogs: Tamil day-details sheet (UI only) —— */
+/* Home uses the shared centered Antharam / Naal dialog shell. */
 .anthara-dialog-overlay--home {
-  align-items: flex-end;
-  justify-content: center;
-  padding: 0;
   background: rgba(45, 35, 25, 0.5);
 }
 
 .anthara-dialog-overlay--home .anthara-dialog--home {
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 100%;
-  max-height: min(92dvh, 100%);
-  margin: 0;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-bottom: none;
-  border-radius: 1.15rem 1.15rem 0 0;
-  background: var(--bg-card);
-  box-shadow: 0 -12px 40px rgba(45, 35, 25, 0.22);
-}
-
-.anthara-dialog-overlay--home .anthara-dialog--home::before {
-  content: "";
-  display: block;
-  flex-shrink: 0;
-  width: 2.5rem;
-  height: 0.28rem;
-  margin: 0.5rem auto 0.15rem;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--muted) 42%, transparent);
-}
-
-.anthara-dialog-overlay--home .jamam-segments-panel {
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  min-height: 0;
-  max-height: min(92dvh, 100%);
-  padding: 0.35rem 0.9rem calc(0.9rem + env(safe-area-inset-bottom, 0px));
+  border-radius: 0.9rem;
+  box-shadow: 0 16px 48px rgba(45, 35, 25, 0.22);
 }
 
 .anthara-dialog-overlay--home .jamam-segments-panel__head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.7rem;
-  margin: 0 0 0.55rem;
-  padding: 0.45rem 0.55rem;
-  overflow: visible;
   border-radius: 0.75rem;
-  background: var(--accent-soft);
-}
-
-.anthara-dialog-overlay--home .jamam-segments-panel__title {
-  flex: 1 1 auto;
-  min-width: 0;
-  font-size: clamp(0.95rem, 3.8vw, 1.12rem);
-  font-weight: 700;
-  line-height: 1.35;
-  white-space: normal;
-  overflow-wrap: anywhere;
-  word-break: normal;
-}
-
-.anthara-dialog-overlay--home .jamam-segments-panel__close {
-  flex-shrink: 0;
-  box-sizing: border-box;
-  min-width: var(--touch-min);
-  min-height: var(--touch-min);
-  padding: 0.4rem 0.75rem;
-  border-radius: 999px;
-  font-size: 0.85rem;
-  line-height: 1.2;
-  white-space: nowrap;
-}
-
-.anthara-dialog-overlay--home .jamam-segments-panel__scroll {
-  flex: 1 1 auto;
-  min-width: 0;
-  min-height: 0;
-  max-width: 100%;
-  overflow-x: auto;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.anthara-dialog-overlay--home .jamam-segments-table,
-.anthara-dialog-overlay--home .jamam-segments-table--matrix,
-.anthara-dialog-overlay--home .jamam-segments-table--home-compact,
-.anthara-dialog-overlay--home .naal-dialog .jamam-segments-table {
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  table-layout: auto;
-  font-size: clamp(0.88rem, 3.2vw, 1rem);
-  line-height: 1.4;
-}
-
-.anthara-dialog-overlay--home .jamam-segments-table th,
-.anthara-dialog-overlay--home .jamam-segments-table td {
-  padding: 0.55rem 0.45rem;
-  font-size: inherit;
-  line-height: 1.35;
-  white-space: normal;
-  overflow-wrap: anywhere;
-  word-break: normal;
-  vertical-align: middle;
-}
-
-.anthara-dialog-overlay--home .jamam-segments-table th {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  font-size: clamp(0.75rem, 2.8vw, 0.88rem);
-  background: var(--bg-card);
-}
-
-.anthara-dialog-overlay--home .jamam-segments-table__segment-number-col,
-.anthara-dialog-overlay--home .jamam-segments-table__segment-previous-col,
-.anthara-dialog-overlay--home .jamam-segments-table__segment-time-col,
-.anthara-dialog-overlay--home .jamam-segments-table__patchi-col {
-  position: static;
-  left: auto;
-  width: auto;
-  min-width: 0;
-}
-
-.anthara-dialog-overlay--home .jamam-segments-table__col-segment-number,
-.anthara-dialog-overlay--home .jamam-segments-table__col-segment-time,
-.anthara-dialog-overlay--home .jamam-segments-table__col-segment-previous,
-.anthara-dialog-overlay--home .jamam-segments-table__col-patchi {
-  width: auto;
-  min-width: 0;
-}
-
-.anthara-dialog-overlay--home .jamam-segments-table__jamam-label,
-.anthara-dialog-overlay--home .jamam-segments-table__jamam-time,
-.anthara-dialog-overlay--home .jamam-segments-table__jamam-time--previous {
-  display: block;
-  white-space: nowrap;
-  overflow-wrap: normal;
-  font-size: 0.92em;
-  font-weight: 600;
-  letter-spacing: 0;
-}
-
-.anthara-dialog-overlay--home .inline-emoji-label,
-.anthara-dialog-overlay--home .jamam-segments-table--matrix tbody .inline-emoji-label,
-.anthara-dialog-overlay--home .jamam-segments-table--home-compact .inline-emoji-label {
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 0.25rem;
-  max-width: 100%;
-  white-space: normal;
-}
-
-.anthara-dialog-overlay--home .inline-emoji-label__text,
-.anthara-dialog-overlay--home .jamam-segments-table--matrix tbody .inline-emoji-label__text,
-.anthara-dialog-overlay--home .jamam-segments-table--home-compact.jamam-segments-table--matrix tbody .inline-emoji-label__text {
-  font-size: inherit;
-  font-weight: 700;
-  line-height: 1.3;
-  white-space: normal;
-  overflow-wrap: anywhere;
-  -webkit-line-clamp: unset;
-}
-
-.anthara-dialog-overlay--home .jamam-segments-table__activity-btn {
-  box-sizing: border-box;
-  width: 100%;
-  min-height: var(--touch-min);
-  padding: 0.4rem 0.5rem;
-  border-radius: 0.55rem;
-  justify-content: flex-start;
-  text-align: left;
 }
 
 .anthara-dialog-overlay--home .naal-dialog--home {
-  max-width: 100%;
+  --dialog-max-width: 36rem;
 }
 
-@media (max-width: 767px) {
-  .anthara-dialog-overlay--home {
-    padding: 0;
-    align-items: flex-end;
-  }
-
-  .anthara-dialog-overlay--home .anthara-dialog,
-  .anthara-dialog-overlay--home .anthara-dialog--home,
-  .anthara-dialog-overlay--home .naal-dialog.anthara-dialog {
-    width: 100%;
-    max-width: 100%;
-    overflow: hidden;
-    overflow-x: hidden;
-  }
-
-  .anthara-dialog-overlay--home .jamam-segments-panel {
-    width: 100%;
-    max-width: 100%;
-    padding: 0.3rem 0.75rem calc(0.85rem + env(safe-area-inset-bottom, 0px));
-  }
-
-  .anthara-dialog-overlay--home .jamam-segments-panel__head {
-    padding: 0.4rem 0.5rem;
-    overflow: visible;
-  }
-
-  .anthara-dialog-overlay--home .jamam-segments-panel__title,
-  .anthara-dialog-overlay--home .anthara-dialog:has(.jamam-segments-table--home-compact) .jamam-segments-panel__title {
-    font-size: clamp(0.92rem, 4vw, 1.08rem);
-    white-space: normal;
-    overflow: visible;
-  }
-
-  .anthara-dialog-overlay--home .jamam-segments-panel__close,
-  .anthara-dialog-overlay--home .anthara-dialog:has(.jamam-segments-table--home-compact) .jamam-segments-panel__close {
-    min-width: var(--touch-min);
-    min-height: var(--touch-min);
-    font-size: 0.82rem;
-    padding: 0.35rem 0.65rem;
-  }
-
-  .anthara-dialog-overlay--home .jamam-segments-panel__scroll,
-  .anthara-dialog-overlay--home .naal-dialog .jamam-segments-panel__scroll {
-    overflow-x: auto;
-    overflow-y: auto;
-  }
-
-  .anthara-dialog-overlay--home .jamam-segments-table,
-  .anthara-dialog-overlay--home .jamam-segments-table--matrix,
-  .anthara-dialog-overlay--home .jamam-segments-table--home-compact {
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-    table-layout: auto;
-    font-size: clamp(0.86rem, 3.4vw, 0.98rem);
-    line-height: 1.35;
-  }
-
-  .anthara-dialog-overlay--home .jamam-segments-table th,
-  .anthara-dialog-overlay--home .jamam-segments-table td,
-  .anthara-dialog-overlay--home .jamam-segments-table--home-compact th,
-  .anthara-dialog-overlay--home .jamam-segments-table--home-compact td {
-    padding: 0.5rem 0.35rem;
-  }
-
-  .anthara-dialog-overlay--home .jamam-segments-table__jamam-time,
-  .anthara-dialog-overlay--home .jamam-segments-table--home-compact .jamam-segments-table__jamam-time {
-    font-size: 0.9em;
-    white-space: nowrap;
-  }
-}
-
-@media (max-width: 359px) {
-  .anthara-dialog-overlay--home .jamam-segments-panel {
-    padding-inline: 0.55rem;
-  }
-
-  .anthara-dialog-overlay--home .jamam-segments-table th,
-  .anthara-dialog-overlay--home .jamam-segments-table td {
-    padding: 0.42rem 0.28rem;
-  }
-
-  .anthara-dialog-overlay--home .jamam-segments-table__jamam-time {
-    white-space: normal;
-  }
-}
-
-@media (min-width: 600px) {
-  .anthara-dialog-overlay--home {
-    align-items: center;
-    padding: 1.25rem;
-  }
-
-  .anthara-dialog-overlay--home .anthara-dialog--home {
-    width: min(100%, 32rem);
-    max-width: 32rem;
-    max-height: min(86vh, 100%);
-    border-bottom: 1px solid var(--border);
-    border-radius: 1.1rem;
-    box-shadow: 0 16px 48px rgba(45, 35, 25, 0.22);
-  }
-
-  .anthara-dialog-overlay--home .anthara-dialog--home::before {
-    display: none;
-  }
-
-  .anthara-dialog-overlay--home .jamam-segments-panel {
-    padding: 0.75rem 1rem 1rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .anthara-dialog-overlay--home .anthara-dialog--home {
-    width: min(100%, 36rem);
-    max-width: 36rem;
-  }
-
-  .anthara-dialog-overlay--home .jamam-segments-table {
-    font-size: 1rem;
-  }
-}
-
-@media (min-width: 1440px) {
-  .anthara-dialog-overlay--home .anthara-dialog--home {
-    width: min(100%, 40rem);
-    max-width: 40rem;
-  }
+.anthara-dialog-overlay--home .naal-dialog--home.naal-dialog--all-birds {
+  --dialog-max-width: 56rem;
 }

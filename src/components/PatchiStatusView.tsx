@@ -173,6 +173,12 @@ export function PatchiStatusView({
     return getPatchiDaysDayForAthikaraPatchi(pakshaId, athikaraPatchi);
   }, [athikaraPatchi, isHome, pakshaId]);
 
+  /**
+   * Home jamam / anthara / naal column: Day Scheduler weekday in brackets
+   * under Athikara Patchi for the current Night Thithi.
+   */
+  const homeScheduleWeekday = thithiPatchiEntry.athikaraWeekday ?? thithiScheduleWeekday;
+
   const homePatchi = homeChipSelection ?? athikaraPatchi;
   const showHomeJamamValue = homeChipSelection != null;
 
@@ -233,18 +239,18 @@ export function PatchiStatusView({
     if (pakshaId !== "valarpirai" && pakshaId !== "theipirai") return null;
     return getAlternatePatchiJamamActivityForWeekday(
       pakshaId,
-      thithiScheduleWeekday,
+      homeScheduleWeekday,
       jamam.yamaIndex,
       jamam.period,
       homeChipSelection,
     );
   }, [
     homeChipSelection,
+    homeScheduleWeekday,
     isHome,
     jamam.period,
     jamam.yamaIndex,
     pakshaId,
-    thithiScheduleWeekday,
   ]);
 
   /** Home: Padu = Die bird in jamam 1 day for Athikara’s Patchi Days weekday. */
@@ -292,8 +298,8 @@ export function PatchiStatusView({
       return null;
     }
     return (yama: number, slotPeriod: PeriodId) =>
-      getAlternateJamamActivitySlots(pakshaId, thithiScheduleWeekday, yama, slotPeriod);
-  }, [isHome, pakshaId, thithiScheduleWeekday]);
+      getAlternateJamamActivitySlots(pakshaId, homeScheduleWeekday, yama, slotPeriod);
+  }, [homeScheduleWeekday, isHome, pakshaId]);
 
   const homeAntharaMatrixOptions = useMemo((): PatchiAntharaMatrixOptions | undefined => {
     if (!isHome || !activeSlot || !homeGetActivitySlots) return undefined;
@@ -504,7 +510,7 @@ export function PatchiStatusView({
           activities: nightYamaOrder.map((yama) => {
             const slots = getAlternateJamamActivitySlots(
               pakshaId,
-              thithiScheduleWeekday,
+              homeScheduleWeekday,
               yama,
               "night",
             );
