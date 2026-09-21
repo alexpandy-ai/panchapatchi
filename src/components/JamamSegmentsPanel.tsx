@@ -34,6 +34,7 @@ import {
   getPatchiAntharaMatrix,
   nightJamamIndicesRotatedFromYama,
   yamasRotatedFrom,
+  clickedPeriodJamamSerials,
   type PatchiAntharaMatrixOptions,
 } from "../utils/anthara";
 
@@ -120,19 +121,24 @@ function antharaSerialNumber(column: {
   return column.segmentIndex + 1;
 }
 
-function antharaRowHeader(column: {
-  jamamIndex?: number;
-  segmentIndex: number;
-  appendedMorning?: boolean;
-}) {
+function antharaRowHeader(
+  column: {
+    jamamIndex?: number;
+    segmentIndex: number;
+    appendedMorning?: boolean;
+  },
+  parentJamamIndex: number,
+) {
   const displaySerial = antharaSerialNumber(column);
-  const jamamLabel =
-    column.appendedMorning && column.jamamIndex != null
-      ? antharaMorningJamamHeader(column.jamamIndex)
-      : antharaJamamHeader(
-          column.jamamIndex != null ? column.jamamIndex : column.segmentIndex + 1,
-        );
-  return antharaColumnRowLabel(displaySerial, jamamLabel);
+  if (column.appendedMorning && column.jamamIndex != null) {
+    return antharaColumnRowLabel(displaySerial, antharaMorningJamamHeader(column.jamamIndex));
+  }
+  if (column.jamamIndex != null) {
+    return antharaColumnRowLabel(displaySerial, antharaJamamHeader(column.jamamIndex));
+  }
+  const clickedJamams = clickedPeriodJamamSerials(parentJamamIndex);
+  const jamamNumber = clickedJamams[column.segmentIndex] ?? column.segmentIndex + 1;
+  return antharaColumnRowLabel(displaySerial, antharaJamamHeader(jamamNumber));
 }
 
 export function JamamSegmentsPanel({
@@ -309,7 +315,7 @@ export function JamamSegmentsPanel({
                         .join(" ")}
                     >
                       <span className="jamam-segments-table__jamam-label">
-                        <BilingualText text={antharaRowHeader(column)} />
+                        <BilingualText text={antharaRowHeader(column, jamamSlot.index)} />
                       </span>
                     </th>
                   )}

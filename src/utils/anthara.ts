@@ -281,6 +281,12 @@ export function nightJamamIndicesRotatedFromYama(startYama: number): number[] {
   return yamasRotatedFrom(startYama).map((yama) => jamamIndexForYama(yama, "night"));
 }
 
+/** Day or night jamam indices 1–5 / 6–10, rotated from the clicked jamam. */
+export function clickedPeriodJamamSerials(parentJamamIndex: number): number[] {
+  const { yama, period } = yamaFromJamamIndex(parentJamamIndex);
+  return yamasRotatedFrom(yama).map((rotatedYama) => jamamIndexForYama(rotatedYama, period));
+}
+
 function nightJamamSlotsRotatedFromYama(
   allJamamSlots: JamamSlot[],
   startYama: number,
