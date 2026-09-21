@@ -47,6 +47,8 @@ export interface NaalDialogProps {
   nightJamamByBird?: { patchi: string; activities: string[] }[];
   /** Display serials for rows 6–10 (morning yamas or night jamam indices). */
   appendedJamamSerials?: number[];
+  /** Display serials for rows 1–5 (clicked period jamams, same as Antharam). */
+  antharaJamamSerials?: number[];
   onClose: () => void;
   /** Home-only presentation; does not change dialog data or click behavior. */
   homeLayout?: boolean;
@@ -120,15 +122,13 @@ function naalRowLabel(
   appendNextDayNight: boolean,
   appendNightJamam: boolean,
   appendedJamamSerials: number[] | undefined,
+  antharaJamamSerials: number[] | undefined,
 ): Bilingual {
   const displaySerial = index + 1;
 
   if (index < ANTHARA_DAY_SEGMENT_COUNT) {
-    // Anthara cycle rows — serial with matching slot number in brackets.
-    return antharaColumnRowLabel(
-      displaySerial,
-      antharaJamamHeader(displaySerial),
-    );
+    const jamamNumber = antharaJamamSerials?.[index] ?? displaySerial;
+    return antharaColumnRowLabel(displaySerial, antharaJamamHeader(jamamNumber));
   }
 
   const serialOffset = index - ANTHARA_DAY_SEGMENT_COUNT;
@@ -164,6 +164,7 @@ export function NaalDialog({
   appendNightJamam = false,
   nightJamamByBird,
   appendedJamamSerials,
+  antharaJamamSerials,
   onClose,
   homeLayout = false,
 }: NaalDialogProps) {
@@ -331,6 +332,7 @@ export function NaalDialog({
                               appendNextDayNight,
                               appendNightJamam,
                               appendedJamamSerials,
+                              antharaJamamSerials,
                             )}
                           />
                         </span>

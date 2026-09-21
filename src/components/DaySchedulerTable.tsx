@@ -27,6 +27,7 @@ import {
   getAlternateNightActivity,
   getAlternateNightBirdForActivity,
   getAlternateJamamActivitySlots,
+  getAlternateJamamActivitySlotsForThithi,
   ALTERNATE_ANTHARA_SEGMENT_COUNT,
   ALTERNATE_NIGHT_ACTIVITY_TA,
 } from "../utils/alternateCalculation";
@@ -44,9 +45,9 @@ import {
 } from "../utils/bilingual";
 import type { PakshaId } from "../utils/paksha";
 import {
-  getNextThithiPatchiEntryAfterWeekday,
-  getNextThithiPatchiEntryForDate,
   getThithiPatchiEntryForDate,
+  logAntharaThithiDebug,
+  resolveNextMorningThithiContext,
 } from "../utils/thithi";
 
 const SHEET_TABS: { id: PakshaId; label: (typeof PAKSHA_BI)[PakshaId] }[] = [
@@ -61,21 +62,6 @@ interface DaySchedulerTableProps {
   onSelectPatchi: (patchi: PatchiSelection) => void;
   selectedDateTime: Date;
   subtitle?: Bilingual;
-}
-
-/** Next morning day schedule from Thithi Patchi (current date when it matches the day column). */
-function resolveNextThithiMorningSchedule(
-  pakshaId: "valarpirai" | "theipirai",
-  weekday: number,
-  selectedDateTime?: Date,
-) {
-  if (selectedDateTime) {
-    const todayEntry = getThithiPatchiEntryForDate(selectedDateTime, pakshaId);
-    if (todayEntry.weekday === weekday) {
-      return getNextThithiPatchiEntryForDate(selectedDateTime, pakshaId);
-    }
-  }
-  return getNextThithiPatchiEntryAfterWeekday(pakshaId, weekday);
 }
 
 interface AlternateAntharaSelection {
@@ -205,19 +191,49 @@ function AlternatePakshaScheduleView({
   const appendNightJamamRows =
     antharaSelection?.period === "day" && alternatePakshaSupportsNight(pakshaId);
 
-  const nextThithiMorning =
-    antharaSelection?.period === "night" && antharaSelection
-      ? resolveNextThithiMorningSchedule(
-          pakshaId,
-          antharaSelection.weekday,
-          selectedDateTime,
-        )
-      : null;
+  const nextMorningContext = useMemo(() => {
+    if (antharaSelection?.period !== "night" || !jamamSlot) return null;
+    return resolveNextMorningThithiContext(jamamSlot.start, coords);
+  }, [antharaSelection?.period, coords, jamamSlot]);
+
+  const nextThithiMorning = nextMorningContext?.nextMorningThithi ?? null;
 
   const appendNextDayMorningJamamRows =
     antharaSelection?.period === "night" &&
     alternatePakshaSupportsNight(pakshaId) &&
     nextThithiMorning != null;
+
+  useEffect(() => {
+    if (!antharaSelection || !jamamSlot) return;
+    const originalDate = selectedDateTime ?? jamamSlot.start;
+    if (antharaSelection.period === "day") {
+      const originalThithi = getThithiPatchiEntryForDate(originalDate, pakshaId);
+      logAntharaThithiDebug({
+        selectedJamamType: "day",
+        originalDate,
+        originalThithi,
+        nextMorningDate: null,
+        nextMorningThithi: null,
+        finalActivity: antharaSelection.thozhil,
+      });
+      return;
+    }
+    if (!nextMorningContext) return;
+    logAntharaThithiDebug({
+      selectedJamamType: "night",
+      originalDate: nextMorningContext.originalDate,
+      originalThithi: nextMorningContext.originalThithi,
+      nextMorningDate: nextMorningContext.nextMorningDate,
+      nextMorningThithi: nextMorningContext.nextMorningThithi,
+      finalActivity: antharaSelection.thozhil,
+    });
+  }, [
+    antharaSelection,
+    jamamSlot,
+    nextMorningContext,
+    pakshaId,
+    selectedDateTime,
+  ]);
 
   return (
     <>
@@ -262,19 +278,18 @@ function AlternatePakshaScheduleView({
                 ? {
                     appendNextDayMorningJamamRows: true,
                     getMorningJamamActivitySlots: (yama) =>
-                      getAlternateJamamActivitySlots(
-                        nextThithiMorning.pakshaId,
-                        nextThithiMorning.weekday,
+                      getAlternateJamamActivitySlotsForThithi(
+                        nextThithiMorning,
                         yama,
                         "day",
                       ),
                     getNextDayNightJamamActivitySlots: (yama) =>
-                      getAlternateJamamActivitySlots(
-                        nextThithiMorning.pakshaId,
-                        nextThithiMorning.weekday,
+                      getAlternateJamamActivitySlotsForThithi(
+                        nextThithiMorning,
                         yama,
                         "night",
                       ),
+                    nextMorningThithiContext: nextMorningContext ?? undefined,
                   }
                 : undefined
           }

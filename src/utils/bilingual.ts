@@ -143,7 +143,7 @@ export const UI = {
   antharaPreviousTime: bi("முந்தைய நேரம்", "Previous time"),
   antharaCurrentTime: bi("நேரம்", "Time"),
   antharaTime: bi("அந்தர நேரம்", "Anthara time"),
-  naalTime: bi("நாள் நேரம்", "Naal time"),
+  naalTime: bi("நேரம்", "Time"),
   patchiThozhilMatrix: bi("அனைத்து பட்சி — ஜாமம் தொழில்", "All patchi — jamam thozhil"),
   patchiColumn: bi("பட்சி", "Patchi"),
 } as const;

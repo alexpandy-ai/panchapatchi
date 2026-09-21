@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 import type { ActivitySlot } from "../types";
 
@@ -32,11 +32,13 @@ import {
   antharaSegmentWindow,
   getAntharaSegmentColumns,
   getPatchiAntharaMatrix,
+  antharaColumnJamamIndex,
   nightJamamIndicesRotatedFromYama,
   yamasRotatedFrom,
   clickedPeriodJamamSerials,
   type PatchiAntharaMatrixOptions,
 } from "../utils/anthara";
+import { logAntharaThithiDebug } from "../utils/thithi";
 
 import { BilingualText } from "./BilingualText";
 import { InlineEmojiLabel } from "./InlineEmojiLabel";
@@ -68,7 +70,7 @@ export interface NaalActivitySelection {
   /** Per bird, night activities for next-day jamams (order matches appendedJamamSerials). */
   nextDayNightByBird?: { patchi: string; activities: string[] }[];
   /**
-   * Day anthara → Naal: rows 6–10 are same-day night jamams (yama-rotated from parent jamam).
+   * Day anthara → Naal: rows 6–10 are same-day night jamams (yama-rotated from the clicked row).
    */
   appendNightJamam?: boolean;
   /** Per bird, night jamam activities (order matches appendedJamamSerials). */
@@ -77,6 +79,8 @@ export interface NaalActivitySelection {
    * Labels for Naal rows 6–10: morning yamas, or night schedule indices (6–10), in display order.
    */
   appendedJamamSerials?: number[];
+  /** Labels for Naal rows 1–5: rotation from the clicked Antharam row’s jamam. */
+  antharaJamamSerials?: number[];
 }
 
 export interface JamamSegmentsPanelProps {
@@ -130,14 +134,10 @@ function antharaRowHeader(
   parentJamamIndex: number,
 ) {
   const displaySerial = antharaSerialNumber(column);
-  if (column.appendedMorning && column.jamamIndex != null) {
-    return antharaColumnRowLabel(displaySerial, antharaMorningJamamHeader(column.jamamIndex));
+  const jamamNumber = antharaColumnJamamIndex(column, parentJamamIndex);
+  if (column.appendedMorning) {
+    return antharaColumnRowLabel(displaySerial, antharaMorningJamamHeader(jamamNumber));
   }
-  if (column.jamamIndex != null) {
-    return antharaColumnRowLabel(displaySerial, antharaJamamHeader(column.jamamIndex));
-  }
-  const clickedJamams = clickedPeriodJamamSerials(parentJamamIndex);
-  const jamamNumber = clickedJamams[column.segmentIndex] ?? column.segmentIndex + 1;
   return antharaColumnRowLabel(displaySerial, antharaJamamHeader(jamamNumber));
 }
 
@@ -214,6 +214,36 @@ export function JamamSegmentsPanel({
       })),
     [matrix.columns, matrix.rows, previousJamamColumns],
   );
+
+  const { period: selectedJamamType } = yamaFromJamamIndex(jamamSlot.index);
+
+  useEffect(() => {
+    const highlightRow = matrix.rows.find((row) => row.patchi === highlightPatchi);
+    const context = matrixOptions?.nextMorningThithiContext;
+    if (context) {
+      logAntharaThithiDebug({
+        selectedJamamType: context.selectedJamamType,
+        originalDate: context.originalDate,
+        originalThithi: context.originalThithi,
+        nextMorningDate: context.nextMorningDate,
+        nextMorningThithi: context.nextMorningThithi,
+        finalActivity: highlightRow?.activities ?? highlightThozhil,
+      });
+      return;
+    }
+    if (selectedJamamType === "day") {
+      console.info("[Antharam]", {
+        selectedJamamType: "day",
+        finalActivity: highlightRow?.activities ?? highlightThozhil,
+      });
+    }
+  }, [
+    highlightPatchi,
+    highlightThozhil,
+    matrix.rows,
+    matrixOptions?.nextMorningThithiContext,
+    selectedJamamType,
+  ]);
 
   return (
     <div className="jamam-segments-panel">
@@ -379,8 +409,12 @@ export function JamamSegmentsPanel({
                                 segmentIndex,
                                 jamamSlot.end,
                               );
-                              const { yama: parentYama, period: jamamPeriod } =
-                                yamaFromJamamIndex(jamamSlot.index);
+                              const { period: jamamPeriod } = yamaFromJamamIndex(jamamSlot.index);
+                              const rowJamamIndex = antharaColumnJamamIndex(
+                                column,
+                                jamamSlot.index,
+                              );
+                              const { yama: rowYama } = yamaFromJamamIndex(rowJamamIndex);
                               const isAppendedMorning = column.appendedMorning === true;
                               const isAppendedNightJamam =
                                 column.jamamIndex != null && !isAppendedMorning;
@@ -410,24 +444,22 @@ export function JamamSegmentsPanel({
                                 matrixOptions?.appendNightJamamRows === true &&
                                 Boolean(matrixOptions.allJamamSlots?.length);
 
-                              const morningYamaOrder = yamasRotatedFrom(parentYama);
-                              const nightYamaOrderFromMorning =
-                                column.jamamIndex != null
-                                  ? yamasRotatedFrom(column.jamamIndex)
-                                  : yamasRotatedFrom(parentYama);
-                              const nightYamaOrderFromDay = yamasRotatedFrom(parentYama);
+                              const morningYamaOrder = yamasRotatedFrom(rowYama);
+                              const nightYamaOrderFromMorning = yamasRotatedFrom(rowYama);
+                              const nightYamaOrderFromDay = yamasRotatedFrom(rowYama);
 
                               const appendedJamamSerials = appendNextDayMorning
                                 ? morningYamaOrder
                                 : appendNextDayNight
-                                  ? nightJamamIndicesRotatedFromYama(
-                                      column.jamamIndex ?? parentYama,
-                                    )
+                                  ? nightJamamIndicesRotatedFromYama(rowYama)
                                   : appendNightJamam
-                                    ? nightJamamIndicesRotatedFromYama(parentYama)
+                                    ? nightJamamIndicesRotatedFromYama(rowYama)
                                     : undefined;
 
-                              onActivityClick?.({
+                              const antharaJamamSerials =
+                                clickedPeriodJamamSerials(rowJamamIndex);
+
+                              const naalSelection = {
                                 segmentStart: start,
                                 segmentEnd: end,
                                 antharaSerial: serial,
@@ -470,7 +502,29 @@ export function JamamSegmentsPanel({
                                       )
                                     : undefined,
                                 appendedJamamSerials,
-                              });
+                                antharaJamamSerials,
+                              };
+                              const nextMorning = matrixOptions?.nextMorningThithiContext;
+                              if (nextMorning && (appendNextDayMorning || appendNextDayNight)) {
+                                logAntharaThithiDebug({
+                                  selectedJamamType: appendNextDayNight ? "day" : "night",
+                                  originalDate: nextMorning.originalDate,
+                                  originalThithi: nextMorning.originalThithi,
+                                  nextMorningDate: nextMorning.nextMorningDate,
+                                  nextMorningThithi: nextMorning.nextMorningThithi,
+                                  finalActivity: [
+                                    activity,
+                                    ...(naalSelection.nextDayMorningByBird?.find(
+                                      (row) => row.patchi === patchi,
+                                    )?.activities ??
+                                      naalSelection.nextDayNightByBird?.find(
+                                        (row) => row.patchi === patchi,
+                                      )?.activities ??
+                                      []),
+                                  ],
+                                });
+                              }
+                              onActivityClick?.(naalSelection);
                             }}
                           >
                             <InlineEmojiLabel text={displayActivityBi(activity)} />

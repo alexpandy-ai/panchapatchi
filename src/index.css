@@ -4005,6 +4005,7 @@ body {
 }
 
 .naal-dialog {
+  --naal-anthara-col: 3.75rem;
   max-width: min(100%, 28rem);
   /* Keep sticky columns working — scroll only inside the panel. */
   overflow: hidden;
@@ -4045,24 +4046,27 @@ body {
   width: 5.25rem;
 }
 
-/* Naal with Antharam + Time: shorter serial labels (`1 (2)`), tighter sticky offsets. */
+/* Naal with Antharam + Time: keep Time flush so its left border stays visible. */
 .naal-dialog
   .jamam-segments-table:not(.jamam-segments-table--time-first)
   .jamam-segments-table__segment-number-col {
-  width: 4.75rem;
+  width: var(--naal-anthara-col);
+  min-width: var(--naal-anthara-col);
 }
 
 .naal-dialog
   .jamam-segments-table:not(.jamam-segments-table--time-first)
   .jamam-segments-table__col-segment-number {
-  width: 4.75rem;
+  width: var(--naal-anthara-col);
+  min-width: var(--naal-anthara-col);
 }
 
 .naal-dialog
   .jamam-segments-table:not(.jamam-segments-table--time-first)
   .jamam-segments-table__segment-time-col {
-  left: 4.75rem;
+  left: var(--naal-anthara-col);
   width: 5rem;
+  box-shadow: -1px 0 0 var(--border);
 }
 
 .naal-dialog
@@ -4097,6 +4101,13 @@ body {
 .naal-dialog .jamam-segments-table--matrix thead .jamam-segments-table__segment-number-col,
 .naal-dialog .jamam-segments-table--matrix thead .jamam-segments-table__segment-time-col {
   z-index: 4;
+}
+
+.naal-dialog
+  .jamam-segments-table:not(.jamam-segments-table--time-first)
+  thead
+  .jamam-segments-table__segment-time-col {
+  box-shadow: -1px 0 0 var(--border), 0 1px 0 var(--border);
 }
 
 .jamam-segments-table__activity-btn {
@@ -4256,17 +4267,26 @@ body {
     .jamam-segments-table__segment-number-col {
     position: sticky;
     left: 0;
-    width: 4.5rem;
+    width: var(--naal-anthara-col);
+    min-width: var(--naal-anthara-col);
     background: var(--bg-card);
+  }
+
+  .naal-dialog.anthara-dialog
+    .jamam-segments-table--matrix:not(.jamam-segments-table--matrix-with-previous)
+    .jamam-segments-table__col-segment-number {
+    width: var(--naal-anthara-col);
+    min-width: var(--naal-anthara-col);
   }
 
   .naal-dialog
     .jamam-segments-table:not(.jamam-segments-table--time-first)
     .jamam-segments-table__segment-time-col {
     position: sticky;
-    left: 4.5rem;
+    left: var(--naal-anthara-col);
     width: 5rem;
     background: var(--bg-card);
+    box-shadow: -1px 0 0 var(--border);
   }
 
   .naal-dialog .jamam-segments-table th,

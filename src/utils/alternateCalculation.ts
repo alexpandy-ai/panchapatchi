@@ -462,6 +462,20 @@ export function getAlternateJamamActivitySlots(
   });
 }
 
+/** Jamam slots from a Thithi Patchi row — pirai + Athikara bracket day stay paired. */
+export function getAlternateJamamActivitySlotsForThithi(
+  entry: { pakshaId: PakshaId; weekday: number; athikaraWeekday?: number },
+  yama: number,
+  period: PeriodId,
+): ActivitySlot[] {
+  return getAlternateJamamActivitySlots(
+    entry.pakshaId,
+    entry.athikaraWeekday ?? entry.weekday,
+    yama,
+    period,
+  );
+}
+
 /**
  * Patchi with Eating (ஊண்) for a paksha / weekday / period / yama.
  * Resolves by scanning activity slots (label match), not a hardcoded index —

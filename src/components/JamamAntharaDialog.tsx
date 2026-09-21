@@ -123,6 +123,7 @@ export function JamamAntharaDialog({
           appendNightJamam={naalSelection.appendNightJamam}
           nightJamamByBird={naalSelection.nightJamamByBird}
           appendedJamamSerials={naalSelection.appendedJamamSerials}
+          antharaJamamSerials={naalSelection.antharaJamamSerials}
           homeLayout={homeLayout}
           onClose={() => setNaalSelection(null)}
         />

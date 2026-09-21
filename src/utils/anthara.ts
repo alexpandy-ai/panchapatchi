@@ -13,6 +13,7 @@ import {
 } from "./bilingual";
 import type { JamamSlot, PeriodId } from "./jamam";
 import { formatTimeWithSeconds, jamamIndexForYama, splitJamamStartTimes, yamaFromJamamIndex } from "./jamam";
+import type { NextMorningThithiContext } from "./thithi";
 
 export const JAMAM_ANTHARA_SEGMENT_COUNT = 10;
 
@@ -223,6 +224,8 @@ export interface PatchiAntharaMatrixOptions {
    * used when opening Naal from next-day morning rows (Anthara 6–10).
    */
   getNextDayNightJamamActivitySlots?: (yama: number) => ActivitySlot[];
+  /** Night click: resolved next-morning date/Thithi for appended rows and Naal. */
+  nextMorningThithiContext?: NextMorningThithiContext;
 }
 
 export interface PatchiAntharaRow {
@@ -285,6 +288,15 @@ export function nightJamamIndicesRotatedFromYama(startYama: number): number[] {
 export function clickedPeriodJamamSerials(parentJamamIndex: number): number[] {
   const { yama, period } = yamaFromJamamIndex(parentJamamIndex);
   return yamasRotatedFrom(yama).map((rotatedYama) => jamamIndexForYama(rotatedYama, period));
+}
+
+/** Jamam in an Antharam row bracket: stored index, or clicked-period rotation. */
+export function antharaColumnJamamIndex(
+  column: { jamamIndex?: number; segmentIndex: number },
+  parentJamamIndex: number,
+): number {
+  if (column.jamamIndex != null) return column.jamamIndex;
+  return clickedPeriodJamamSerials(parentJamamIndex)[column.segmentIndex] ?? parentJamamIndex;
 }
 
 function nightJamamSlotsRotatedFromYama(
