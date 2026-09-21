@@ -2393,6 +2393,29 @@ body {
   color: var(--muted);
 }
 
+.days-view .sheet-table.vazhipattu-table {
+  min-width: 52rem;
+  max-width: none;
+}
+
+.vazhipattu-table th,
+.vazhipattu-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.55rem 0.7rem;
+  white-space: normal;
+  line-height: 1.4;
+}
+
+.vazhipattu-table__patchi {
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.vazhipattu-table__list {
+  display: block;
+}
+
 .thithi-patchi-table__row--current td {
   background: rgba(196, 92, 38, 0.12);
 }

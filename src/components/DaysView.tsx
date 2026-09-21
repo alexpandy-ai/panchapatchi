@@ -15,6 +15,7 @@ import {
   type Bilingual,
 } from "../utils/bilingual";
 import { PATCHI_DETAILS_TABLE } from "../utils/patchiDetails";
+import { VAZHIPATTU_THALANGAL_TABLE } from "../utils/vazhipattuThalangal";
 import {
   NATCHATHIRA_PATCHI_COLUMNS,
 } from "../utils/natchathiraPatchi";
@@ -35,6 +36,7 @@ const INFORMATION_SECTIONS: { id: InformationSection; label: Bilingual }[] = [
   { id: "patchiDetails", label: UI.patchiDetails },
   { id: "patchiActivity", label: UI.patchiActivity },
   { id: "patchiRelation", label: UI.patchiRelation },
+  { id: "vazhipattuThalangal", label: UI.vazhipattuThalangal },
 ];
 
 function PatchiCell({ bird }: { bird: string }) {
@@ -52,6 +54,31 @@ function PatchiListCell({ birds }: { birds: readonly string[] }) {
       ))}
     </>
   );
+}
+
+function BilingualListCell({ items }: { items: readonly Bilingual[] }) {
+  if (items.length === 0) {
+    return <span>—</span>;
+  }
+
+  return (
+    <span className="vazhipattu-table__list">
+      {items.map((item, index) => (
+        <Fragment key={`${item.ta}-${item.en}`}>
+          {index > 0 ? ", " : null}
+          <BilingualText text={item} />
+        </Fragment>
+      ))}
+    </span>
+  );
+}
+
+function OptionalBilingualCell({ value }: { value: Bilingual | null }) {
+  if (!value) {
+    return <span>—</span>;
+  }
+
+  return <BilingualText text={value} />;
 }
 
 function PatchiDaysSection() {
@@ -462,6 +489,66 @@ function PatchiRelationSection() {
   );
 }
 
+function VazhipattuThalangalSection() {
+  return (
+    <section className="schedule-table-card days-view__vazhipattu-card">
+      <h3 className="schedule-table-card__title">
+        <BilingualText text={UI.vazhipattuThalangal} />
+      </h3>
+      <div className="sheet-table-wrap">
+        <table className="sheet-table days-table vazhipattu-table">
+          <thead>
+            <tr>
+              <th>
+                <BilingualText text={UI.patchi} />
+              </th>
+              <th>
+                <BilingualText text={UI.templePlace} />
+              </th>
+              <th>
+                <BilingualText text={UI.pandavas} />
+              </th>
+              <th>
+                <BilingualText text={UI.siddhar} />
+              </th>
+              <th>
+                <BilingualText text={UI.devas} />
+              </th>
+              <th>
+                <BilingualText text={UI.otherMatches} />
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {VAZHIPATTU_THALANGAL_TABLE.map((row) => (
+              <tr key={row.patchi}>
+                <td className="vazhipattu-table__patchi">
+                  <PatchiCell bird={row.patchi} />
+                </td>
+                <td>
+                  <BilingualListCell items={row.temples} />
+                </td>
+                <td>
+                  <OptionalBilingualCell value={row.pandava} />
+                </td>
+                <td>
+                  <OptionalBilingualCell value={row.siddhar} />
+                </td>
+                <td>
+                  <OptionalBilingualCell value={row.deva} />
+                </td>
+                <td>
+                  <BilingualListCell items={row.otherMatches} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
 export function DaysView({ selectedDateTime }: { selectedDateTime: Date }) {
   const { daysSection: activeSection, setDaysSection: setActiveSection } = useNavigation();
 
@@ -500,6 +587,7 @@ export function DaysView({ selectedDateTime }: { selectedDateTime: Date }) {
       {activeSection === "patchiDetails" && <PatchiDetailsSection />}
       {activeSection === "patchiActivity" && <PatchiActivitySection />}
       {activeSection === "patchiRelation" && <PatchiRelationSection />}
+      {activeSection === "vazhipattuThalangal" && <VazhipattuThalangalSection />}
     </div>
   );
 }

@@ -8,7 +8,8 @@ export type InformationSection =
   | "natchathiraPatchi"
   | "patchiDetails"
   | "patchiActivity"
-  | "patchiRelation";
+  | "patchiRelation"
+  | "vazhipattuThalangal";
 
 export type PatchiName = (typeof PATCHI_ORDER)[number];
 export type PatchiSelection = PatchiName | "all";
@@ -30,6 +31,7 @@ const INFORMATION_SECTIONS: InformationSection[] = [
   "patchiDetails",
   "patchiActivity",
   "patchiRelation",
+  "vazhipattuThalangal",
 ];
 
 const PAKSHA_IDS: PakshaId[] = ["valarpirai", "theipirai"];
