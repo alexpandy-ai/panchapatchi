@@ -15,9 +15,8 @@ import {
   type Bilingual,
 } from "../utils/bilingual";
 import { PATCHI_DETAILS_TABLE } from "../utils/patchiDetails";
-import {
-  NATCHATHIRA_PATCHI_COLUMNS,
-} from "../utils/natchathiraPatchi";
+import { VAZHIPATTU_THALANGAL_TABLE } from "../utils/vazhipattuThalangal";
+import { NATCHATHIRA_PATCHI_TABLE } from "../utils/natchathiraPatchi";
 import {
   THITHI_PATCHI_BY_PAKSHA,
   getThithiPlanetDay,
@@ -35,6 +34,7 @@ const INFORMATION_SECTIONS: { id: InformationSection; label: Bilingual }[] = [
   { id: "patchiDetails", label: UI.patchiDetails },
   { id: "patchiActivity", label: UI.patchiActivity },
   { id: "patchiRelation", label: UI.patchiRelation },
+  { id: "vazhipattuThalangal", label: UI.vazhipattuThalangal },
 ];
 
 function PatchiCell({ bird }: { bird: string }) {
@@ -52,6 +52,31 @@ function PatchiListCell({ birds }: { birds: readonly string[] }) {
       ))}
     </>
   );
+}
+
+function BilingualListCell({ items }: { items: readonly Bilingual[] }) {
+  if (items.length === 0) {
+    return <span>—</span>;
+  }
+
+  return (
+    <span className="vazhipattu-table__list">
+      {items.map((item, index) => (
+        <Fragment key={`${item.ta}-${item.en}`}>
+          {index > 0 ? ", " : null}
+          <BilingualText text={item} />
+        </Fragment>
+      ))}
+    </span>
+  );
+}
+
+function OptionalBilingualCell({ value }: { value: Bilingual | null }) {
+  if (!value) {
+    return <span>—</span>;
+  }
+
+  return <BilingualText text={value} />;
 }
 
 function PatchiDaysSection() {
@@ -198,46 +223,73 @@ function ThithiPakshaTable({
 
 function NatchathiraPatchiSection() {
   return (
-    <section className="schedule-table-card days-view__natchathira-patchi-card">
-      <h3 className="schedule-table-card__title">
-        <BilingualText text={UI.natchathiraPatchi} />
-      </h3>
-      <div className="sheet-table-wrap">
-        <table className="sheet-table days-table days-table--two-col natchathira-patchi-table">
-          <thead>
-            <tr>
-              <th>
-                <BilingualText text={UI.patchi} />
-              </th>
-              <th>
-                <BilingualText text={UI.natchathira} />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {NATCHATHIRA_PATCHI_COLUMNS.map((column) => (
-              <tr key={column.patchi}>
-                <th scope="row" className="days-table__row-label">
-                  <PatchiCell bird={column.patchi} />
+    <div className="days-view__thithi-sections days-view__natchathira-sections">
+      <section className="schedule-table-card days-view__natchathira-patchi-card">
+        <h3 className="schedule-table-card__title">
+          <BilingualText text={UI.natchathiraPatchi} />
+        </h3>
+        <div className="sheet-table-wrap">
+          <table className="sheet-table days-table natchathira-patchi-table">
+            <thead>
+              <tr>
+                <th>
+                  <BilingualText text={UI.number} />
                 </th>
-                <td className="natchathira-patchi-table__list">
-                  {column.natchathiras.map((natchathira, index) => (
-                    <Fragment key={natchathira.en}>
-                      {index > 0 ? (
-                        <span className="natchathira-patchi-table__sep" aria-hidden="true">
-                          {", "}
-                        </span>
-                      ) : null}
-                      <BilingualText text={natchathira} block={false} />
-                    </Fragment>
-                  ))}
-                </td>
+                <th>
+                  <BilingualText text={UI.natchathira} />
+                </th>
+                <th>
+                  <BilingualText text={UI.patchi} />
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </section>
+            </thead>
+            <tbody>
+              {NATCHATHIRA_PATCHI_TABLE.map((row) => (
+                <tr key={`patchi-${row.natchathira.en}`}>
+                  <td className="natchathira-patchi-table__index">{row.number}</td>
+                  <td className="natchathira-patchi-table__name">
+                    <BilingualText text={row.natchathira} />
+                  </td>
+                  <td>
+                    <PatchiCell bird={row.patchi} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="schedule-table-card days-view__natchathira-patchi-card">
+        <h3 className="schedule-table-card__title">
+          <BilingualText text={UI.natchathiraPatchiTable27} />
+        </h3>
+        <div className="sheet-table-wrap">
+          <table className="sheet-table days-table natchathira-patchi-table natchathira-order-table">
+            <thead>
+              <tr>
+                <th>
+                  <BilingualText text={UI.number} />
+                </th>
+                <th>
+                  <BilingualText text={UI.natchathira} />
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {NATCHATHIRA_PATCHI_TABLE.map((row) => (
+                <tr key={`order-${row.natchathira.en}`}>
+                  <td className="natchathira-patchi-table__index">{row.number}</td>
+                  <td className="natchathira-patchi-table__name">
+                    <BilingualText text={row.natchathira} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
   );
 }
 
@@ -462,6 +514,66 @@ function PatchiRelationSection() {
   );
 }
 
+function VazhipattuThalangalSection() {
+  return (
+    <section className="schedule-table-card days-view__vazhipattu-card">
+      <h3 className="schedule-table-card__title">
+        <BilingualText text={UI.vazhipattuThalangal} />
+      </h3>
+      <div className="sheet-table-wrap">
+        <table className="sheet-table days-table vazhipattu-table">
+          <thead>
+            <tr>
+              <th>
+                <BilingualText text={UI.patchi} />
+              </th>
+              <th>
+                <BilingualText text={UI.templePlace} />
+              </th>
+              <th>
+                <BilingualText text={UI.pandavas} />
+              </th>
+              <th>
+                <BilingualText text={UI.siddhar} />
+              </th>
+              <th>
+                <BilingualText text={UI.devas} />
+              </th>
+              <th>
+                <BilingualText text={UI.otherMatches} />
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {VAZHIPATTU_THALANGAL_TABLE.map((row) => (
+              <tr key={row.patchi}>
+                <td className="vazhipattu-table__patchi">
+                  <PatchiCell bird={row.patchi} />
+                </td>
+                <td>
+                  <BilingualListCell items={row.temples} />
+                </td>
+                <td>
+                  <OptionalBilingualCell value={row.pandava} />
+                </td>
+                <td>
+                  <OptionalBilingualCell value={row.siddhar} />
+                </td>
+                <td>
+                  <OptionalBilingualCell value={row.deva} />
+                </td>
+                <td>
+                  <BilingualListCell items={row.otherMatches} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
 export function DaysView({ selectedDateTime }: { selectedDateTime: Date }) {
   const { daysSection: activeSection, setDaysSection: setActiveSection } = useNavigation();
 
@@ -500,6 +612,7 @@ export function DaysView({ selectedDateTime }: { selectedDateTime: Date }) {
       {activeSection === "patchiDetails" && <PatchiDetailsSection />}
       {activeSection === "patchiActivity" && <PatchiActivitySection />}
       {activeSection === "patchiRelation" && <PatchiRelationSection />}
+      {activeSection === "vazhipattuThalangal" && <VazhipattuThalangalSection />}
     </div>
   );
 }
