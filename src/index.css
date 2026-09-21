@@ -2278,6 +2278,10 @@ body {
   margin-bottom: 0.25rem;
 }
 
+.days-view__submenu .sheet-picker__btn:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
 .days-view__thithi-sections {
   display: grid;
   grid-template-columns: 1fr;
@@ -2398,18 +2402,21 @@ body {
   max-width: none;
 }
 
-.vazhipattu-table th,
-.vazhipattu-table td {
+.days-view .sheet-table.vazhipattu-table th,
+.days-view .sheet-table.vazhipattu-table td {
   text-align: left;
   vertical-align: top;
   padding: 0.55rem 0.7rem;
   white-space: normal;
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
-.vazhipattu-table__patchi {
+.days-view .sheet-table.vazhipattu-table .vazhipattu-table__patchi {
   white-space: nowrap;
+  width: 8rem;
+  min-width: 8rem;
   font-weight: 700;
+  vertical-align: middle;
 }
 
 .vazhipattu-table__list {
