@@ -2378,9 +2378,13 @@ body {
   white-space: nowrap;
 }
 
+.days-view__natchathira-patchi-card {
+  max-width: 28rem;
+}
+
 .days-view .sheet-table.natchathira-patchi-table {
   min-width: 0;
-  max-width: 28rem;
+  max-width: none;
 }
 
 .days-view .sheet-table.natchathira-patchi-table th,
