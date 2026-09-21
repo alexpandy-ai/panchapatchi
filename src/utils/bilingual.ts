@@ -111,6 +111,7 @@ export const UI = {
   thithiPatchi: bi("திதி பட்சி", "Thithi Patchi"),
   natchathiraPatchi: bi("நட்சத்திர பட்சி", "Natchathira Patchi"),
   natchathira: bi("நட்சத்திரம்", "Natchathira"),
+  natchathiraPatchiTable27: bi("நட்சத்திர பட்சி அட்டவணை — 27", "Natchathira Patchi Table — 27"),
   thithi: bi("திதி", "Thithi"),
   nightThithi: bi("இரவு திதி", "Night Thithi"),
   theipiraiPlanets: bi("தேய்பிறை கிரகம்", "Theipirai planet"),

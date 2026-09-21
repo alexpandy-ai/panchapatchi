@@ -2379,7 +2379,7 @@ body {
 }
 
 .days-view__natchathira-patchi-card {
-  max-width: 28rem;
+  max-width: none;
 }
 
 .days-view .sheet-table.natchathira-patchi-table {

@@ -223,39 +223,73 @@ function ThithiPakshaTable({
 
 function NatchathiraPatchiSection() {
   return (
-    <section className="schedule-table-card days-view__natchathira-patchi-card">
-      <h3 className="schedule-table-card__title">
-        <BilingualText text={UI.natchathiraPatchi} />
-      </h3>
-      <div className="sheet-table-wrap">
-        <table className="sheet-table days-table natchathira-patchi-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>
-                <BilingualText text={UI.natchathira} />
-              </th>
-              <th>
-                <BilingualText text={UI.patchi} />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {NATCHATHIRA_PATCHI_TABLE.map((row) => (
-              <tr key={row.natchathira.en}>
-                <td className="natchathira-patchi-table__index">{row.number}</td>
-                <td className="natchathira-patchi-table__name">
-                  <BilingualText text={row.natchathira} />
-                </td>
-                <td>
-                  <PatchiCell bird={row.patchi} />
-                </td>
+    <div className="days-view__thithi-sections days-view__natchathira-sections">
+      <section className="schedule-table-card days-view__natchathira-patchi-card">
+        <h3 className="schedule-table-card__title">
+          <BilingualText text={UI.natchathiraPatchi} />
+        </h3>
+        <div className="sheet-table-wrap">
+          <table className="sheet-table days-table natchathira-patchi-table">
+            <thead>
+              <tr>
+                <th>
+                  <BilingualText text={UI.number} />
+                </th>
+                <th>
+                  <BilingualText text={UI.natchathira} />
+                </th>
+                <th>
+                  <BilingualText text={UI.patchi} />
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </section>
+            </thead>
+            <tbody>
+              {NATCHATHIRA_PATCHI_TABLE.map((row) => (
+                <tr key={`patchi-${row.natchathira.en}`}>
+                  <td className="natchathira-patchi-table__index">{row.number}</td>
+                  <td className="natchathira-patchi-table__name">
+                    <BilingualText text={row.natchathira} />
+                  </td>
+                  <td>
+                    <PatchiCell bird={row.patchi} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="schedule-table-card days-view__natchathira-patchi-card">
+        <h3 className="schedule-table-card__title">
+          <BilingualText text={UI.natchathiraPatchiTable27} />
+        </h3>
+        <div className="sheet-table-wrap">
+          <table className="sheet-table days-table natchathira-patchi-table natchathira-order-table">
+            <thead>
+              <tr>
+                <th>
+                  <BilingualText text={UI.number} />
+                </th>
+                <th>
+                  <BilingualText text={UI.natchathira} />
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {NATCHATHIRA_PATCHI_TABLE.map((row) => (
+                <tr key={`order-${row.natchathira.en}`}>
+                  <td className="natchathira-patchi-table__index">{row.number}</td>
+                  <td className="natchathira-patchi-table__name">
+                    <BilingualText text={row.natchathira} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
   );
 }
 
