@@ -2378,16 +2378,28 @@ body {
   white-space: nowrap;
 }
 
-.natchathira-patchi-table thead th,
-.natchathira-patchi-table tbody td {
-  text-align: left;
-  vertical-align: middle;
+.days-view .sheet-table.natchathira-patchi-table {
+  min-width: 0;
+  max-width: 28rem;
 }
 
-.natchathira-patchi-table__list {
+.days-view .sheet-table.natchathira-patchi-table th,
+.days-view .sheet-table.natchathira-patchi-table td {
   text-align: left;
-  line-height: 1.35;
-  white-space: normal;
+  vertical-align: middle;
+  padding: 0.45rem 0.65rem;
+  white-space: nowrap;
+}
+
+.natchathira-patchi-table__index {
+  width: 2.5rem;
+  text-align: center;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.days-view .sheet-table.natchathira-patchi-table .natchathira-patchi-table__index {
+  text-align: center;
 }
 
 .days-activity-table__index {
