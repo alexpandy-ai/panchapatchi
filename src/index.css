@@ -2385,25 +2385,32 @@ body {
 .days-view .sheet-table.natchathira-patchi-table {
   min-width: 0;
   max-width: none;
+  width: 100%;
 }
 
 .days-view .sheet-table.natchathira-patchi-table th,
 .days-view .sheet-table.natchathira-patchi-table td {
-  text-align: left;
+  text-align: center;
   vertical-align: middle;
-  padding: 0.45rem 0.65rem;
+  padding: 0.45rem 0.5rem;
   white-space: nowrap;
 }
 
-.natchathira-patchi-table__index {
-  width: 2.5rem;
-  text-align: center;
+.days-view .sheet-table.natchathira-patchi-table .natchathira-patchi-table__patchi {
   font-weight: 700;
-  color: var(--muted);
+  background: rgba(196, 92, 38, 0.06);
 }
 
-.days-view .sheet-table.natchathira-patchi-table .natchathira-patchi-table__index {
-  text-align: center;
+.days-view .sheet-table.natchathira-patchi-table .natchathira-patchi-table__patchi .inline-emoji-label {
+  justify-content: center;
+}
+
+@media (max-width: 767px) {
+  .days-view .sheet-table.natchathira-patchi-table th,
+  .days-view .sheet-table.natchathira-patchi-table td {
+    padding: 0.35rem 0.3rem;
+    white-space: normal;
+  }
 }
 
 .days-activity-table__index {

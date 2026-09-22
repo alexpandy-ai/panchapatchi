@@ -16,7 +16,7 @@ import {
 } from "../utils/bilingual";
 import { PATCHI_DETAILS_TABLE } from "../utils/patchiDetails";
 import { VAZHIPATTU_THALANGAL_TABLE } from "../utils/vazhipattuThalangal";
-import { NATCHATHIRA_PATCHI_TABLE } from "../utils/natchathiraPatchi";
+import { NATCHATHIRA_PATCHI_GRID } from "../utils/natchathiraPatchi";
 import {
   THITHI_PATCHI_BY_PAKSHA,
   getThithiPlanetDay,
@@ -223,73 +223,51 @@ function ThithiPakshaTable({
 
 function NatchathiraPatchiSection() {
   return (
-    <div className="days-view__thithi-sections days-view__natchathira-sections">
-      <section className="schedule-table-card days-view__natchathira-patchi-card">
-        <h3 className="schedule-table-card__title">
-          <BilingualText text={UI.natchathiraPatchi} />
-        </h3>
-        <div className="sheet-table-wrap">
-          <table className="sheet-table days-table natchathira-patchi-table">
-            <thead>
-              <tr>
-                <th>
-                  <BilingualText text={UI.number} />
-                </th>
-                <th>
+    <section className="schedule-table-card days-view__natchathira-patchi-card">
+      <h3 className="schedule-table-card__title">
+        <BilingualText text={UI.natchathiraPatchi} />
+      </h3>
+      <div className="sheet-table-wrap">
+        <table className="sheet-table days-table natchathira-patchi-table">
+          <thead>
+            <tr>
+              {Array.from({ length: 3 }, (_, index) => (
+                <th key={`left-${index}`}>
                   <BilingualText text={UI.natchathira} />
                 </th>
-                <th>
-                  <BilingualText text={UI.patchi} />
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {NATCHATHIRA_PATCHI_TABLE.map((row) => (
-                <tr key={`patchi-${row.natchathira.en}`}>
-                  <td className="natchathira-patchi-table__index">{row.number}</td>
-                  <td className="natchathira-patchi-table__name">
-                    <BilingualText text={row.natchathira} />
-                  </td>
-                  <td>
-                    <PatchiCell bird={row.patchi} />
-                  </td>
-                </tr>
               ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section className="schedule-table-card days-view__natchathira-patchi-card">
-        <h3 className="schedule-table-card__title">
-          <BilingualText text={UI.natchathiraPatchiTable27} />
-        </h3>
-        <div className="sheet-table-wrap">
-          <table className="sheet-table days-table natchathira-patchi-table natchathira-order-table">
-            <thead>
-              <tr>
-                <th>
-                  <BilingualText text={UI.number} />
-                </th>
-                <th>
+              <th>
+                <BilingualText text={UI.patchi} />
+              </th>
+              {Array.from({ length: 3 }, (_, index) => (
+                <th key={`right-${index}`}>
                   <BilingualText text={UI.natchathira} />
                 </th>
-              </tr>
-            </thead>
-            <tbody>
-              {NATCHATHIRA_PATCHI_TABLE.map((row) => (
-                <tr key={`order-${row.natchathira.en}`}>
-                  <td className="natchathira-patchi-table__index">{row.number}</td>
-                  <td className="natchathira-patchi-table__name">
-                    <BilingualText text={row.natchathira} />
-                  </td>
-                </tr>
               ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-    </div>
+            </tr>
+          </thead>
+          <tbody>
+            {NATCHATHIRA_PATCHI_GRID.map((row) => (
+              <tr key={row.patchi}>
+                {row.left.map((natchathira, index) => (
+                  <td key={`${row.patchi}-left-${index}`}>
+                    {natchathira ? <BilingualText text={natchathira} /> : null}
+                  </td>
+                ))}
+                <td className="natchathira-patchi-table__patchi">
+                  <PatchiCell bird={row.patchi} />
+                </td>
+                {row.right.map((natchathira, index) => (
+                  <td key={`${row.patchi}-right-${index}`}>
+                    {natchathira ? <BilingualText text={natchathira} /> : null}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
   );
 }
 
