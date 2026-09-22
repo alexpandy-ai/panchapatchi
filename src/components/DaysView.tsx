@@ -6,9 +6,12 @@ import {
   PATCHI_ENEMIES,
   PATCHI_NATPU,
   PATCHI_ORDER,
-  PANCHA_ACTIVITIES,
+  JAMAM_ACTIVITY_TA,
+  NIGHT_JAMAM_ACTIVITY_TA,
   PAKSHA_BI,
   PATCHI_DAYS_TABLE,
+  PERIOD_BI,
+  activityBilingual,
   patchiEmoji,
   patchiLabelBilingual,
   UI,
@@ -392,33 +395,39 @@ function PatchiDetailsSection() {
 
 function PatchiActivitySection() {
   return (
-    <section className="schedule-table-card days-view__activity-card">
-      <h3 className="schedule-table-card__title">
-        <BilingualText text={UI.patchiActivity} />
-      </h3>
-      <div className="sheet-table-wrap">
-        <table className="sheet-table days-table days-table--two-col days-activity-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>
-                <BilingualText text={UI.patchiActivity} />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {PANCHA_ACTIVITIES.map((activity, index) => (
-              <tr key={activity.ta}>
-                <td className="days-activity-table__index">{index + 1}</td>
-                <td>
-                  <BilingualText text={activity} />
-                </td>
+    <div className="days-view__patchi-days">
+      <section className="schedule-table-card days-view__patchi-days-card">
+        <h3 className="schedule-table-card__title">
+          <BilingualText text={UI.patchiActivity} />
+        </h3>
+        <div className="sheet-table-wrap">
+          <table className="sheet-table days-table days-table--two-col">
+            <thead>
+              <tr>
+                <th>
+                  <BilingualText text={PERIOD_BI.day} />
+                </th>
+                <th>
+                  <BilingualText text={PERIOD_BI.night} />
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </section>
+            </thead>
+            <tbody>
+              {JAMAM_ACTIVITY_TA.map((dayActivity, index) => (
+                <tr key={dayActivity}>
+                  <td className="days-table__day">
+                    <BilingualText text={activityBilingual(dayActivity)} />
+                  </td>
+                  <td>
+                    <BilingualText text={activityBilingual(NIGHT_JAMAM_ACTIVITY_TA[index])} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
   );
 }
 

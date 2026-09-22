@@ -2413,13 +2413,6 @@ body {
   }
 }
 
-.days-activity-table__index {
-  width: 3rem;
-  text-align: center;
-  font-weight: 700;
-  color: var(--muted);
-}
-
 .days-view .sheet-table.vazhipattu-table {
   min-width: 52rem;
   max-width: none;
@@ -2480,21 +2473,6 @@ body {
   color: var(--muted);
   text-align: left;
   white-space: nowrap;
-}
-
-.days-activity-table {
-  min-width: 0;
-}
-
-.sheet-table.days-activity-table--transposed {
-  width: auto;
-  min-width: 0;
-  max-width: 14rem;
-  margin: 0;
-}
-
-.sheet-table.days-activity-table--transposed td {
-  font-weight: 600;
 }
 
 .days-table__day .bi-ta {
