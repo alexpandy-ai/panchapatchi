@@ -26,8 +26,8 @@ import {
   getAlternateGroupKey,
   getAlternateNightActivity,
   getAlternateNightBirdForActivity,
-  getAlternateJamamActivitySlots,
   getAlternateJamamActivitySlotsForThithi,
+  getAntharaClickActivitySlots,
   ALTERNATE_ANTHARA_SEGMENT_COUNT,
   ALTERNATE_NIGHT_ACTIVITY_TA,
 } from "../utils/alternateCalculation";
@@ -258,9 +258,13 @@ function AlternatePakshaScheduleView({
           open
           jamamSlot={jamamSlot}
           getActivitySlots={(yama, slotPeriod) =>
-            getAlternateJamamActivitySlots(
-              pakshaId,
-              antharaSelection.weekday,
+            getAntharaClickActivitySlots(
+              {
+                period: antharaSelection.period,
+                pakshaId,
+                weekday: antharaSelection.weekday,
+              },
+              antharaSelection.period === "night" ? nextThithiMorning : null,
               yama,
               slotPeriod,
             )
