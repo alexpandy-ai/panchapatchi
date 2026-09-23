@@ -11,18 +11,28 @@ export type InformationSection =
   | "patchiRelation"
   | "vazhipattuThalangal";
 
+export type OthersSection = "" | "tithi";
+
 export type PatchiName = (typeof PATCHI_ORDER)[number];
 export type PatchiSelection = PatchiName | "all";
 
 export interface NavigationState {
   view: AppView;
   daysSection: InformationSection;
+  othersSection: OthersSection;
   paksha: PakshaId;
   patchi: PatchiSelection;
   myPatchi: PatchiSelection;
 }
 
-const APP_VIEWS: AppView[] = ["home", "status", "schedule", "alternateSchedule", "days"];
+const APP_VIEWS: AppView[] = [
+  "home",
+  "status",
+  "schedule",
+  "alternateSchedule",
+  "days",
+  "others",
+];
 
 const INFORMATION_SECTIONS: InformationSection[] = [
   "patchiDays",
@@ -34,6 +44,8 @@ const INFORMATION_SECTIONS: InformationSection[] = [
   "vazhipattuThalangal",
 ];
 
+const OTHERS_SECTIONS: OthersSection[] = ["", "tithi"];
+
 const PAKSHA_IDS: PakshaId[] = ["valarpirai", "theipirai"];
 
 const STORAGE_KEY = "pancha-patchi-navigation";
@@ -41,6 +53,7 @@ const STORAGE_KEY = "pancha-patchi-navigation";
 export const DEFAULT_NAVIGATION: NavigationState = {
   view: "home",
   daysSection: "patchiDays",
+  othersSection: "",
   paksha: "valarpirai",
   patchi: "all",
   myPatchi: PATCHI_ORDER[0],
@@ -52,6 +65,10 @@ function isAppView(value: string): value is AppView {
 
 function isInformationSection(value: string): value is InformationSection {
   return INFORMATION_SECTIONS.includes(value as InformationSection);
+}
+
+function isOthersSection(value: string): value is OthersSection {
+  return OTHERS_SECTIONS.includes(value as OthersSection);
 }
 
 function isPakshaId(value: string): value is PakshaId {
@@ -75,6 +92,11 @@ function parseParams(source: string): Partial<NavigationState> {
 
   const daysSection = params.get("daysSection");
   if (daysSection && isInformationSection(daysSection)) parsed.daysSection = daysSection;
+
+  const othersSection = params.get("othersSection");
+  if (othersSection !== null && isOthersSection(othersSection)) {
+    parsed.othersSection = othersSection;
+  }
 
   const paksha = params.get("paksha");
   if (paksha && isPakshaId(paksha)) parsed.paksha = paksha;
@@ -119,6 +141,10 @@ export function normalizeNavigationState(
       partial.daysSection && isInformationSection(partial.daysSection)
         ? partial.daysSection
         : DEFAULT_NAVIGATION.daysSection,
+    othersSection:
+      partial.othersSection !== undefined && isOthersSection(partial.othersSection)
+        ? partial.othersSection
+        : DEFAULT_NAVIGATION.othersSection,
     paksha:
       partial.paksha && isPakshaId(partial.paksha) ? partial.paksha : DEFAULT_NAVIGATION.paksha,
     patchi:
@@ -154,6 +180,10 @@ export function saveNavigationState(state: NavigationState): void {
 
   if (state.view === "days") {
     params.set("daysSection", state.daysSection);
+  }
+
+  if (state.view === "others" && state.othersSection) {
+    params.set("othersSection", state.othersSection);
   }
 
   if (state.view === "schedule" || state.view === "alternateSchedule") {

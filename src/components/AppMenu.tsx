@@ -2,7 +2,13 @@ import { useEffect, useState } from "react";
 import { BilingualText } from "./BilingualText";
 import { MENU_ITEMS, UI, type Bilingual } from "../utils/bilingual";
 
-export type AppView = "home" | "status" | "schedule" | "alternateSchedule" | "days";
+export type AppView =
+  | "home"
+  | "status"
+  | "schedule"
+  | "alternateSchedule"
+  | "days"
+  | "others";
 
 interface AppMenuProps {
   activeView: AppView;
@@ -131,5 +137,5 @@ export function AppMenu({ activeView, onNavigate }: AppMenuProps) {
 }
 
 export function viewTitle(view: AppView): Bilingual {
-  return MENU_ITEMS.find((item) => item.id === view)!.label;
+  return MENU_ITEMS.find((item) => item.id === view)?.label ?? UI.appTitle;
 }
