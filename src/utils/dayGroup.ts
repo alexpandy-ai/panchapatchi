@@ -22,6 +22,15 @@ export function getPanchaDisplayWeekday(weekday: number): number {
   return PANCHA_AVAILABLE_WEEKDAYS[0];
 }
 
+/**
+ * Morning column that follows a Day Scheduler night row.
+ * Tuesday night → Wednesday morning, through Friday night → Saturday morning.
+ * Saturday night ends on Sunday, which is not its own row and uses Saturday.
+ */
+export function nextMorningScheduleWeekday(weekday: number): number {
+  return getPanchaDisplayWeekday(weekday + 1);
+}
+
 export const TAMIL_WEEKDAYS = [
   "ஞாயிறு",
   "திங்கள்",
