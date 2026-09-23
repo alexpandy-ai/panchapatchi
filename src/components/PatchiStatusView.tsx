@@ -17,15 +17,12 @@ import {
   ANTHARA_DAY_SEGMENT_COUNT,
   ANTHARA_NIGHT_SEGMENT_COUNT,
   antharaSegmentWindow,
-  antharaColumnJamamIndex,
+  buildJamamAntharaClick,
   getAntharaSegmentIndex,
   getPatchiAntharaMatrix,
   JAMAM_ANTHARA_SEGMENT_COUNT,
-  nightJamamIndicesRotatedFromYama,
-  yamasRotatedFrom,
-  clickedPeriodJamamSerials,
+  resolveNaalAppendForAntharaClick,
   type PatchiAntharaColumn,
-  type PatchiAntharaMatrixOptions,
 } from "../utils/anthara";
 
 import { displayActivity, displayActivityBi } from "../utils/activityLabel";
@@ -59,7 +56,6 @@ import {
   alternatePakshaSupportsNight,
   getAlternateJamamActivitySlots,
   getAlternateJamamActivitySlotsForThithi,
-  getAntharaClickActivitySlots,
   getAlternatePaduPatchiForJamam,
   getAlternatePatchiJamamActivityForWeekday,
   getDayEatingPatchiOnThithiBracketDay,
@@ -294,59 +290,22 @@ export function PatchiStatusView({
     [paksha, derived.athikaraGroupKey],
   );
 
-  const homeNightMorningThithi = useMemo(() => {
+  const homeAntharaClick = useMemo(() => {
     if (!isHome || !activeSlot) return null;
     if (pakshaId !== "valarpirai" && pakshaId !== "theipirai") return null;
-    if (yamaFromJamamIndex(activeSlot.index).period !== "night") return null;
-    return resolveNextMorningThithiContext(activeSlot.start, coords).nextMorningThithi;
-  }, [activeSlot, coords, isHome, pakshaId]);
-
-  const homeGetActivitySlots = useMemo(() => {
-    if (!isHome || (pakshaId !== "valarpirai" && pakshaId !== "theipirai")) {
-      return null;
-    }
-    const clickPeriod: PeriodId = homeNightMorningThithi ? "night" : "day";
-    return (yama: number, slotPeriod: PeriodId) =>
-      getAntharaClickActivitySlots(
-        { period: clickPeriod, pakshaId, weekday: homeScheduleWeekday },
-        yama,
-        slotPeriod,
-      );
-  }, [homeNightMorningThithi, homeScheduleWeekday, isHome, pakshaId]);
-
-  const homeAntharaMatrixOptions = useMemo((): PatchiAntharaMatrixOptions | undefined => {
-    if (!isHome || !activeSlot || !homeGetActivitySlots) return undefined;
-
     const { period } = yamaFromJamamIndex(activeSlot.index);
-    const supportsNight = alternatePakshaSupportsNight(pakshaId);
+    return buildJamamAntharaClick({
+      period,
+      pakshaId,
+      weekday: homeScheduleWeekday,
+      jamamInstant: activeSlot.start,
+      coords,
+      allJamamSlots: jamam.slots,
+    });
+  }, [activeSlot, coords, homeScheduleWeekday, isHome, jamam.slots, pakshaId]);
 
-    if (period === "day" && supportsNight) {
-      return {
-        appendNightJamamRows: true,
-        allJamamSlots: jamam.slots,
-      };
-    }
-    if (period === "night" && supportsNight) {
-      const nextMorningContext = resolveNextMorningThithiContext(activeSlot.start, coords);
-      const nextThithiMorning = nextMorningContext.nextMorningThithi;
-      return {
-        appendNextDayMorningJamamRows: true,
-        getMorningJamamActivitySlots: (yama: number) =>
-          getAlternateJamamActivitySlotsForThithi(nextThithiMorning, yama, "day"),
-        getNextDayNightJamamActivitySlots: (yama: number) =>
-          getAlternateJamamActivitySlotsForThithi(nextThithiMorning, yama, "night"),
-        nextMorningThithiContext: nextMorningContext,
-      };
-    }
-    return undefined;
-  }, [
-    activeSlot,
-    coords,
-    homeGetActivitySlots,
-    isHome,
-    jamam.slots,
-    pakshaId,
-  ]);
+  const homeGetActivitySlots = homeAntharaClick?.getActivitySlots ?? null;
+  const homeAntharaMatrixOptions = homeAntharaClick?.matrixOptions;
 
   /**
    * Home Antharam: current of 10 equal jamam slices (same times as the Home dialog rows).
@@ -479,18 +438,16 @@ export function PatchiStatusView({
     if (!activeSlot || !homeChipSelection || !homeAntharaCurrent) return;
     if (pakshaId !== "valarpirai" && pakshaId !== "theipirai") return;
 
-    const { period: jamamPeriod } = yamaFromJamamIndex(activeSlot.index);
     const column: PatchiAntharaColumn = homeAntharaCurrent.column;
-    const rowJamamIndex = antharaColumnJamamIndex(column, activeSlot.index);
-    const { yama: rowYama } = yamaFromJamamIndex(rowJamamIndex);
-    const isAppendedMorning = column.appendedMorning === true;
-    const isAppendedNightJamam = column.jamamIndex != null && !isAppendedMorning;
-    const period = isAppendedMorning
-      ? "day"
-      : isAppendedNightJamam
-        ? "night"
-        : jamamPeriod;
     const activity = displayActivity(homeAntharaCurrent.activity);
+    const supportsNight = alternatePakshaSupportsNight(pakshaId);
+    const naalAppend = resolveNaalAppendForAntharaClick({
+      parentJamamIndex: activeSlot.index,
+      column,
+      canAppendNextMorning: supportsNight,
+      canAppendNextDayNight: supportsNight,
+      canAppendSameDayNight: supportsNight,
+    });
     const selection: NaalActivitySelection = {
       segmentStart: homeAntharaCurrent.start,
       segmentEnd: homeAntharaCurrent.end,
@@ -498,29 +455,20 @@ export function PatchiStatusView({
       patchi: homeChipSelection,
       activity,
       birdRows: [{ patchi: homeChipSelection, activity }],
-      period,
+      period: naalAppend.period,
       repeatActivity: false,
-      antharaJamamSerials: clickedPeriodJamamSerials(rowJamamIndex),
+      antharaJamamSerials: naalAppend.antharaJamamSerials,
     };
 
-    const supportsNight = alternatePakshaSupportsNight(pakshaId);
-    const appendNextDayMorning =
-      jamamPeriod === "night" && !isAppendedMorning && supportsNight;
-    const appendNextDayNight = isAppendedMorning && supportsNight;
-    const appendNightJamam =
-      jamamPeriod === "day" &&
-      !isAppendedMorning &&
-      !isAppendedNightJamam &&
-      supportsNight;
+    const { appendNextDayMorning, appendNextDayNight, appendNightJamam } = naalAppend;
 
     if (appendNightJamam) {
-      const nightYamaOrder = yamasRotatedFrom(rowYama);
       selection.appendNightJamam = true;
-      selection.appendedJamamSerials = nightJamamIndicesRotatedFromYama(rowYama);
+      selection.appendedJamamSerials = naalAppend.appendedJamamSerials;
       selection.nightJamamByBird = [
         {
           patchi: homeChipSelection,
-          activities: nightYamaOrder.map((yama) => {
+          activities: naalAppend.nightYamaOrder.map((yama) => {
             const slots = getAlternateJamamActivitySlots(
               pakshaId,
               homeScheduleWeekday,
@@ -539,13 +487,12 @@ export function PatchiStatusView({
         activeSlot.start,
         coords,
       ).nextMorningThithi;
-      const morningYamaOrder = yamasRotatedFrom(rowYama);
       selection.appendNextDayMorning = true;
-      selection.appendedJamamSerials = morningYamaOrder;
+      selection.appendedJamamSerials = naalAppend.appendedJamamSerials;
       selection.nextDayMorningByBird = [
         {
           patchi: homeChipSelection,
-          activities: morningYamaOrder.map((yama) => {
+          activities: naalAppend.morningYamaOrder.map((yama) => {
             const slots = getAlternateJamamActivitySlotsForThithi(
               nextThithiMorning,
               yama,
@@ -563,13 +510,12 @@ export function PatchiStatusView({
         activeSlot.start,
         coords,
       ).nextMorningThithi;
-      const nightYamaOrder = yamasRotatedFrom(rowYama);
       selection.appendNextDayNight = true;
-      selection.appendedJamamSerials = nightJamamIndicesRotatedFromYama(rowYama);
+      selection.appendedJamamSerials = naalAppend.appendedJamamSerials;
       selection.nextDayNightByBird = [
         {
           patchi: homeChipSelection,
-          activities: nightYamaOrder.map((yama) => {
+          activities: naalAppend.nightYamaOrder.map((yama) => {
             const slots = getAlternateJamamActivitySlotsForThithi(
               nextThithiMorning,
               yama,

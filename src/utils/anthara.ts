@@ -1,6 +1,11 @@
 import type { ActivitySlot } from "../types";
 import { displayActivity } from "./activityLabel";
-import { ALTERNATE_NIGHT_ACTIVITY_TA } from "./alternateCalculation";
+import {
+  ALTERNATE_NIGHT_ACTIVITY_TA,
+  alternatePakshaSupportsNight,
+  getAlternateJamamActivitySlotsForThithi,
+  getAntharaClickActivitySlots,
+} from "./alternateCalculation";
 import {
   activityBilingual,
   bi,
@@ -13,7 +18,8 @@ import {
 } from "./bilingual";
 import type { JamamSlot, PeriodId } from "./jamam";
 import { formatTimeWithSeconds, jamamIndexForYama, splitJamamStartTimes, yamaFromJamamIndex } from "./jamam";
-import type { NextMorningThithiContext } from "./thithi";
+import type { GeoCoords } from "./location";
+import { resolveNextMorningThithiContext, type NextMorningThithiContext } from "./thithi";
 
 export const JAMAM_ANTHARA_SEGMENT_COUNT = 10;
 
@@ -217,7 +223,11 @@ export interface PatchiAntharaMatrixOptions {
   allJamamSlots?: JamamSlot[];
   /** Append jamams 6–10 with next-day morning schedule after night anthara rows. */
   appendNextDayMorningJamamRows?: boolean;
-  /** Day jamam slots (yamas 1–5) for appended rows 6–10 on night click. */
+  /**
+   * Day jamam slots (yamas 1–5) for the next Thithi morning.
+   * Fills Anthara rows 6–10 on a night jamam, and Naal rows 6–10 when the
+   * clicked cell is a night slice (night Anthara 1–5, or day Anthara 6–10).
+   */
   getMorningJamamActivitySlots?: (yama: number) => ActivitySlot[];
   /**
    * Night jamam slots for the same next Thithi day as getMorningJamamActivitySlots —
@@ -226,6 +236,76 @@ export interface PatchiAntharaMatrixOptions {
   getNextDayNightJamamActivitySlots?: (yama: number) => ActivitySlot[];
   /** Night click: resolved next-morning date/Thithi for appended rows and Naal. */
   nextMorningThithiContext?: NextMorningThithiContext;
+}
+
+/**
+ * One jamam click on Home or Day Schedule.
+ * `weekday` is the clicked BracketDay (Home: night thithi athikara weekday;
+ * Day Schedule: the row that was clicked). Both pages must pass that into
+ * this function — they must not build matrix options separately.
+ */
+export interface JamamAntharaClickInput {
+  period: PeriodId;
+  pakshaId: "valarpirai" | "theipirai";
+  weekday: number;
+  /** Instant inside the clicked jamam. Night Anthara 6–10 step from this night’s ThithiValue. */
+  jamamInstant: Date;
+  coords: GeoCoords | null;
+  allJamamSlots: JamamSlot[];
+}
+
+export interface JamamAntharaClickModel {
+  getActivitySlots: (yama: number, slotPeriod: PeriodId) => ActivitySlot[];
+  matrixOptions: PatchiAntharaMatrixOptions | undefined;
+}
+
+/**
+ * Anthara / Naal slots for a jamam click. Home and Day Schedule both call this.
+ * Day: rows 1–5 are the clicked day jamam; rows 6–10 are that day’s night.
+ * Naal opened from those night rows uses the next thithi’s morning BracketDay.
+ * Night: rows 1–5 stay on the clicked night; rows 6–10 are the next thithi’s morning.
+ * Naal opened from those morning rows stays on that morning’s night (no second step).
+ */
+export function buildJamamAntharaClick(input: JamamAntharaClickInput): JamamAntharaClickModel {
+  const getActivitySlots = (yama: number, slotPeriod: PeriodId) =>
+    getAntharaClickActivitySlots(
+      { period: input.period, pakshaId: input.pakshaId, weekday: input.weekday },
+      yama,
+      slotPeriod,
+    );
+
+  if (!alternatePakshaSupportsNight(input.pakshaId)) {
+    return { getActivitySlots, matrixOptions: undefined };
+  }
+
+  const nextMorningContext = resolveNextMorningThithiContext(input.jamamInstant, input.coords);
+  const nextThithiMorning = nextMorningContext.nextMorningThithi;
+  const morningSlots = (yama: number) =>
+    getAlternateJamamActivitySlotsForThithi(nextThithiMorning, yama, "day");
+
+  if (input.period === "day") {
+    return {
+      getActivitySlots,
+      matrixOptions: {
+        appendNightJamamRows: true,
+        allJamamSlots: input.allJamamSlots,
+        // Anthara rows 6–10 stay this night (getActivitySlots). Naal from those
+        // rows uses the next thithi’s morning BracketDay.
+        getMorningJamamActivitySlots: morningSlots,
+      },
+    };
+  }
+
+  return {
+    getActivitySlots,
+    matrixOptions: {
+      appendNextDayMorningJamamRows: true,
+      getMorningJamamActivitySlots: morningSlots,
+      getNextDayNightJamamActivitySlots: (yama: number) =>
+        getAlternateJamamActivitySlotsForThithi(nextThithiMorning, yama, "night"),
+      nextMorningThithiContext: nextMorningContext,
+    },
+  };
 }
 
 export interface PatchiAntharaRow {
@@ -297,6 +377,86 @@ export function antharaColumnJamamIndex(
 ): number {
   if (column.jamamIndex != null) return column.jamamIndex;
   return clickedPeriodJamamSerials(parentJamamIndex)[column.segmentIndex] ?? parentJamamIndex;
+}
+
+export interface NaalAppendResolution {
+  period: PeriodId;
+  /** Rows 6–10 are the next Thithi’s morning day jamams. */
+  appendNextDayMorning: boolean;
+  /** Rows 6–10 are that next morning’s night jamams (no further thithi step). */
+  appendNextDayNight: boolean;
+  /** Rows 6–10 are the same day’s night jamams. */
+  appendNightJamam: boolean;
+  /** Bracket labels for Naal rows 6–10. */
+  appendedJamamSerials?: number[];
+  /** Bracket labels for Naal rows 1–5. */
+  antharaJamamSerials: number[];
+  /** Yama order for next-morning day activities. */
+  morningYamaOrder: number[];
+  /** Yama order for night activities appended on rows 6–10. */
+  nightYamaOrder: number[];
+}
+
+/**
+ * Naal split for one Anthara cell.
+ * Rows 1–5 stay on the clicked period. Rows 6–10 advance one thithi only when
+ * the clicked cell is a night slice (day Anthara 6–10, or night Anthara 1–5).
+ * Night Anthara 6–10 are already the next morning — their Naal 6–10 stay that
+ * morning’s night jamams and do not step another thithi.
+ * Day Anthara 1–5 keep same-day night jamams.
+ */
+export function resolveNaalAppendForAntharaClick(input: {
+  parentJamamIndex: number;
+  column: { jamamIndex?: number; appendedMorning?: boolean; segmentIndex: number };
+  /** Next-thithi morning day slots can fill Naal rows 6–10. */
+  canAppendNextMorning: boolean;
+  /** Night slots of that same next morning (already-morning Anthara rows). */
+  canAppendNextDayNight: boolean;
+  /** Same-day night jamams can fill Naal rows 6–10 (day Anthara 1–5). */
+  canAppendSameDayNight: boolean;
+}): NaalAppendResolution {
+  const { period: jamamPeriod } = yamaFromJamamIndex(input.parentJamamIndex);
+  const isAppendedMorning = input.column.appendedMorning === true;
+  const isAppendedNightJamam = input.column.jamamIndex != null && !isAppendedMorning;
+  const rowJamamIndex = antharaColumnJamamIndex(input.column, input.parentJamamIndex);
+  const { yama: rowYama } = yamaFromJamamIndex(rowJamamIndex);
+  const period: PeriodId = isAppendedMorning
+    ? "day"
+    : isAppendedNightJamam
+      ? "night"
+      : jamamPeriod;
+  const morningYamaOrder = yamasRotatedFrom(rowYama);
+  const nightYamaOrder = yamasRotatedFrom(rowYama);
+
+  const appendNextDayMorning =
+    input.canAppendNextMorning &&
+    ((jamamPeriod === "night" && !isAppendedMorning) || isAppendedNightJamam);
+  const appendNextDayNight =
+    !appendNextDayMorning && isAppendedMorning && input.canAppendNextDayNight;
+  const appendNightJamam =
+    !appendNextDayMorning &&
+    !appendNextDayNight &&
+    jamamPeriod === "day" &&
+    !isAppendedMorning &&
+    !isAppendedNightJamam &&
+    input.canAppendSameDayNight;
+
+  const appendedJamamSerials = appendNextDayMorning
+    ? morningYamaOrder
+    : appendNextDayNight || appendNightJamam
+      ? nightJamamIndicesRotatedFromYama(rowYama)
+      : undefined;
+
+  return {
+    period,
+    appendNextDayMorning,
+    appendNextDayNight,
+    appendNightJamam,
+    appendedJamamSerials,
+    antharaJamamSerials: clickedPeriodJamamSerials(rowJamamIndex),
+    morningYamaOrder,
+    nightYamaOrder,
+  };
 }
 
 function nightJamamSlotsRotatedFromYama(

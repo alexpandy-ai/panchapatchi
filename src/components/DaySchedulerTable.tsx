@@ -8,6 +8,7 @@ import { useNavigation } from "../context/NavigationContext";
 
 import type { PeriodId } from "../utils/jamam";
 import { jamamIndexForYama } from "../utils/jamam";
+import { buildJamamAntharaClick } from "../utils/anthara";
 import {
   buildDaySchedulerJamamColumns,
   daySchedulerJamamSlots,
@@ -26,8 +27,6 @@ import {
   getAlternateGroupKey,
   getAlternateNightActivity,
   getAlternateNightBirdForActivity,
-  getAlternateJamamActivitySlotsForThithi,
-  getAntharaClickActivitySlots,
   ALTERNATE_ANTHARA_SEGMENT_COUNT,
   ALTERNATE_NIGHT_ACTIVITY_TA,
 } from "../utils/alternateCalculation";
@@ -47,7 +46,6 @@ import type { PakshaId } from "../utils/paksha";
 import {
   getThithiPatchiEntryForDate,
   logAntharaThithiDebug,
-  resolveNextMorningThithiContext,
 } from "../utils/thithi";
 
 const SHEET_TABS: { id: PakshaId; label: (typeof PAKSHA_BI)[PakshaId] }[] = [
@@ -188,20 +186,19 @@ function AlternatePakshaScheduleView({
     return allJamamSlots.find((slot) => slot.index === index) ?? null;
   }, [allJamamSlots, antharaSelection]);
 
-  const appendNightJamamRows =
-    antharaSelection?.period === "day" && alternatePakshaSupportsNight(pakshaId);
+  const antharaClick = useMemo(() => {
+    if (!antharaSelection || !jamamSlot) return null;
+    return buildJamamAntharaClick({
+      period: antharaSelection.period,
+      pakshaId,
+      weekday: antharaSelection.weekday,
+      jamamInstant: jamamSlot.start,
+      coords,
+      allJamamSlots,
+    });
+  }, [allJamamSlots, antharaSelection, coords, jamamSlot, pakshaId]);
 
-  const nextMorningContext = useMemo(() => {
-    if (antharaSelection?.period !== "night" || !jamamSlot) return null;
-    return resolveNextMorningThithiContext(jamamSlot.start, coords);
-  }, [antharaSelection?.period, coords, jamamSlot]);
-
-  const nextThithiMorning = nextMorningContext?.nextMorningThithi ?? null;
-
-  const appendNextDayMorningJamamRows =
-    antharaSelection?.period === "night" &&
-    alternatePakshaSupportsNight(pakshaId) &&
-    nextThithiMorning != null;
+  const nextMorningContext = antharaClick?.matrixOptions?.nextMorningThithiContext ?? null;
 
   useEffect(() => {
     if (!antharaSelection || !jamamSlot) return;
@@ -253,49 +250,18 @@ function AlternatePakshaScheduleView({
           onOpenAnthara={setAntharaSelection}
         />
       )}
-      {antharaSelection && jamamSlot ? (
+      {antharaClick && antharaSelection && jamamSlot ? (
         <JamamAntharaDialog
           open
           jamamSlot={jamamSlot}
-          getActivitySlots={(yama, slotPeriod) =>
-            getAntharaClickActivitySlots(
-              {
-                period: antharaSelection.period,
-                pakshaId,
-                weekday: antharaSelection.weekday,
-              },
-              yama,
-              slotPeriod,
-            )
-          }
+          getActivitySlots={antharaClick.getActivitySlots}
           highlightPatchi={antharaSelection.patchi}
           highlightThozhil={antharaSelection.thozhil}
           onClose={() => setAntharaSelection(null)}
           coords={coords}
           jamamSlots={allJamamSlots}
           segmentCount={ALTERNATE_ANTHARA_SEGMENT_COUNT}
-          matrixOptions={
-            appendNightJamamRows
-              ? { appendNightJamamRows: true, allJamamSlots }
-              : appendNextDayMorningJamamRows && nextThithiMorning != null
-                ? {
-                    appendNextDayMorningJamamRows: true,
-                    getMorningJamamActivitySlots: (yama) =>
-                      getAlternateJamamActivitySlotsForThithi(
-                        nextThithiMorning,
-                        yama,
-                        "day",
-                      ),
-                    getNextDayNightJamamActivitySlots: (yama) =>
-                      getAlternateJamamActivitySlotsForThithi(
-                        nextThithiMorning,
-                        yama,
-                        "night",
-                      ),
-                    nextMorningThithiContext: nextMorningContext ?? undefined,
-                  }
-                : undefined
-          }
+          matrixOptions={antharaClick.matrixOptions}
         />
       ) : null}
     </>

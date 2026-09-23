@@ -33,9 +33,7 @@ import {
   getAntharaSegmentColumns,
   getPatchiAntharaMatrix,
   antharaColumnJamamIndex,
-  nightJamamIndicesRotatedFromYama,
-  yamasRotatedFrom,
-  clickedPeriodJamamSerials,
+  resolveNaalAppendForAntharaClick,
   type PatchiAntharaMatrixOptions,
 } from "../utils/anthara";
 import { logAntharaThithiDebug } from "../utils/thithi";
@@ -401,15 +399,6 @@ export function JamamSegmentsPanel({
                                 segmentIndex,
                                 jamamSlot.end,
                               );
-                              const { period: jamamPeriod } = yamaFromJamamIndex(jamamSlot.index);
-                              const rowJamamIndex = antharaColumnJamamIndex(
-                                column,
-                                jamamSlot.index,
-                              );
-                              const { yama: rowYama } = yamaFromJamamIndex(rowJamamIndex);
-                              const isAppendedMorning = column.appendedMorning === true;
-                              const isAppendedNightJamam =
-                                column.jamamIndex != null && !isAppendedMorning;
                               const birdSourceRows = onlyPatchi
                                 ? fullMatrix.rows.filter(
                                     (row) => patchiBaseName(row.patchi) === wantedPatchi,
@@ -425,33 +414,25 @@ export function JamamSegmentsPanel({
                               const morningSlotsFn = matrixOptions?.getMorningJamamActivitySlots;
                               const nextDayNightSlotsFn =
                                 matrixOptions?.getNextDayNightJamamActivitySlots;
-                              const appendNextDayMorning =
-                                jamamPeriod === "night" &&
-                                !isAppendedMorning &&
-                                Boolean(morningSlotsFn);
-                              const appendNextDayNight =
-                                isAppendedMorning && Boolean(nextDayNightSlotsFn);
-                              const appendNightJamam =
-                                jamamPeriod === "day" &&
-                                !isAppendedMorning &&
-                                !isAppendedNightJamam &&
-                                matrixOptions?.appendNightJamamRows === true &&
-                                Boolean(matrixOptions.allJamamSlots?.length);
-
-                              const morningYamaOrder = yamasRotatedFrom(rowYama);
-                              const nightYamaOrderFromMorning = yamasRotatedFrom(rowYama);
-                              const nightYamaOrderFromDay = yamasRotatedFrom(rowYama);
-
-                              const appendedJamamSerials = appendNextDayMorning
-                                ? morningYamaOrder
-                                : appendNextDayNight
-                                  ? nightJamamIndicesRotatedFromYama(rowYama)
-                                  : appendNightJamam
-                                    ? nightJamamIndicesRotatedFromYama(rowYama)
-                                    : undefined;
-
-                              const antharaJamamSerials =
-                                clickedPeriodJamamSerials(rowJamamIndex);
+                              const naalAppend = resolveNaalAppendForAntharaClick({
+                                parentJamamIndex: jamamSlot.index,
+                                column,
+                                canAppendNextMorning: Boolean(morningSlotsFn),
+                                canAppendNextDayNight: Boolean(nextDayNightSlotsFn),
+                                canAppendSameDayNight:
+                                  matrixOptions?.appendNightJamamRows === true &&
+                                  Boolean(matrixOptions.allJamamSlots?.length),
+                              });
+                              const {
+                                period,
+                                appendNextDayMorning,
+                                appendNextDayNight,
+                                appendNightJamam,
+                                appendedJamamSerials,
+                                antharaJamamSerials,
+                                morningYamaOrder,
+                                nightYamaOrder,
+                              } = naalAppend;
 
                               const naalSelection = {
                                 segmentStart: start,
@@ -460,12 +441,8 @@ export function JamamSegmentsPanel({
                                 patchi: patchi!,
                                 activity,
                                 birdRows,
-                                // Appended night jamam rows must cycle with night order (not the parent day jamam period).
-                                period: isAppendedMorning
-                                  ? "day"
-                                  : isAppendedNightJamam
-                                    ? "night"
-                                    : jamamPeriod,
+                                // Night-slice rows cycle in night order; already-morning rows cycle in day order.
+                                period,
                                 // Never repeat one jamam activity across all Naal slots — each bird cycles from its cell.
                                 repeatActivity: false,
                                 appendNextDayMorning,
@@ -483,7 +460,7 @@ export function JamamSegmentsPanel({
                                     ? activitiesForBirdsFromSlots(
                                         birdSourceRows,
                                         nextDayNightSlotsFn,
-                                        nightYamaOrderFromMorning,
+                                        nightYamaOrder,
                                       )
                                     : undefined,
                                 appendNightJamam,
@@ -492,7 +469,7 @@ export function JamamSegmentsPanel({
                                     ? activitiesForBirdsFromSlots(
                                         birdSourceRows,
                                         (yama) => getActivitySlots(yama, "night"),
-                                        nightYamaOrderFromDay,
+                                        nightYamaOrder,
                                       )
                                     : undefined,
                                 appendedJamamSerials,
