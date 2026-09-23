@@ -16,7 +16,7 @@ import {
 
 import { displayActivityBi } from "../utils/activityLabel";
 
-import { getPakshaGroupDayBilingual } from "../utils/dayGroup";
+import { getPakshaGroupDayBilingual, nextMorningScheduleWeekday } from "../utils/dayGroup";
 
 import {
   alternatePakshaSupportsNight,
@@ -27,7 +27,6 @@ import {
   getAlternateNightActivity,
   getAlternateNightBirdForActivity,
   getAlternateJamamActivitySlots,
-  getAlternateJamamActivitySlotsForThithi,
   ALTERNATE_ANTHARA_SEGMENT_COUNT,
   ALTERNATE_NIGHT_ACTIVITY_TA,
 } from "../utils/alternateCalculation";
@@ -44,11 +43,7 @@ import {
   type Bilingual,
 } from "../utils/bilingual";
 import type { PakshaId } from "../utils/paksha";
-import {
-  getThithiPatchiEntryForDate,
-  logAntharaThithiDebug,
-  resolveNextMorningThithiContext,
-} from "../utils/thithi";
+import { getThithiPatchiEntryForDate, logAntharaThithiDebug } from "../utils/thithi";
 
 const SHEET_TABS: { id: PakshaId; label: (typeof PAKSHA_BI)[PakshaId] }[] = [
   { id: "valarpirai", label: PAKSHA_BI.valarpirai },
@@ -191,17 +186,15 @@ function AlternatePakshaScheduleView({
   const appendNightJamamRows =
     antharaSelection?.period === "day" && alternatePakshaSupportsNight(pakshaId);
 
-  const nextMorningContext = useMemo(() => {
-    if (antharaSelection?.period !== "night" || !jamamSlot) return null;
-    return resolveNextMorningThithiContext(jamamSlot.start, coords);
-  }, [antharaSelection?.period, coords, jamamSlot]);
-
-  const nextThithiMorning = nextMorningContext?.nextMorningThithi ?? null;
+  const nextMorningWeekday =
+    antharaSelection?.period === "night"
+      ? nextMorningScheduleWeekday(antharaSelection.weekday)
+      : null;
 
   const appendNextDayMorningJamamRows =
     antharaSelection?.period === "night" &&
     alternatePakshaSupportsNight(pakshaId) &&
-    nextThithiMorning != null;
+    nextMorningWeekday != null;
 
   useEffect(() => {
     if (!antharaSelection || !jamamSlot) return;
@@ -218,19 +211,16 @@ function AlternatePakshaScheduleView({
       });
       return;
     }
-    if (!nextMorningContext) return;
-    logAntharaThithiDebug({
+    console.info("[Antharam]", {
       selectedJamamType: "night",
-      originalDate: nextMorningContext.originalDate,
-      originalThithi: nextMorningContext.originalThithi,
-      nextMorningDate: nextMorningContext.nextMorningDate,
-      nextMorningThithi: nextMorningContext.nextMorningThithi,
+      clickedWeekday: antharaSelection.weekday,
+      nextMorningWeekday,
       finalActivity: antharaSelection.thozhil,
     });
   }, [
     antharaSelection,
     jamamSlot,
-    nextMorningContext,
+    nextMorningWeekday,
     pakshaId,
     selectedDateTime,
   ]);
@@ -274,22 +264,23 @@ function AlternatePakshaScheduleView({
           matrixOptions={
             appendNightJamamRows
               ? { appendNightJamamRows: true, allJamamSlots }
-              : appendNextDayMorningJamamRows && nextThithiMorning != null
+              : appendNextDayMorningJamamRows && nextMorningWeekday != null
                 ? {
                     appendNextDayMorningJamamRows: true,
                     getMorningJamamActivitySlots: (yama) =>
-                      getAlternateJamamActivitySlotsForThithi(
-                        nextThithiMorning,
+                      getAlternateJamamActivitySlots(
+                        pakshaId,
+                        nextMorningWeekday,
                         yama,
                         "day",
                       ),
                     getNextDayNightJamamActivitySlots: (yama) =>
-                      getAlternateJamamActivitySlotsForThithi(
-                        nextThithiMorning,
+                      getAlternateJamamActivitySlots(
+                        pakshaId,
+                        nextMorningWeekday,
                         yama,
                         "night",
                       ),
-                    nextMorningThithiContext: nextMorningContext ?? undefined,
                   }
                 : undefined
           }

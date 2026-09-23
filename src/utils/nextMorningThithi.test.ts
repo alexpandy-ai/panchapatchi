@@ -1,8 +1,13 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { getAlternateJamamActivitySlots, getAlternateJamamActivitySlotsForThithi } from "./alternateCalculation";
+import {
+  getAlternateDayActivity,
+  getAlternateJamamActivitySlots,
+  getAlternateJamamActivitySlotsForThithi,
+} from "./alternateCalculation";
 import { getPatchiAntharaMatrix } from "./anthara";
+import { nextMorningScheduleWeekday } from "./dayGroup";
 import type { JamamSlot } from "./jamam";
 import { jamamIndexForYama } from "./jamam";
 import {
@@ -273,6 +278,44 @@ test("pirai change: night Antharam / Naal next-morning rows use the next pirai�
   }
   if (planetActivity !== newActivity) {
     assert.notEqual(peacock.activities[5], planetActivity);
+  }
+});
+
+test("jamam night click rows 6–10 match the next day’s morning columns", () => {
+  assert.equal(nextMorningScheduleWeekday(2), 3);
+  assert.equal(nextMorningScheduleWeekday(3), 4);
+  assert.equal(nextMorningScheduleWeekday(4), 5);
+  assert.equal(nextMorningScheduleWeekday(5), 6);
+  assert.equal(nextMorningScheduleWeekday(6), 6);
+
+  const clickedWeekday = 3;
+  const nextWeekday = nextMorningScheduleWeekday(clickedWeekday);
+  const start = localDate(2026, 1, 4, 20);
+  const slot = nightSlot(start, new Date(start.getTime() + 2 * 60 * 60 * 1000));
+  const matrix = getPatchiAntharaMatrix(
+    slot.start,
+    slot.end,
+    (yama, period) => getAlternateJamamActivitySlots("valarpirai", clickedWeekday, yama, period),
+    slot.index,
+    10,
+    {
+      appendNextDayMorningJamamRows: true,
+      getMorningJamamActivitySlots: (yama) =>
+        getAlternateJamamActivitySlots("valarpirai", nextWeekday, yama, "day"),
+    },
+  );
+
+  assert.equal(matrix.columns.length, 10);
+  for (const row of matrix.rows) {
+    for (let offset = 0; offset < 5; offset += 1) {
+      const yama = matrix.columns[5 + offset]?.jamamIndex ?? 1;
+      const expected = getAlternateDayActivity("valarpirai", nextWeekday, yama, row.patchi);
+      const sameDay = getAlternateDayActivity("valarpirai", clickedWeekday, yama, row.patchi);
+      assert.equal(row.activities[5 + offset], expected);
+      if (sameDay !== expected) {
+        assert.notEqual(row.activities[5 + offset], sameDay);
+      }
+    }
   }
 });
 
