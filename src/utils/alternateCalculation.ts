@@ -477,6 +477,27 @@ export function getAlternateJamamActivitySlotsForThithi(
 }
 
 /**
+ * Anthara / Naal activity lookup for a jamam click.
+ * Night uses the next-morning Thithi (pirai + Athikara bracket day).
+ * Day stays on the clicked row’s pirai and weekday.
+ */
+export function getAntharaClickActivitySlots(
+  click: {
+    period: PeriodId;
+    pakshaId: AlternatePakshaId;
+    weekday: number;
+  },
+  nextMorning: { pakshaId: PakshaId; weekday: number; athikaraWeekday?: number } | null,
+  yama: number,
+  slotPeriod: PeriodId,
+): ActivitySlot[] {
+  if (click.period === "night" && nextMorning) {
+    return getAlternateJamamActivitySlotsForThithi(nextMorning, yama, slotPeriod);
+  }
+  return getAlternateJamamActivitySlots(click.pakshaId, click.weekday, yama, slotPeriod);
+}
+
+/**
  * Patchi with Eating (ஊண்) for a paksha / weekday / period / yama.
  * Resolves by scanning activity slots (label match), not a hardcoded index —
  * night cycle lists Die first, so Eat is not index 0.

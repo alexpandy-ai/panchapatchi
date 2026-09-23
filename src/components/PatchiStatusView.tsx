@@ -59,6 +59,7 @@ import {
   alternatePakshaSupportsNight,
   getAlternateJamamActivitySlots,
   getAlternateJamamActivitySlotsForThithi,
+  getAntharaClickActivitySlots,
   getAlternatePaduPatchiForJamam,
   getAlternatePatchiJamamActivityForWeekday,
   getDayEatingPatchiOnThithiBracketDay,
@@ -293,13 +294,26 @@ export function PatchiStatusView({
     [paksha, derived.athikaraGroupKey],
   );
 
+  const homeNightMorningThithi = useMemo(() => {
+    if (!isHome || !activeSlot) return null;
+    if (pakshaId !== "valarpirai" && pakshaId !== "theipirai") return null;
+    if (yamaFromJamamIndex(activeSlot.index).period !== "night") return null;
+    return resolveNextMorningThithiContext(activeSlot.start, coords).nextMorningThithi;
+  }, [activeSlot, coords, isHome, pakshaId]);
+
   const homeGetActivitySlots = useMemo(() => {
     if (!isHome || (pakshaId !== "valarpirai" && pakshaId !== "theipirai")) {
       return null;
     }
+    const clickPeriod: PeriodId = homeNightMorningThithi ? "night" : "day";
     return (yama: number, slotPeriod: PeriodId) =>
-      getAlternateJamamActivitySlots(pakshaId, homeScheduleWeekday, yama, slotPeriod);
-  }, [homeScheduleWeekday, isHome, pakshaId]);
+      getAntharaClickActivitySlots(
+        { period: clickPeriod, pakshaId, weekday: homeScheduleWeekday },
+        homeNightMorningThithi,
+        yama,
+        slotPeriod,
+      );
+  }, [homeNightMorningThithi, homeScheduleWeekday, isHome, pakshaId]);
 
   const homeAntharaMatrixOptions = useMemo((): PatchiAntharaMatrixOptions | undefined => {
     if (!isHome || !activeSlot || !homeGetActivitySlots) return undefined;

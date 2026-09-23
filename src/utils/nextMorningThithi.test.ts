@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { getAlternateJamamActivitySlots, getAlternateJamamActivitySlotsForThithi } from "./alternateCalculation";
+import {
+  getAlternateJamamActivitySlots,
+  getAlternateJamamActivitySlotsForThithi,
+  getAntharaClickActivitySlots,
+} from "./alternateCalculation";
 import { getPatchiAntharaMatrix } from "./anthara";
 import type { JamamSlot } from "./jamam";
 import { jamamIndexForYama } from "./jamam";
@@ -274,6 +278,112 @@ test("pirai change: night Antharam / Naal next-morning rows use the next pirai�
   if (planetActivity !== newActivity) {
     assert.notEqual(peacock.activities[5], planetActivity);
   }
+});
+
+test("night jamam click uses next-morning pirai and Athikara weekday, not the clicked row", () => {
+  const night = localDate(2026, 1, 1, 20);
+  const context = resolveNextMorningThithiContext(night, null);
+  const clickedWeekday = 2;
+  assert.notEqual(context.nextMorningThithi.athikaraWeekday, clickedWeekday);
+
+  const fromClick = getAntharaClickActivitySlots(
+    { period: "night", pakshaId: "valarpirai", weekday: clickedWeekday },
+    context.nextMorningThithi,
+    1,
+    "night",
+  );
+  const nextMorningNight = getAlternateJamamActivitySlotsForThithi(
+    context.nextMorningThithi,
+    1,
+    "night",
+  );
+  const sameDayNight = getAlternateJamamActivitySlots("valarpirai", clickedWeekday, 1, "night");
+  assert.deepEqual(fromClick, nextMorningNight);
+  assert.notDeepEqual(fromClick, sameDayNight);
+  assert.equal(context.nextMorningThithi.pakshaId, "valarpirai");
+  assert.equal(context.nextMorningDate.getDate(), 2);
+
+  const slot = nightSlot(night, new Date(night.getTime() + 2 * 60 * 60 * 1000));
+  const matrix = getPatchiAntharaMatrix(
+    slot.start,
+    slot.end,
+    (yama, period) =>
+      getAntharaClickActivitySlots(
+        { period: "night", pakshaId: "valarpirai", weekday: clickedWeekday },
+        context.nextMorningThithi,
+        yama,
+        period,
+      ),
+    slot.index,
+    10,
+    {
+      appendNextDayMorningJamamRows: true,
+      getMorningJamamActivitySlots: (yama) =>
+        getAlternateJamamActivitySlotsForThithi(context.nextMorningThithi, yama, "day"),
+      getNextDayNightJamamActivitySlots: (yama) =>
+        getAlternateJamamActivitySlotsForThithi(context.nextMorningThithi, yama, "night"),
+      nextMorningThithiContext: context,
+    },
+  );
+
+  const peacock = matrix.rows.find((row) => row.patchi === "மயில்");
+  assert.ok(peacock);
+  assert.equal(matrix.columns[0]?.jamamIndex, undefined);
+  assert.equal(peacock.activities[0], nextMorningNight.find((entry) => entry.bird === "மயில்")?.activity);
+  const appendedYama = matrix.columns[5]?.jamamIndex ?? 1;
+  const nextMorningDay = getAlternateJamamActivitySlotsForThithi(
+    context.nextMorningThithi,
+    appendedYama,
+    "day",
+  );
+  assert.equal(
+    peacock.activities[5],
+    nextMorningDay.find((entry) => entry.bird === "மயில்")?.activity,
+  );
+});
+
+test("pirai boundary night click uses the next pirai Athikara bracket day for Anthara rows 1–5", () => {
+  const pournami = getThithiPatchiEntryForThithiNumber("valarpirai", 15);
+  const nextPirai = nextMorningThithiForAnthara(pournami, pournami);
+  const clickedWeekday = pournami.athikaraWeekday;
+  const fromClick = getAntharaClickActivitySlots(
+    { period: "night", pakshaId: "valarpirai", weekday: clickedWeekday },
+    nextPirai,
+    1,
+    "night",
+  );
+  const nextNight = getAlternateJamamActivitySlots(
+    "theipirai",
+    nextPirai.athikaraWeekday,
+    1,
+    "night",
+  );
+  const samePiraiNight = getAlternateJamamActivitySlots("valarpirai", clickedWeekday, 1, "night");
+  assert.equal(nextPirai.pakshaId, "theipirai");
+  assert.equal(nextPirai.thithiNumber, 1);
+  assert.equal(nextPirai.athikaraWeekday, 4);
+  assert.deepEqual(fromClick, nextNight);
+  assert.notDeepEqual(fromClick, samePiraiNight);
+});
+
+test("day jamam click keeps the clicked weekday even when a next-morning thithi is available", () => {
+  const night = localDate(2026, 1, 4, 20);
+  const context = resolveNextMorningThithiContext(night, null);
+  const clickedWeekday = 3;
+  const fromClick = getAntharaClickActivitySlots(
+    { period: "day", pakshaId: "theipirai", weekday: clickedWeekday },
+    context.nextMorningThithi,
+    1,
+    "day",
+  );
+  assert.deepEqual(
+    fromClick,
+    getAlternateJamamActivitySlots("theipirai", clickedWeekday, 1, "day"),
+  );
+  assert.notDeepEqual(
+    fromClick,
+    getAlternateJamamActivitySlotsForThithi(context.nextMorningThithi, 1, "day"),
+  );
 });
 
 test("day Antharam still appends same-day night jamams, not next-morning day jamams", () => {
