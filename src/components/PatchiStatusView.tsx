@@ -309,7 +309,6 @@ export function PatchiStatusView({
     return (yama: number, slotPeriod: PeriodId) =>
       getAntharaClickActivitySlots(
         { period: clickPeriod, pakshaId, weekday: homeScheduleWeekday },
-        homeNightMorningThithi,
         yama,
         slotPeriod,
       );

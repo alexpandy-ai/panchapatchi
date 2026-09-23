@@ -74,22 +74,17 @@ export function thithiEntryForPirai(
 }
 
 /**
- * Next-morning Thithi for night Anthara / Naal rows 6–10.
- * Same pirai: keep that pirai’s table for the sunrise thithi.
- * End of pirai (thithi 15) or sunrise already in the other pirai: use the
- * next pirai’s Prathamai Athikara Patchi bracket day from that pirai’s table.
+ * Next Thithi for night Anthara / Naal rows 6–10.
+ * Steps one lunar day from the selected night’s ThithiValue in the Thithi
+ * Patchi table (same BracketDay lookup as the current day).
+ * Thithi 15 (Pournami / Amavasai) continues into the other pirai’s Prathamai.
+ * Does not reuse the night’s thithi when that thithi is still in force at sunrise.
  */
 export function nextMorningThithiForAnthara(
   originalThithi: ThithiPatchiEntry,
-  sunriseThithi: ThithiPatchiEntry,
+  _sunriseThithi: ThithiPatchiEntry,
 ): ThithiPatchiEntry {
-  if (sunriseThithi.pakshaId !== originalThithi.pakshaId) {
-    return thithiEntryForPirai(sunriseThithi.pakshaId, sunriseThithi.thithiNumber);
-  }
-  if (originalThithi.thithiNumber === 15) {
-    return getNextThithiPatchiEntry(originalThithi.pakshaId, 15);
-  }
-  return thithiEntryForPirai(originalThithi.pakshaId, sunriseThithi.thithiNumber);
+  return getNextThithiPatchiEntry(originalThithi.pakshaId, originalThithi.thithiNumber);
 }
 
 /** Sunrise that ends the night window containing `nightInstant`. */
@@ -109,11 +104,12 @@ export interface NextMorningThithiContext {
 }
 
 /**
- * Night jamam → next morning’s date and Thithi.
- * Uses the sunrise that closes the night window, then the Thithi and pirai
- * in force for that morning (same pirai, overnight thithi, or pirai change
- * at Pournami/Amavasai). Planet-day is always taken from that pirai’s table.
- * Does not add one calendar day and does not blindly increment thithi number.
+ * Night jamam → next morning’s date, and the Thithi for Anthara rows 6–10.
+ * The morning instant is the sunrise that closes the night window.
+ * The Thithi is the next row after the selected night’s ThithiValue
+ * (getNextThithiPatchiEntry), including the pirai switch after Pournami
+ * or Amavasai. It does not add one calendar day and does not reuse the
+ * night’s thithi or BracketDay.
  */
 export function resolveNextMorningThithiContext(
   nightInstant: Date,

@@ -264,7 +264,6 @@ function AlternatePakshaScheduleView({
                 pakshaId,
                 weekday: antharaSelection.weekday,
               },
-              antharaSelection.period === "night" ? nextThithiMorning : null,
               yama,
               slotPeriod,
             )
