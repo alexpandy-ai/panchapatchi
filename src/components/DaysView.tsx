@@ -25,20 +25,8 @@ import {
   getThithiPlanetDay,
   type ThithiPakshaGroup,
 } from "../utils/thithiPatchi";
-import { getMorningDieNightEatDayForPatchi } from "../utils/alternateCalculation";
 import { getCurrentThithiPosition, isCurrentThithiRow } from "../utils/thithi";
-import type { InformationSection } from "../utils/navigationState";
 import type { PakshaId } from "../utils/paksha";
-
-const INFORMATION_SECTIONS: { id: InformationSection; label: Bilingual }[] = [
-  { id: "patchiDays", label: UI.patchiDays },
-  { id: "thithiPatchi", label: UI.thithiPatchi },
-  { id: "natchathiraPatchi", label: UI.natchathiraPatchi },
-  { id: "patchiDetails", label: UI.patchiDetails },
-  { id: "patchiActivity", label: UI.patchiActivity },
-  { id: "patchiRelation", label: UI.patchiRelation },
-  { id: "vazhipattuThalangal", label: UI.vazhipattuThalangal },
-];
 
 function PatchiCell({ bird }: { bird: string }) {
   return <InlineEmojiLabel text={patchiLabelBilingual(bird)} emoji={patchiEmoji(bird)} />;
@@ -154,7 +142,7 @@ function ThithiPakshaTable({
           <tbody>
             {groups.map((group, groupIndex) => {
               const isGroupCurrent = highlightPaksha && currentThithi.groupIndex === groupIndex;
-              const dieEatDay = getMorningDieNightEatDayForPatchi(pakshaId, group.patchi);
+              const dieEatDay = group.athikaraDisplayDay;
 
               return (
                 <tr
@@ -562,35 +550,10 @@ function VazhipattuThalangalSection() {
 }
 
 export function DaysView({ selectedDateTime }: { selectedDateTime: Date }) {
-  const { daysSection: activeSection, setDaysSection: setActiveSection } = useNavigation();
+  const { daysSection: activeSection } = useNavigation();
 
   return (
     <div className="days-view">
-      <div
-        className="sheet-picker days-view__submenu"
-        role="tablist"
-        aria-label={`${UI.patchiSubmenu.ta} ${UI.patchiSubmenu.en}`}
-      >
-        {INFORMATION_SECTIONS.map((section) => (
-          <button
-            key={section.id}
-            type="button"
-            role="tab"
-            className={
-              activeSection === section.id
-                ? "sheet-picker__btn sheet-picker__btn--active"
-                : "sheet-picker__btn"
-            }
-            onClick={() => setActiveSection(section.id)}
-            aria-selected={activeSection === section.id}
-          >
-            <span className="sheet-picker__label">
-              <BilingualText text={section.label} />
-            </span>
-          </button>
-        ))}
-      </div>
-
       {activeSection === "patchiDays" && <PatchiDaysSection />}
       {activeSection === "thithiPatchi" && (
         <ThithiPatchiSection selectedDateTime={selectedDateTime} />

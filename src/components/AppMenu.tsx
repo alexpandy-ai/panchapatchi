@@ -1,8 +1,17 @@
 import { useEffect, useState } from "react";
 import { BilingualText } from "./BilingualText";
+import { useNavigation } from "../context/NavigationContext";
 import { MENU_ITEMS, UI, type Bilingual } from "../utils/bilingual";
+import type { InformationSection } from "../utils/navigationState";
 
-export type AppView = "home" | "status" | "schedule" | "alternateSchedule" | "days";
+export type AppView =
+  | "home"
+  | "status"
+  | "schedule"
+  | "alternateSchedule"
+  | "thithiSchedule"
+  | "thithiDetails"
+  | "days";
 
 interface AppMenuProps {
   activeView: AppView;
@@ -44,7 +53,9 @@ export function HomeNavButton({ active, onNavigate, label }: HomeNavButtonProps)
 }
 
 export function AppMenu({ activeView, onNavigate }: AppMenuProps) {
+  const { daysSection, setView, setDaysSection } = useNavigation();
   const [isOpen, setIsOpen] = useState(false);
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (!isOpen) return;
@@ -61,9 +72,38 @@ export function AppMenu({ activeView, onNavigate }: AppMenuProps) {
     };
   }, [isOpen]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    setOpenGroups((current) => {
+      const next = { ...current };
+      if (activeView === "thithiSchedule" || activeView === "thithiDetails") {
+        next.thithiSchedule = true;
+      }
+      if (activeView === "days") next.days = true;
+      return next;
+    });
+  }, [isOpen, activeView]);
+
   function selectView(view: AppView) {
     onNavigate(view);
     setIsOpen(false);
+  }
+
+  function selectChild(parentId: string, childId: string) {
+    if (parentId === "days") {
+      setView("days");
+      setDaysSection(childId as InformationSection);
+    } else {
+      onNavigate(childId as AppView);
+    }
+    setIsOpen(false);
+  }
+
+  function childIsActive(parentId: string, childId: string) {
+    if (parentId === "days") {
+      return activeView === "days" && daysSection === childId;
+    }
+    return activeView === childId;
   }
 
   return (
@@ -104,24 +144,99 @@ export function AppMenu({ activeView, onNavigate }: AppMenuProps) {
               </button>
             </div>
             <ul className="app-menu__list">
-              {MENU_ITEMS.map((item) => (
-                <li key={item.id}>
-                  <button
-                    type="button"
-                    className={
-                      activeView === item.id
-                        ? "app-menu__item app-menu__item--active"
-                        : "app-menu__item"
-                    }
-                    onClick={() => selectView(item.id as AppView)}
-                    aria-current={activeView === item.id ? "page" : undefined}
-                  >
-                    <span className="app-menu__item-label">
-                      <BilingualText text={item.label} />
-                    </span>
-                  </button>
-                </li>
-              ))}
+              {MENU_ITEMS.map((item) => {
+                if (!item.children?.length) {
+                  return (
+                    <li key={item.id}>
+                      <button
+                        type="button"
+                        className={
+                          activeView === item.id
+                            ? "app-menu__item app-menu__item--active"
+                            : "app-menu__item"
+                        }
+                        onClick={() => selectView(item.id as AppView)}
+                        aria-current={activeView === item.id ? "page" : undefined}
+                      >
+                        <span className="app-menu__item-label">
+                          <BilingualText text={item.label} />
+                        </span>
+                      </button>
+                    </li>
+                  );
+                }
+
+                const submenuId = `app-menu-sub-${item.id}`;
+                const groupOpen = Boolean(openGroups[item.id]);
+
+                return (
+                  <li key={item.id} className="app-menu__group">
+                    <button
+                      type="button"
+                      className={
+                        groupOpen
+                          ? "app-menu__item app-menu__item--parent app-menu__item--open"
+                          : "app-menu__item app-menu__item--parent"
+                      }
+                      aria-expanded={groupOpen}
+                      aria-controls={submenuId}
+                      onClick={() =>
+                        setOpenGroups((current) => ({
+                          ...current,
+                          [item.id]: !current[item.id],
+                        }))
+                      }
+                    >
+                      <span className="app-menu__item-label">
+                        <BilingualText text={item.label} />
+                      </span>
+                      <svg
+                        className={
+                          groupOpen
+                            ? "app-menu__chevron app-menu__chevron--open"
+                            : "app-menu__chevron"
+                        }
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M6 9l6 6 6-6"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </button>
+                    {groupOpen && (
+                      <ul id={submenuId} className="app-menu__sublist">
+                        {item.children.map((child) => {
+                          const active = childIsActive(item.id, child.id);
+                          return (
+                            <li key={child.id}>
+                              <button
+                                type="button"
+                                className={
+                                  active
+                                    ? "app-menu__item app-menu__item--sub app-menu__item--active"
+                                    : "app-menu__item app-menu__item--sub"
+                                }
+                                onClick={() => selectChild(item.id, child.id)}
+                                aria-current={active ? "page" : undefined}
+                              >
+                                <span className="app-menu__item-label">
+                                  <BilingualText text={child.label} />
+                                </span>
+                              </button>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </nav>
         </>
@@ -131,5 +246,13 @@ export function AppMenu({ activeView, onNavigate }: AppMenuProps) {
 }
 
 export function viewTitle(view: AppView): Bilingual {
-  return MENU_ITEMS.find((item) => item.id === view)!.label;
+  const parent = MENU_ITEMS.find((item) => item.id === view);
+  if (parent) return parent.label;
+
+  for (const item of MENU_ITEMS) {
+    const child = item.children?.find((entry) => entry.id === view);
+    if (child) return child.label;
+  }
+
+  return UI.appTitle;
 }

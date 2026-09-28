@@ -5,6 +5,8 @@ export interface ThithiPakshaGroup {
   thithis: readonly [Bilingual, Bilingual, Bilingual];
   planet: Bilingual;
   patchi: (typeof PATCHI_ORDER)[number];
+  /** Information → Thithi Patchi bracket day only. Schedule views keep the derived day. */
+  athikaraDisplayDay: Bilingual;
 }
 
 /** Weekday for each Thithi Patchi planet abbreviation (Graham → Day). */
@@ -39,26 +41,31 @@ export const THITHI_PATCHI_THEIPIRAI: ThithiPakshaGroup[] = [
     thithis: [bi("பிரதமை", "Prathamai"), bi("சஷ்டி", "Sashti"), bi("ஏகாதசி", "Ekadasi")],
     planet: bi("செ", "Mars"),
     patchi: "ஆந்தை",
+    athikaraDisplayDay: bi("சனி", "Saturday"),
   },
   {
     thithis: [bi("துவிதியை", "Dwitiyai"), bi("சப்தமி", "Sapthami"), bi("துவாதசி", "Dwadasi")],
     planet: bi("பு", "Mercury"),
     patchi: "வல்லூறு",
+    athikaraDisplayDay: bi("செவ்வாய்", "Tuesday"),
   },
   {
     thithis: [bi("திரிதியை", "Trithiyai"), bi("அஷ்டமி", "Ashtami"), bi("திரியோதசி", "Trayodasi")],
     planet: bi("வி", "Jupiter"),
     patchi: "மயில்",
+    athikaraDisplayDay: bi("புதன்", "Wednesday"),
   },
   {
     thithis: [bi("சதுர்த்தி", "Chathurthi"), bi("நவமி", "Navami"), bi("சதுர்தசி", "Chaturdasi")],
     planet: bi("வெ", "Venus"),
     patchi: "கோழி",
+    athikaraDisplayDay: bi("வியாழன்", "Thursday"),
   },
   {
     thithis: [bi("பஞ்சமி", "Panchami"), bi("தசமி", "Dasami"), bi("அமாவாசை", "Amavasya")],
     planet: bi("ச", "Saturn"),
     patchi: "காகம்",
+    athikaraDisplayDay: bi("வெள்ளி", "Friday"),
   },
 ];
 
@@ -72,26 +79,31 @@ export const THITHI_PATCHI_VALARPIRAI: ThithiPakshaGroup[] = [
     thithis: [bi("பிரதமை", "Prathamai"), bi("சஷ்டி", "Sashti"), bi("ஏகாதசி", "Ekadasi")],
     planet: bi("செ", "Mars"),
     patchi: "வல்லூறு",
+    athikaraDisplayDay: bi("வெள்ளி", "Friday"),
   },
   {
     thithis: [bi("துவிதியை", "Dwitiyai"), bi("சப்தமி", "Sapthami"), bi("துவாதசி", "Dwadasi")],
     planet: bi("ச", "Saturn"),
     patchi: "ஆந்தை",
+    athikaraDisplayDay: bi("வியாழன்", "Thursday"),
   },
   {
     thithis: [bi("திரிதியை", "Trithiyai"), bi("அஷ்டமி", "Ashtami"), bi("திரியோதசி", "Trayodasi")],
     planet: bi("வெ", "Venus"),
     patchi: "காகம்",
+    athikaraDisplayDay: bi("புதன்", "Wednesday"),
   },
   {
     thithis: [bi("சதுர்த்தி", "Chathurthi"), bi("நவமி", "Navami"), bi("சதுர்தசி", "Chaturdasi")],
     planet: bi("வி", "Jupiter"),
     patchi: "கோழி",
+    athikaraDisplayDay: bi("செவ்வாய்", "Tuesday"),
   },
   {
     thithis: [bi("பஞ்சமி", "Panchami"), bi("தசமி", "Dasami"), bi("பௌர்ணமி", "Pournami")],
     planet: bi("பு", "Mercury"),
     patchi: "மயில்",
+    athikaraDisplayDay: bi("சனி", "Saturday"),
   },
 ];
 

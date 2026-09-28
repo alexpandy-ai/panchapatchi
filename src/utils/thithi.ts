@@ -114,8 +114,14 @@ export interface NextMorningThithiContext {
 export function resolveNextMorningThithiContext(
   nightInstant: Date,
   coords: GeoCoords | null,
+  /**
+   * Home Pirai/Thithi override. Omit to use the calculated night thithi.
+   * The next-morning step is still one Thithi Patchi row after this entry.
+   */
+  originalThithiOverride?: ThithiPatchiEntry,
 ): NextMorningThithiContext {
-  const originalThithi = getNightThithiPatchiEntryForDate(nightInstant, coords);
+  const originalThithi =
+    originalThithiOverride ?? getNightThithiPatchiEntryForDate(nightInstant, coords);
   const nextMorningDate = getNextMorningDateAfterNight(nightInstant, coords);
   const sunriseThithi = thithiEntryAt(nextMorningDate);
   const nextMorningThithi = nextMorningThithiForAnthara(originalThithi, sunriseThithi);

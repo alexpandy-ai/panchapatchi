@@ -99,6 +99,9 @@ export const UI = {
   schedule: bi("பட்சி அட்டவணை", "Patchi Schedule"),
   alternateSchedule: bi("நாள் அட்டவணை", "Day Scheduler"),
   alternateCalculation: bi("நாள் அட்டவணை", "Day Scheduler"),
+  thithiSchedule: bi("திதி அட்டவணை", "Thithi Schedule"),
+  thithiScheduleItem: bi("அட்டவணை", "Schedule"),
+  thithiDetails: bi("திதி விவரம்", "Thithi Details"),
   sheetPicker: bi("அட்டவணை தேர்வு", "Sheet selection"),
   patchiSubmenu: bi("பட்சி துணை மெனு", "Bird submenu"),
   dayGroupSchedule: bi("நாள் குழு அட்டவணை", "Day group schedule"),
@@ -112,6 +115,8 @@ export const UI = {
   natchathiraPatchi: bi("நட்சத்திர பட்சி", "Natchathira Patchi"),
   natchathira: bi("நட்சத்திரம்", "Natchathira"),
   thithi: bi("திதி", "Thithi"),
+  pirai: bi("பிறை", "Pirai"),
+  restoreCalculated: bi("கணக்கிட்டதை மீட்டமை", "Restore calculated"),
   nightThithi: bi("இரவு திதி", "Night Thithi"),
   theipiraiPlanets: bi("தேய்பிறை கிரகம்", "Theipirai planet"),
   valarpiraiPlanets: bi("வளர்பிறை கிரகம்", "Valarpirai planet"),
@@ -257,7 +262,24 @@ export const PATCHI_DAYS_TABLE = [
 ] as const;
 
 
-export const MENU_ITEMS: { id: string; label: Bilingual }[] = [
+/** Same labels as the Information page chips, in the same order. */
+export const INFORMATION_PAGE_SECTIONS = [
+  { id: "patchiDays", label: UI.patchiDays },
+  { id: "thithiPatchi", label: UI.thithiPatchi },
+  { id: "natchathiraPatchi", label: UI.natchathiraPatchi },
+  { id: "patchiDetails", label: UI.patchiDetails },
+  { id: "patchiActivity", label: UI.patchiActivity },
+  { id: "patchiRelation", label: UI.patchiRelation },
+  { id: "vazhipattuThalangal", label: UI.vazhipattuThalangal },
+] as const;
+
+export interface AppMenuItem {
+  id: string;
+  label: Bilingual;
+  children?: { id: string; label: Bilingual }[];
+}
+
+export const MENU_ITEMS: AppMenuItem[] = [
   {
     id: "home",
     label: bi("முகப்பு", "Home"),
@@ -275,8 +297,26 @@ export const MENU_ITEMS: { id: string; label: Bilingual }[] = [
     label: bi("நாள் அட்டவணை", "Day Scheduler"),
   },
   {
+    id: "thithiSchedule",
+    label: bi("திதி அட்டவணை", "Thithi Schedule"),
+    children: [
+      {
+        id: "thithiSchedule",
+        label: UI.thithiScheduleItem,
+      },
+      {
+        id: "thithiDetails",
+        label: UI.thithiDetails,
+      },
+    ],
+  },
+  {
     id: "days",
     label: bi("தகவல்", "Information"),
+    children: INFORMATION_PAGE_SECTIONS.map((section) => ({
+      id: section.id,
+      label: section.label,
+    })),
   },
 ];
 

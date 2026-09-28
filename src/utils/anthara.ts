@@ -19,7 +19,11 @@ import {
 import type { JamamSlot, PeriodId } from "./jamam";
 import { formatTimeWithSeconds, jamamIndexForYama, splitJamamStartTimes, yamaFromJamamIndex } from "./jamam";
 import type { GeoCoords } from "./location";
-import { resolveNextMorningThithiContext, type NextMorningThithiContext } from "./thithi";
+import {
+  resolveNextMorningThithiContext,
+  type NextMorningThithiContext,
+  type ThithiPatchiEntry,
+} from "./thithi";
 
 export const JAMAM_ANTHARA_SEGMENT_COUNT = 10;
 
@@ -252,6 +256,11 @@ export interface JamamAntharaClickInput {
   jamamInstant: Date;
   coords: GeoCoords | null;
   allJamamSlots: JamamSlot[];
+  /**
+   * Home only: selected Pirai/Thithi. Omit on Day Schedule so rows 6–10
+   * still step from the calculated night thithi.
+   */
+  nightThithi?: ThithiPatchiEntry;
 }
 
 export interface JamamAntharaClickModel {
@@ -278,7 +287,11 @@ export function buildJamamAntharaClick(input: JamamAntharaClickInput): JamamAnth
     return { getActivitySlots, matrixOptions: undefined };
   }
 
-  const nextMorningContext = resolveNextMorningThithiContext(input.jamamInstant, input.coords);
+  const nextMorningContext = resolveNextMorningThithiContext(
+    input.jamamInstant,
+    input.coords,
+    input.nightThithi,
+  );
   const nextThithiMorning = nextMorningContext.nextMorningThithi;
   const morningSlots = (yama: number) =>
     getAlternateJamamActivitySlotsForThithi(nextThithiMorning, yama, "day");

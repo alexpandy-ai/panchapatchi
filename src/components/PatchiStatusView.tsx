@@ -8,6 +8,7 @@ import { InlineEmojiLabel } from "./InlineEmojiLabel";
 import { PatchiFilterChips } from "./PatchiPickerBlock";
 import type { NaalActivitySelection } from "./JamamSegmentsPanel";
 
+import { useLanguage } from "../context/LanguageContext";
 import { useLocation } from "../context/LocationContext";
 import { useNavigation } from "../context/NavigationContext";
 
@@ -36,6 +37,7 @@ import {
   patchiBaseName,
   patchiEmoji,
   patchiLabelBilingual,
+  pickBilingual,
   thozhilHeader,
   thozhilValueWithTime,
   UI,
@@ -69,6 +71,7 @@ import { getPakshaFromDate, type PakshaId } from "../utils/paksha";
 import {
   getNightThithiPatchiEntryForDate,
   getThithiPatchiEntryForDate,
+  getThithiPatchiEntryForThithiNumber,
   logAntharaThithiDebug,
   resolveNextMorningThithiContext,
 } from "../utils/thithi";
@@ -88,6 +91,7 @@ export function PatchiStatusView({
 }: PatchiStatusViewProps) {
   const isHome = variant === "home";
 
+  const { language } = useLanguage();
   const { coords } = useLocation();
 
   const {
@@ -124,15 +128,46 @@ export function PatchiStatusView({
     [isHome, selectedDateTime, coords],
   );
 
+  /**
+   * Home Pirai/Thithi override. Null means the selectors follow the calculated
+   * night thithi and update when date, time, or place changes.
+   */
+  const [homeThithiOverride, setHomeThithiOverride] = useState<{
+    pakshaId: PakshaId;
+    thithiNumber: number;
+  } | null>(null);
+
+  const selectHomePiraiThithi = (pakshaId: PakshaId, thithiNumber: number) => {
+    if (
+      nightThithiEntry &&
+      nightThithiEntry.pakshaId === pakshaId &&
+      nightThithiEntry.thithiNumber === thithiNumber
+    ) {
+      setHomeThithiOverride(null);
+      return;
+    }
+    setHomeThithiOverride({ pakshaId, thithiNumber });
+  };
+
+  /** Selected row when the user overrides; otherwise the calculated night thithi. */
+  const homeNightThithi = useMemo(() => {
+    if (!isHome || !nightThithiEntry) return null;
+    if (!homeThithiOverride) return nightThithiEntry;
+    return getThithiPatchiEntryForThithiNumber(
+      homeThithiOverride.pakshaId,
+      homeThithiOverride.thithiNumber,
+    );
+  }, [homeThithiOverride, isHome, nightThithiEntry]);
+
   const currentPakshaId = isHome
-    ? (nightThithiEntry?.pakshaId ?? getPakshaFromDate(selectedDateTime))
+    ? (homeNightThithi?.pakshaId ?? getPakshaFromDate(selectedDateTime))
     : navigationPakshaId;
   const pakshaId = currentPakshaId;
 
   const thithiPatchiEntry = useMemo(() => {
-    if (isHome && nightThithiEntry) return nightThithiEntry;
+    if (isHome && homeNightThithi) return homeNightThithi;
     return getThithiPatchiEntryForDate(selectedDateTime, pakshaId);
-  }, [isHome, nightThithiEntry, selectedDateTime, pakshaId]);
+  }, [isHome, homeNightThithi, selectedDateTime, pakshaId]);
 
   /**
    * Home Athikara: bird Eating on the Thithi Patchi bracket day (Day Scheduler
@@ -301,8 +336,18 @@ export function PatchiStatusView({
       jamamInstant: activeSlot.start,
       coords,
       allJamamSlots: jamam.slots,
+      nightThithi: homeThithiOverride ? (homeNightThithi ?? undefined) : undefined,
     });
-  }, [activeSlot, coords, homeScheduleWeekday, isHome, jamam.slots, pakshaId]);
+  }, [
+    activeSlot,
+    coords,
+    homeNightThithi,
+    homeScheduleWeekday,
+    homeThithiOverride,
+    isHome,
+    jamam.slots,
+    pakshaId,
+  ]);
 
   const homeGetActivitySlots = homeAntharaClick?.getActivitySlots ?? null;
   const homeAntharaMatrixOptions = homeAntharaClick?.matrixOptions;
@@ -486,6 +531,7 @@ export function PatchiStatusView({
       const nextThithiMorning = resolveNextMorningThithiContext(
         activeSlot.start,
         coords,
+        homeThithiOverride ? (homeNightThithi ?? undefined) : undefined,
       ).nextMorningThithi;
       selection.appendNextDayMorning = true;
       selection.appendedJamamSerials = naalAppend.appendedJamamSerials;
@@ -509,6 +555,7 @@ export function PatchiStatusView({
       const nextThithiMorning = resolveNextMorningThithiContext(
         activeSlot.start,
         coords,
+        homeThithiOverride ? (homeNightThithi ?? undefined) : undefined,
       ).nextMorningThithi;
       selection.appendNextDayNight = true;
       selection.appendedJamamSerials = naalAppend.appendedJamamSerials;
@@ -531,7 +578,11 @@ export function PatchiStatusView({
     }
 
     if (appendNextDayMorning || appendNextDayNight) {
-      const nextMorning = resolveNextMorningThithiContext(activeSlot.start, coords);
+      const nextMorning = resolveNextMorningThithiContext(
+        activeSlot.start,
+        coords,
+        homeThithiOverride ? (homeNightThithi ?? undefined) : undefined,
+      );
       logAntharaThithiDebug({
         selectedJamamType: appendNextDayNight ? "day" : "night",
         originalDate: nextMorning.originalDate,
@@ -582,25 +633,82 @@ export function PatchiStatusView({
             <div className="context-row--home-details">
               <div className="context-row context-row--home-thithi">
                 <span className="context-inline-item">
-                  <span className="context-label">
-                    <BilingualText text={UI.nightThithi} block={false} />
-                  </span>
+                  <label className="context-label" htmlFor="home-thithi-select">
+                    <BilingualText text={UI.thithi} block={false} />
+                  </label>
                   <span className="context-value context-value--home-thithi-name">
-                    <BilingualText text={thithiPatchiEntry.thithi} block={false} />
+                    <select
+                      id="home-thithi-select"
+                      className="home-field-select"
+                      value={thithiPatchiEntry.thithiNumber}
+                      onChange={(event) => {
+                        if (currentPakshaId !== "valarpirai" && currentPakshaId !== "theipirai") {
+                          return;
+                        }
+                        selectHomePiraiThithi(currentPakshaId, Number(event.target.value));
+                      }}
+                    >
+                      {Array.from({ length: 15 }, (_, index) => {
+                        const thithiNumber = index + 1;
+                        const optionPaksha =
+                          currentPakshaId === "theipirai" ? "theipirai" : "valarpirai";
+                        const label = getThithiPatchiEntryForThithiNumber(
+                          optionPaksha,
+                          thithiNumber,
+                        ).thithi;
+                        return (
+                          <option key={thithiNumber} value={thithiNumber}>
+                            {pickBilingual(label, language)}
+                          </option>
+                        );
+                      })}
+                    </select>
                   </span>
                 </span>
               </div>
               <div className="context-row context-row--home-day">
+                <label className="context-label" htmlFor="home-pirai-select">
+                  <BilingualText text={UI.pirai} block={false} />
+                </label>
                 <span className="context-value context-value--home-pirai">
-                  <BilingualText text={PAKSHA_BI[currentPakshaId]} block={false} />
-                </span>
-                <span className="context-value context-value--home-day">
-                  <BilingualText
-                    text={athikaraPatchiDay ?? thithiPatchiEntry.day}
-                    block={false}
-                  />
+                  <span className="home-pirai-line">
+                    <select
+                      id="home-pirai-select"
+                      className="home-field-select home-field-select--pirai"
+                      value={currentPakshaId}
+                      onChange={(event) => {
+                        const nextPaksha = event.target.value;
+                        if (nextPaksha !== "valarpirai" && nextPaksha !== "theipirai") return;
+                        selectHomePiraiThithi(nextPaksha, thithiPatchiEntry.thithiNumber);
+                      }}
+                    >
+                      <option value="valarpirai">
+                        {pickBilingual(PAKSHA_BI.valarpirai, language)}
+                      </option>
+                      <option value="theipirai">
+                        {pickBilingual(PAKSHA_BI.theipirai, language)}
+                      </option>
+                    </select>
+                    <span className="context-value context-value--home-day">
+                      <BilingualText
+                        text={athikaraPatchiDay ?? thithiPatchiEntry.day}
+                        block={false}
+                      />
+                    </span>
+                  </span>
                 </span>
               </div>
+              {homeThithiOverride ? (
+                <div className="context-row context-row--home-restore">
+                  <button
+                    type="button"
+                    className="home-thithi-restore"
+                    onClick={() => setHomeThithiOverride(null)}
+                  >
+                    <BilingualText text={UI.restoreCalculated} block={false} />
+                  </button>
+                </div>
+              ) : null}
 
               <div className="context-row context-row--home-athikara">
                 <span className="context-inline-item context-inline-item--athikara">

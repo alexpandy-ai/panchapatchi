@@ -8,12 +8,13 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "test": "npx --yes tsx --test src/utils/nextMorningThithi.test.ts"
+    "test": "npx --yes tsx --test src/utils/nextMorningThithi.test.ts src/utils/kolkataCivil.test.ts"
   },
   "dependencies": {
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "suncalc": "^2.0.1"
+    "suncalc": "^2.0.1",
+    "tz-lookup": "^6.1.25"
   },
   "devDependencies": {
     "@types/node": "^24.13.3",

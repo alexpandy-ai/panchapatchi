@@ -6,6 +6,8 @@ import { useNavigation } from "./context/NavigationContext";
 import { DateTimeCard } from "./components/DateTimeCard";
 import { DaysView } from "./components/DaysView";
 import { DaySchedulerView } from "./components/DaySchedulerView";
+import { ThithiDetailsView } from "./components/ThithiDetailsView";
+import { ThithiScheduleView } from "./components/ThithiScheduleView";
 import { FindPatchiView, type FindPatchiQuery } from "./components/FindPatchiView";
 import { PatchiStatusView } from "./components/PatchiStatusView";
 import { TimeTableView } from "./components/TimeTableView";
@@ -78,6 +80,8 @@ export default function App() {
 
       {activeView !== "schedule" &&
         activeView !== "alternateSchedule" &&
+        activeView !== "thithiSchedule" &&
+        activeView !== "thithiDetails" &&
         activeView !== "days" && (
         <DateTimeCard
           value={selectedDateTime}
@@ -107,6 +111,12 @@ export default function App() {
         {activeView === "alternateSchedule" && (
           <DaySchedulerView selectedDateTime={selectedDateTime} />
         )}
+
+        {activeView === "thithiSchedule" && (
+          <ThithiScheduleView selectedDateTime={selectedDateTime} />
+        )}
+
+        {activeView === "thithiDetails" && <ThithiDetailsView />}
 
         {activeView === "days" && <DaysView selectedDateTime={selectedDateTime} />}
       </main>

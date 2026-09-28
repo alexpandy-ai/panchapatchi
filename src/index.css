@@ -216,6 +216,50 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.45rem;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.app-menu__group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.app-menu__item--parent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.app-menu__item--open {
+  border-color: var(--accent);
+}
+
+.app-menu__chevron {
+  width: 1.1rem;
+  height: 1.1rem;
+  flex: 0 0 auto;
+  transition: transform 0.15s ease;
+}
+
+.app-menu__chevron--open {
+  transform: rotate(180deg);
+}
+
+.app-menu__sublist {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.app-menu__item--parent .app-menu__item-label {
+  flex: 1;
 }
 
 .app-menu__item {
@@ -2983,7 +3027,7 @@ body {
   min-width: 0;
 }
 
-.context-card--home .context-row--home-details > .context-row:not(.context-row--jamam-pair) {
+.context-card--home .context-row--home-details > .context-row:not(.context-row--jamam-pair):not(.context-row--home-restore) {
   display: grid;
   grid-template-columns: subgrid;
   grid-column: 1 / -1;
@@ -3033,6 +3077,108 @@ body {
   white-space: normal;
   overflow-wrap: anywhere;
   word-break: normal;
+  justify-self: stretch;
+  width: auto;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.context-card--home .home-field-select {
+  font-family: inherit;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--text);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 0.45rem;
+  padding: 0.2rem 0.35rem;
+  min-height: var(--touch-min);
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.context-card--home .home-field-select:focus {
+  outline: 2px solid var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.context-card--home .context-value--home-thithi-name {
+  justify-self: stretch;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.context-card--home .context-value--home-thithi-name .home-field-select {
+  width: 100%;
+  max-width: 12rem;
+  font-size: var(--home-value-size);
+  color: inherit;
+}
+
+.context-card--home .home-pirai-line {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.context-card--home .home-field-select--pirai {
+  flex: 1 1 0;
+  width: 100%;
+  min-width: 0;
+  max-width: 10rem;
+  font-size: var(--home-label-size);
+  font-weight: 600;
+}
+
+.context-card--home .home-pirai-line .context-value--home-day {
+  flex: 0 0 auto;
+}
+
+.context-card--home .context-row--home-details > .context-row--home-restore {
+  display: flex;
+  grid-column: 1 / -1;
+  justify-content: flex-start;
+  padding-top: 0.15rem;
+}
+
+.context-card--home .home-thithi-restore {
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.3;
+  min-height: var(--touch-min);
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  white-space: normal;
+  text-align: center;
+}
+
+.context-card--home .home-thithi-restore:hover,
+.context-card--home .home-thithi-restore:focus-visible {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  outline: none;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .context-card--home .context-value--home-thithi-name,
@@ -3284,6 +3430,20 @@ body {
   .datetime-card--form-grid {
     padding: 0.7rem 0.45rem;
     border-radius: 0.65rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .context-card--home .context-row--home-details > .context-row.context-row--home-thithi:not(.context-row--jamam-pair),
+  .context-card--home .context-row--home-details > .context-row.context-row--home-day:not(.context-row--jamam-pair) {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0.15rem;
+  }
+
+  .context-card--home .context-value--home-thithi-name .home-field-select,
+  .context-card--home .home-field-select--pirai {
+    max-width: 100%;
+    width: 100%;
   }
 }
 
@@ -5389,4 +5549,285 @@ body:has(.app--find-patchi) {
 
 .anthara-dialog-overlay--home .naal-dialog--home.naal-dialog--all-birds {
   --dialog-max-width: 56rem;
+}
+
+/* Thithi Details — moon phase table (USNO). Independent of Home pirai/thithi selectors. */
+.moon-phase-card {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.moon-phase {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.85rem;
+  min-width: 0;
+}
+
+.moon-phase-today {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin: 0;
+}
+
+.moon-phase-today__label {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.moon-phase-today__date {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: baseline;
+  font-size: 1.05rem;
+  color: var(--text);
+}
+
+.moon-phase-today__iso,
+.moon-phase-table__iso {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.moon-phase-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.moon-phase-controls__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1 1 9rem;
+  min-width: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.moon-phase-controls select,
+.moon-phase-controls input,
+.moon-phase-controls__step,
+.moon-phase-retry {
+  font: inherit;
+  color: var(--text);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 0.55rem;
+  min-height: var(--touch-min);
+}
+
+.moon-phase-controls select,
+.moon-phase-controls input {
+  width: 100%;
+  padding: 0.35rem 0.55rem;
+}
+
+.moon-phase-controls__step {
+  width: var(--touch-min);
+  flex: 0 0 var(--touch-min);
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.moon-phase-controls__step:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.moon-phase-note {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.moon-phase-note--quiet {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.moon-phase-note__zone {
+  display: inline-block;
+  margin-left: 0.35rem;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.moon-phase-status {
+  margin: 0;
+  padding: 0.85rem 0.2rem;
+  color: var(--muted);
+}
+
+.moon-phase-status--error {
+  color: #b42318;
+}
+
+.moon-phase-status__detail {
+  margin: 0.35rem 0 0;
+  font-size: 0.82rem;
+  overflow-wrap: anywhere;
+}
+
+.moon-phase-retry {
+  margin-top: 0.65rem;
+  padding: 0.35rem 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--accent);
+}
+
+.moon-phase-table-wrap {
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.moon-phase-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.moon-phase-table__caption {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.moon-phase-table th,
+.moon-phase-table td {
+  border: 1px solid var(--border);
+  padding: 0.55rem 0.65rem;
+  text-align: left;
+  vertical-align: top;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.moon-phase-table thead th {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.moon-phase-table__row--today td {
+  background: rgba(196, 92, 38, 0.1);
+}
+
+.moon-phase-table__date {
+  display: block;
+  font-weight: 700;
+}
+
+.moon-phase-table__phase {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+}
+
+.moon-phase-events {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  max-width: 100%;
+}
+
+.moon-phase-event {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+@media (max-width: 640px) {
+  .moon-phase-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .moon-phase-table,
+  .moon-phase-table tbody,
+  .moon-phase-table tr,
+  .moon-phase-table td {
+    display: block;
+    width: auto;
+  }
+
+  .moon-phase-table {
+    border-collapse: separate;
+    border-spacing: 0 0.65rem;
+  }
+
+  .moon-phase-table tr {
+    border: 1px solid var(--border);
+    border-radius: 0.7rem;
+    padding: 0.35rem 0.55rem 0.5rem;
+    background: var(--bg-card);
+  }
+
+  .moon-phase-table td {
+    display: grid;
+    grid-template-columns: minmax(6.5rem, 42%) minmax(0, 1fr);
+    gap: 0.35rem 0.65rem;
+    align-items: start;
+    border: 0;
+    padding: 0.35rem 0;
+  }
+
+  .moon-phase-table td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: var(--muted);
+    overflow-wrap: anywhere;
+  }
+
+  .moon-phase-table__row--today {
+    box-shadow: inset 0 0 0 2px var(--accent);
+  }
+
+  .moon-phase-table__value {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .moon-phase-event {
+    width: auto;
+    border-radius: 0.55rem;
+  }
 }

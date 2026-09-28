@@ -22,7 +22,15 @@ export interface NavigationState {
   myPatchi: PatchiSelection;
 }
 
-const APP_VIEWS: AppView[] = ["home", "status", "schedule", "alternateSchedule", "days"];
+const APP_VIEWS: AppView[] = [
+  "home",
+  "status",
+  "schedule",
+  "alternateSchedule",
+  "thithiSchedule",
+  "thithiDetails",
+  "days",
+];
 
 const INFORMATION_SECTIONS: InformationSection[] = [
   "patchiDays",
@@ -156,7 +164,11 @@ export function saveNavigationState(state: NavigationState): void {
     params.set("daysSection", state.daysSection);
   }
 
-  if (state.view === "schedule" || state.view === "alternateSchedule") {
+  if (
+    state.view === "schedule" ||
+    state.view === "alternateSchedule" ||
+    state.view === "thithiSchedule"
+  ) {
     params.set("paksha", state.paksha);
     params.set("patchi", state.patchi);
   }
