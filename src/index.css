@@ -3016,6 +3016,7 @@ body {
 
 .context-card--home .context-row--home-thithi {
   flex-wrap: nowrap;
+  min-width: 0;
 }
 
 /* Shared label | value columns so every value shares one left edge */
@@ -3027,7 +3028,7 @@ body {
   min-width: 0;
 }
 
-.context-card--home .context-row--home-details > .context-row:not(.context-row--jamam-pair):not(.context-row--home-restore) {
+.context-card--home .context-row--home-details > .context-row:not(.context-row--jamam-pair):not(.context-row--home-restore):not(.context-row--home-pirai):not(.context-row--home-thithi) {
   display: grid;
   grid-template-columns: subgrid;
   grid-column: 1 / -1;
@@ -3035,6 +3036,37 @@ body {
   align-items: center;
   width: 100%;
   min-width: 0;
+}
+
+.context-card--home .context-row--home-details > .context-row--home-pirai {
+  display: block;
+  grid-column: 1 / -1;
+  width: 100%;
+  min-width: 0;
+  padding: 0.12rem 0 0.2rem;
+}
+
+.context-card--home .context-row--home-details > .context-row--home-thithi {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  column-gap: var(--home-label-gap);
+  grid-column: 1 / -1;
+  width: 100%;
+  min-width: 0;
+}
+
+.context-card--home .context-row--home-thithi .context-inline-item {
+  display: flex;
+  align-items: center;
+  gap: var(--home-label-gap);
+  width: 100%;
+  min-width: 0;
+}
+
+.context-card--home .context-row--home-thithi .context-label {
+  flex: 0 0 auto;
+  width: auto;
 }
 
 .context-card--home .context-row--home-details .context-inline-item,
@@ -3091,12 +3123,13 @@ body {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 0.45rem;
-  padding: 0.2rem 0.35rem;
+  padding: 0.2rem 1.6rem 0.2rem 0.45rem;
   min-height: var(--touch-min);
   max-width: 100%;
   min-width: 0;
   box-sizing: border-box;
   cursor: pointer;
+  field-sizing: content;
 }
 
 .context-card--home .home-field-select:focus {
@@ -3111,15 +3144,23 @@ body {
   max-width: 100%;
 }
 
+.context-card--home .context-value--home-thithi-name {
+  flex: 0 1 auto;
+  width: auto;
+  max-width: 100%;
+}
+
 .context-card--home .context-value--home-thithi-name .home-field-select {
-  width: 100%;
-  max-width: 12rem;
+  width: auto;
+  max-width: 100%;
+  flex-shrink: 0;
   font-size: var(--home-value-size);
   color: inherit;
 }
 
 .context-card--home .home-pirai-line {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.45rem;
   min-width: 0;
@@ -3127,16 +3168,17 @@ body {
 }
 
 .context-card--home .home-field-select--pirai {
-  flex: 1 1 0;
-  width: 100%;
+  flex: 0 0 auto;
+  width: auto;
   min-width: 0;
-  max-width: 10rem;
+  max-width: 100%;
   font-size: var(--home-label-size);
   font-weight: 600;
 }
 
 .context-card--home .home-pirai-line .context-value--home-day {
   flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .context-card--home .context-row--home-details > .context-row--home-restore {
@@ -3369,7 +3411,7 @@ body {
     padding: 0.22rem 0;
   }
 
-  .context-card--home .context-row--home-day {
+  .context-card--home .context-row--home-pirai {
     gap: 0;
   }
 
@@ -3434,16 +3476,9 @@ body {
 }
 
 @media (max-width: 480px) {
-  .context-card--home .context-row--home-details > .context-row.context-row--home-thithi:not(.context-row--jamam-pair),
-  .context-card--home .context-row--home-details > .context-row.context-row--home-day:not(.context-row--jamam-pair) {
-    grid-template-columns: minmax(0, 1fr);
-    row-gap: 0.15rem;
-  }
-
   .context-card--home .context-value--home-thithi-name .home-field-select,
   .context-card--home .home-field-select--pirai {
     max-width: 100%;
-    width: 100%;
   }
 }
 

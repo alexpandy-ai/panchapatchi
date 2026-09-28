@@ -116,7 +116,7 @@ export const UI = {
   natchathira: bi("நட்சத்திரம்", "Natchathira"),
   thithi: bi("திதி", "Thithi"),
   pirai: bi("பிறை", "Pirai"),
-  restoreCalculated: bi("கணக்கிட்டதை மீட்டமை", "Restore calculated"),
+  restoreCalculated: bi("மீட்டமை", "Refresh"),
   nightThithi: bi("இரவு திதி", "Night Thithi"),
   theipiraiPlanets: bi("தேய்பிறை கிரகம்", "Theipirai planet"),
   valarpiraiPlanets: bi("வளர்பிறை கிரகம்", "Valarpirai planet"),

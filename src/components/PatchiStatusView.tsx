@@ -631,6 +631,36 @@ export function PatchiStatusView({
             </div>
 
             <div className="context-row--home-details">
+              <div className="context-row context-row--home-pirai">
+                <label className="visually-hidden" htmlFor="home-pirai-select">
+                  <BilingualText text={UI.pirai} block={false} />
+                </label>
+                <span className="home-pirai-line">
+                  <select
+                    id="home-pirai-select"
+                    className="home-field-select home-field-select--pirai"
+                    value={currentPakshaId}
+                    onChange={(event) => {
+                      const nextPaksha = event.target.value;
+                      if (nextPaksha !== "valarpirai" && nextPaksha !== "theipirai") return;
+                      selectHomePiraiThithi(nextPaksha, thithiPatchiEntry.thithiNumber);
+                    }}
+                  >
+                    <option value="valarpirai">
+                      {pickBilingual(PAKSHA_BI.valarpirai, language)}
+                    </option>
+                    <option value="theipirai">
+                      {pickBilingual(PAKSHA_BI.theipirai, language)}
+                    </option>
+                  </select>
+                  <span className="context-value context-value--home-day">
+                    <BilingualText
+                      text={athikaraPatchiDay ?? thithiPatchiEntry.day}
+                      block={false}
+                    />
+                  </span>
+                </span>
+              </div>
               <div className="context-row context-row--home-thithi">
                 <span className="context-inline-item">
                   <label className="context-label" htmlFor="home-thithi-select">
@@ -663,38 +693,6 @@ export function PatchiStatusView({
                         );
                       })}
                     </select>
-                  </span>
-                </span>
-              </div>
-              <div className="context-row context-row--home-day">
-                <label className="context-label" htmlFor="home-pirai-select">
-                  <BilingualText text={UI.pirai} block={false} />
-                </label>
-                <span className="context-value context-value--home-pirai">
-                  <span className="home-pirai-line">
-                    <select
-                      id="home-pirai-select"
-                      className="home-field-select home-field-select--pirai"
-                      value={currentPakshaId}
-                      onChange={(event) => {
-                        const nextPaksha = event.target.value;
-                        if (nextPaksha !== "valarpirai" && nextPaksha !== "theipirai") return;
-                        selectHomePiraiThithi(nextPaksha, thithiPatchiEntry.thithiNumber);
-                      }}
-                    >
-                      <option value="valarpirai">
-                        {pickBilingual(PAKSHA_BI.valarpirai, language)}
-                      </option>
-                      <option value="theipirai">
-                        {pickBilingual(PAKSHA_BI.theipirai, language)}
-                      </option>
-                    </select>
-                    <span className="context-value context-value--home-day">
-                      <BilingualText
-                        text={athikaraPatchiDay ?? thithiPatchiEntry.day}
-                        block={false}
-                      />
-                    </span>
                   </span>
                 </span>
               </div>
