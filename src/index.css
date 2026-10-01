@@ -5867,23 +5867,42 @@ body:has(.app--find-patchi) {
 
 .moon-phase-controls {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: row;
+  flex-wrap: nowrap;
   align-items: flex-end;
-  gap: 0.5rem;
+  gap: 0.35rem;
   min-width: 0;
   max-width: 100%;
+  box-sizing: border-box;
 }
 
 .moon-phase-controls__field {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  flex: 1 1 12rem;
-  min-width: min(100%, 12rem);
-  max-width: 100%;
-  font-size: 0.78rem;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.moon-phase-controls__field--month {
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+.moon-phase-controls__field--year {
+  flex: 0 0 4.25rem;
+  min-width: 0;
+  max-width: 4.85rem;
+}
+
+.moon-phase-controls__label {
+  display: block;
+  font-size: 0.76rem;
   font-weight: 700;
+  line-height: 1.25;
   color: var(--stellarium-accent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .moon-phase-controls select,
@@ -5894,16 +5913,54 @@ body:has(.app--find-patchi) {
   color: var(--stellarium-text);
   background: var(--stellarium-surface);
   border: 1px solid var(--stellarium-border);
-  border-radius: 0.55rem;
-  min-height: var(--touch-min);
-  box-shadow: inset 0 2px 0 var(--stellarium-accent);
+  border-radius: 0.5rem;
+  box-sizing: border-box;
 }
 
 .moon-phase-controls select,
+.moon-phase-controls input,
+.moon-phase-controls__step {
+  height: 2.25rem;
+  min-height: 2.25rem;
+}
+
+.moon-phase-controls select {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding: 0.25rem 1.35rem 0.25rem 0.45rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.35;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='none' stroke='%231c1c1c' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' d='M1 1l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.45rem center;
+  background-size: 10px 6px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
 .moon-phase-controls input {
   width: 100%;
   max-width: 100%;
-  padding: 0.35rem 1.6rem 0.35rem 0.55rem;
+  min-width: 0;
+  padding: 0.25rem 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.moon-phase-controls input::-webkit-inner-spin-button,
+.moon-phase-controls input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .moon-phase-controls select:focus,
@@ -5916,12 +5973,17 @@ body:has(.app--find-patchi) {
 }
 
 .moon-phase-controls__step {
-  width: var(--touch-min);
-  flex: 0 0 var(--touch-min);
-  font-size: 1.35rem;
-  line-height: 1;
-  cursor: pointer;
+  flex: 0 0 2.25rem;
+  width: 2.25rem;
+  min-width: 2.25rem;
   padding: 0;
+  font-size: 1.25rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
 }
 
 .moon-phase-controls__step:hover:not(:disabled),
@@ -5937,6 +5999,68 @@ body:has(.app--find-patchi) {
   border-color: var(--stellarium-border);
   box-shadow: none;
   cursor: not-allowed;
+  opacity: 0.6;
+}
+
+@media (max-width: 360px) {
+  .moon-phase {
+    padding: 0.65rem 0.4rem;
+  }
+
+  .moon-phase-controls {
+    gap: 0.25rem;
+  }
+
+  .moon-phase-controls__step {
+    flex: 0 0 2rem;
+    width: 2rem;
+    min-width: 2rem;
+  }
+
+  .moon-phase-controls__field--year {
+    flex: 0 0 3.85rem;
+    max-width: 4.1rem;
+  }
+
+  .moon-phase-controls select {
+    padding: 0.25rem 1.2rem 0.25rem 0.35rem;
+    font-size: 0.8rem;
+    background-position: right 0.35rem center;
+  }
+
+  .moon-phase-controls input {
+    padding: 0.25rem 0.2rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (min-width: 641px) {
+  .moon-phase-controls {
+    gap: 0.5rem;
+  }
+
+  .moon-phase-controls__field--month {
+    flex: 0 1 12rem;
+    max-width: 14rem;
+  }
+
+  .moon-phase-controls__field--year {
+    flex: 0 0 5rem;
+    max-width: 5.5rem;
+  }
+
+  .moon-phase-controls select,
+  .moon-phase-controls input,
+  .moon-phase-controls__step {
+    height: 2.35rem;
+    min-height: 2.35rem;
+  }
+
+  .moon-phase-controls__step {
+    flex: 0 0 2.35rem;
+    width: 2.35rem;
+    min-width: 2.35rem;
+  }
 }
 
 .moon-phase-note {

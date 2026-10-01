@@ -154,8 +154,10 @@ export function ThithiDetailsView() {
           >
             ‹
           </button>
-          <label className="moon-phase-controls__field">
-            <BilingualText text={MOON_UI.month} />
+          <label className="moon-phase-controls__field moon-phase-controls__field--month">
+            <span className="moon-phase-controls__label">
+              <BilingualText text={MOON_UI.month} />
+            </span>
             <select
               id="moon-phase-month"
               value={month}
@@ -168,8 +170,10 @@ export function ThithiDetailsView() {
               ))}
             </select>
           </label>
-          <label className="moon-phase-controls__field">
-            <BilingualText text={MOON_UI.year} />
+          <label className="moon-phase-controls__field moon-phase-controls__field--year">
+            <span className="moon-phase-controls__label">
+              <BilingualText text={MOON_UI.year} />
+            </span>
             <input
               id="moon-phase-year"
               type="number"
