@@ -285,18 +285,6 @@ export const MENU_ITEMS: AppMenuItem[] = [
     label: bi("முகப்பு", "Home"),
   },
   {
-    id: "status",
-    label: bi("பட்சி அறிக", "Find Patchi"),
-  },
-  {
-    id: "schedule",
-    label: bi("பட்சி அட்டவணை", "Patchi Schedule"),
-  },
-  {
-    id: "alternateSchedule",
-    label: bi("நாள் அட்டவணை", "Day Scheduler"),
-  },
-  {
     id: "thithiSchedule",
     label: bi("திதி அட்டவணை", "Thithi Schedule"),
     children: [
@@ -317,6 +305,18 @@ export const MENU_ITEMS: AppMenuItem[] = [
       id: section.id,
       label: section.label,
     })),
+  },
+  {
+    id: "status",
+    label: bi("பட்சி அறிக", "Find Patchi"),
+  },
+  {
+    id: "schedule",
+    label: bi("பட்சி அட்டவணை", "Patchi Schedule"),
+  },
+  {
+    id: "alternateSchedule",
+    label: bi("நாள் அட்டவணை", "Day Scheduler"),
   },
 ];
 

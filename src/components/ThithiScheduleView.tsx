@@ -22,6 +22,7 @@ export function ThithiScheduleView({ selectedDateTime, subtitle }: ThithiSchedul
         onSelectPatchi={setSelectedPatchi}
         selectedDateTime={selectedDateTime}
         subtitle={subtitle}
+        rowHeading="thithi"
       />
     </div>
   );

@@ -1,16 +1,54 @@
 :root {
-  --bg: #f5f0e8;
-  --bg-card: #ffffff;
-  --border: rgba(45, 35, 25, 0.12);
-  --text: #2d2318;
-  --muted: #6b5f52;
-  --accent: #c45c26;
-  --accent-soft: rgba(196, 92, 38, 0.12);
-  --app-header-offset: 3.5rem;
+  --gold: #ffbc0d;
+  --red: #db0007;
+  --red-deep: #a80005;
+  --white: #ffffff;
+  --cream: #fff7de;
+  --panel-yellow: #ffe8a3;
+  --ink: #1c1c1c;
+  --burgundy: var(--ink);
+  --ruby: var(--red);
+  --ivory: var(--cream);
+  --surface: var(--white);
+  --rose: var(--panel-yellow);
+  --bg-panel: var(--panel-yellow);
+  --bg: var(--white);
+  --bg-card: var(--white);
+  --border: rgba(28, 28, 28, 0.14);
+  --text: var(--ink);
+  --muted: #4a433a;
+  --accent: var(--ink);
+  --accent-strong: var(--red-deep);
+  --accent-soft: var(--cream);
+  --stellarium-text: var(--ink);
+  --stellarium-surface: var(--white);
+  --stellarium-wash: var(--cream);
+  --stellarium-blush: var(--rose);
+  --stellarium-accent: var(--ink);
+  --stellarium-on-accent: var(--white);
+  --stellarium-border: var(--border);
+  --stellarium-muted: var(--muted);
+  --gold-soft: #ffe8a3;
+  --chip-bg: var(--white);
+  --chip-text: var(--ink);
+  --chip-border: rgba(28, 28, 28, 0.16);
+  --chip-radius: 999px;
+  --chip-hover-bg: var(--gold-soft);
+  --chip-hover-text: var(--ink);
+  --chip-hover-border: var(--chip-border);
+  --chip-active-bg: var(--gold);
+  --chip-active-text: var(--ink);
+  --chip-active-border: var(--chip-border);
+  --chip-focus: var(--ink);
+  --chip-disabled-bg: var(--cream);
+  --chip-disabled-text: var(--muted);
+  --chip-disabled-border: var(--border);
+  --chip-mark: var(--gold);
+  --app-header-offset: 3.75rem;
   --app-max-width: 1100px;
   --touch-min: 44px;
-  --page-pad-x: 1rem;
-  --page-pad-y: 1.5rem;
+  --page-pad-x: 1.25rem;
+  --page-pad-y: 1.75rem;
 }
 
 *,
@@ -42,7 +80,8 @@ video {
 }
 
 body {
-  font-family: "Noto Sans Tamil", system-ui, sans-serif;
+  font-family: "Source Sans 3", "Noto Sans Tamil", system-ui, sans-serif;
+  letter-spacing: 0.01em;
   background: var(--bg);
   color: var(--text);
   line-height: 1.6;
@@ -65,7 +104,8 @@ body {
   margin-bottom: 1.25rem;
   padding-top: 0.25rem;
   padding-bottom: 0.35rem;
-  background: var(--bg);
+  background: var(--white);
+  border-bottom: 1px solid rgba(28, 28, 28, 0.08);
 }
 
 .header__toolbar {
@@ -91,9 +131,10 @@ body {
 }
 
 .header-home-btn--active {
-  background: var(--accent-soft);
-  border-color: var(--accent);
-  color: var(--accent);
+  background: var(--white);
+  border-color: transparent;
+  color: var(--ink);
+  box-shadow: inset 0 -3px 0 var(--gold);
 }
 
 .header__actions {
@@ -128,7 +169,7 @@ body {
   color: var(--text);
   cursor: pointer;
   transition: all 0.15s;
-  box-shadow: 0 2px 8px rgba(45, 35, 25, 0.06);
+  box-shadow: 0 2px 8px rgba(32, 40, 59, 0.06);
 }
 
 .app-menu__toggle:hover,
@@ -147,7 +188,7 @@ body {
   position: fixed;
   inset: 0;
   border: none;
-  background: rgba(45, 35, 25, 0.35);
+  background: rgba(32, 40, 59, 0.35);
   cursor: pointer;
   z-index: 80;
 }
@@ -158,9 +199,9 @@ body {
   right: 0;
   width: min(18rem, 88vw);
   height: 100vh;
-  background: var(--bg-card);
+  background: var(--cream);
   border-left: 1px solid var(--border);
-  box-shadow: -8px 0 24px rgba(45, 35, 25, 0.12);
+  box-shadow: -8px 0 24px rgba(32, 40, 59, 0.12);
   z-index: 90;
   display: flex;
   flex-direction: column;
@@ -234,10 +275,6 @@ body {
   gap: 0.5rem;
 }
 
-.app-menu__item--open {
-  border-color: var(--accent);
-}
-
 .app-menu__chevron {
   width: 1.1rem;
   height: 1.1rem;
@@ -266,24 +303,47 @@ body {
   width: 100%;
   text-align: left;
   font-family: inherit;
-  border: 1px solid var(--border);
+  border: 1px solid var(--chip-border);
   border-radius: 0.75rem;
-  background: var(--bg);
+  background: var(--chip-bg);
+  color: var(--chip-text);
+  box-shadow: inset 0 2px 0 var(--chip-mark);
   padding: 0.75rem 0.85rem;
   min-height: var(--touch-min);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: background 300ms ease, color 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
 }
 
 .app-menu__item:hover {
-  border-color: var(--accent);
-  background: var(--accent-soft);
+  border-color: var(--chip-hover-border);
+  background: var(--chip-hover-bg);
+  color: var(--chip-hover-text);
+}
+
+.app-menu__item--open {
+  border-color: var(--chip-hover-border);
+  background: var(--chip-hover-bg);
+  color: var(--chip-hover-text);
 }
 
 .app-menu__item--active {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: #fff;
+  border-color: var(--chip-active-border);
+  background: var(--chip-active-bg);
+  color: var(--chip-active-text);
+  box-shadow: inset 0 -3px 0 var(--gold);
+}
+
+.app-menu__item:focus-visible {
+  outline: 2px solid var(--chip-focus);
+  outline-offset: 2px;
+}
+
+.app-menu__item:disabled {
+  background: var(--chip-disabled-bg);
+  color: var(--chip-disabled-text);
+  border-color: var(--chip-disabled-border);
+  box-shadow: none;
+  cursor: not-allowed;
 }
 
 .app-menu__item-label {
@@ -335,24 +395,41 @@ body {
 .sheet-picker__btn {
   font-family: inherit;
   text-align: left;
-  border: 1px solid var(--border);
+  border: 1px solid var(--chip-border);
   border-radius: 0.75rem;
-  background: var(--bg);
+  background: var(--chip-bg);
+  color: var(--chip-text);
+  box-shadow: inset 0 2px 0 var(--chip-mark);
   padding: 0.7rem 0.8rem;
   min-height: var(--touch-min);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: background 300ms ease, color 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
 }
 
 .sheet-picker__btn:hover {
-  border-color: var(--accent);
-  background: var(--accent-soft);
+  border-color: var(--chip-hover-border);
+  background: var(--chip-hover-bg);
+  color: var(--chip-hover-text);
 }
 
 .sheet-picker__btn--active {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: #fff;
+  border-color: var(--chip-active-border);
+  background: var(--chip-active-bg);
+  color: var(--chip-active-text);
+  box-shadow: inset 0 -3px 0 var(--gold);
+}
+
+.sheet-picker__btn:focus-visible {
+  outline: 2px solid var(--chip-focus);
+  outline-offset: 2px;
+}
+
+.sheet-picker__btn:disabled {
+  background: var(--chip-disabled-bg);
+  color: var(--chip-disabled-text);
+  border-color: var(--chip-disabled-border);
+  box-shadow: none;
+  cursor: not-allowed;
 }
 
 .sheet-picker__label {
@@ -405,7 +482,7 @@ body {
   margin: 0 auto;
   border-radius: 0.75rem;
   border: 1px solid var(--border);
-  box-shadow: 0 2px 12px rgba(45, 35, 25, 0.08);
+  box-shadow: 0 2px 12px rgba(32, 40, 59, 0.08);
 }
 
 .schedule-table-card {
@@ -512,7 +589,7 @@ body {
   color: var(--accent);
   padding: 0.75rem 0.85rem;
   border-bottom: 1px solid var(--border);
-  background: var(--accent-soft);
+  background: var(--white);
 }
 
 .schedule-table-wrap {
@@ -530,7 +607,7 @@ body {
 .schedule-table th,
 .schedule-table td {
   border-bottom: 1px solid var(--border);
-  padding: 0.5pt;
+  padding: 0.45rem 0.4rem;
   text-align: left;
 }
 
@@ -538,7 +615,7 @@ body {
   font-size: 0.78rem;
   font-weight: 700;
   color: var(--muted);
-  background: rgba(45, 35, 25, 0.03);
+  background: rgba(32, 40, 59, 0.03);
 }
 
 .schedule-table__row--active {
@@ -575,7 +652,7 @@ body {
   font-size: 0.8rem;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
-  background: rgba(45, 35, 25, 0.03);
+  background: rgba(32, 40, 59, 0.03);
 }
 
 .schedule-grid-table__row--active .sheet-table__yama {
@@ -584,7 +661,7 @@ body {
 }
 
 .schedule-grid-table__cell--period {
-  background: rgba(196, 92, 38, 0.08);
+  background: color-mix(in srgb, var(--rose) 72%, white);
 }
 
 .schedule-grid-table__cell--current {
@@ -608,7 +685,7 @@ body {
 
 .activity-table__row--current td {
   background: var(--accent-soft);
-  border-color: rgba(196, 92, 38, 0.35);
+  border-color: color-mix(in srgb, var(--burgundy) 35%, transparent);
   font-weight: 700;
 }
 
@@ -744,18 +821,18 @@ body {
 }
 
 .patchi-pivot-table__col--active {
-  background: rgba(196, 92, 38, 0.12);
+  background: var(--rose);
   color: var(--accent);
 }
 
 .patchi-pivot-table__row--today .patchi-pivot-table__day {
-  background: rgba(196, 92, 38, 0.14);
+  background: var(--rose);
   color: var(--accent);
   font-weight: 700;
 }
 
 .patchi-pivot-table__row--today td:not(.patchi-pivot-table__day) {
-  background: rgba(196, 92, 38, 0.06);
+  background: color-mix(in srgb, var(--rose) 65%, white);
 }
 
 .patchi-pivot-table__today-badge {
@@ -772,7 +849,7 @@ body {
 }
 
 .patchi-pivot-table__row--current td:not(.patchi-pivot-table__day) {
-  background: rgba(196, 92, 38, 0.05);
+  background: color-mix(in srgb, var(--rose) 55%, white);
 }
 
 .patchi-pivot-table td {
@@ -797,8 +874,8 @@ body {
 }
 
 .patchi-pivot-table__cell--selected {
-  background: rgba(196, 92, 38, 0.1);
-  box-shadow: inset 0 0 0 2px rgba(196, 92, 38, 0.35);
+  background: var(--rose);
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--burgundy) 35%, transparent);
 }
 
 .patchi-pivot-table__cell-btn {
@@ -821,7 +898,7 @@ body {
 
 .patchi-pivot-table__detail-row td {
   padding: 0;
-  background: rgba(196, 92, 38, 0.04);
+  background: color-mix(in srgb, var(--rose) 50%, white);
   border-top: 0;
 }
 
@@ -839,7 +916,7 @@ body {
   margin-bottom: 0.15rem;
   padding: 0.22rem 0.28rem;
   border-radius: 0.35rem;
-  background: rgba(196, 92, 38, 0.1);
+  background: var(--rose);
 }
 
 .jamam-segments-panel__title {
@@ -893,7 +970,7 @@ body {
   padding: 0.12rem 0.14rem;
   border: 1px solid var(--border);
   border-radius: 0.35rem;
-  background: rgba(196, 92, 38, 0.04);
+  background: color-mix(in srgb, var(--rose) 50%, white);
   font-size: 0.68rem;
   line-height: 1.15;
 }
@@ -956,7 +1033,7 @@ body {
 }
 
 .jamam-segments-table th {
-  background: rgba(196, 92, 38, 0.12);
+  background: var(--rose);
   font-weight: 700;
   color: var(--text);
   font-size: 0.66rem;
@@ -1219,7 +1296,7 @@ body {
 .jamam-segments-table--matrix thead .jamam-segments-table__segment-time-col,
 .jamam-segments-table--matrix thead .jamam-segments-table__segment-previous-col {
   z-index: 2;
-  background: rgba(196, 92, 38, 0.12);
+  background: var(--rose);
 }
 
 .jamam-segments-table__jamam-label {
@@ -1244,7 +1321,7 @@ body {
 }
 
 .jamam-segments-table__col--highlight {
-  background: rgba(196, 92, 38, 0.08);
+  background: color-mix(in srgb, var(--rose) 72%, white);
 }
 
 .jamam-segments-table__row--highlight th.jamam-segments-table__patchi-col,
@@ -1252,12 +1329,12 @@ body {
 .jamam-segments-table__row--highlight th.jamam-segments-table__segment-number-col,
 .jamam-segments-table__row--highlight td.jamam-segments-table__segment-time-col,
 .jamam-segments-table__row--highlight td.jamam-segments-table__segment-previous-col {
-  background: rgba(196, 92, 38, 0.1);
+  background: var(--rose);
 }
 
 .jamam-segments-table__row--previous th.jamam-segments-table__patchi-col,
 .jamam-segments-table__row--previous td {
-  background: rgba(196, 92, 38, 0.04);
+  background: color-mix(in srgb, var(--rose) 50%, white);
   border-bottom: 1px solid var(--border);
 }
 
@@ -1288,7 +1365,7 @@ body {
 }
 
 .jamam-segments-table__cell--highlight {
-  background: rgba(196, 92, 38, 0.18);
+  background: var(--rose);
   font-weight: 700;
 }
 
@@ -1336,34 +1413,51 @@ body {
   padding: 0.45rem 0.7rem;
   min-height: var(--touch-min);
   border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  color: var(--text);
+  border: 1px solid var(--chip-border);
+  background: var(--chip-bg);
+  color: var(--chip-text);
+  box-shadow: inset 0 2px 0 var(--chip-mark);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: background 300ms ease, color 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
   white-space: normal;
   overflow-wrap: anywhere;
   max-width: 100%;
 }
 
 .patchi-submenu__btn:hover {
-  border-color: var(--accent);
-  background: var(--accent-soft);
+  border-color: var(--chip-hover-border);
+  background: var(--chip-hover-bg);
+  color: var(--chip-hover-text);
 }
 
-.patchi-submenu__btn--active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
+.patchi-submenu__btn--active,
+.patchi-submenu__btn[aria-pressed="true"] {
+  background: var(--chip-active-bg);
+  border-color: var(--chip-active-border);
+  color: var(--chip-active-text);
+  box-shadow: inset 0 -3px 0 var(--gold);
 }
 
+.patchi-submenu__btn:focus-visible {
+  outline: 2px solid var(--chip-focus);
+  outline-offset: 2px;
+}
+
+.patchi-submenu__btn:disabled,
 .patchi-submenu__btn--readonly {
+  background: var(--chip-disabled-bg);
+  color: var(--chip-disabled-text);
+  border-color: var(--chip-disabled-border);
+  box-shadow: none;
   cursor: default;
   pointer-events: none;
 }
 
 .athikara-row__chips--derived .patchi-submenu__btn:not(.patchi-submenu__btn--active) {
-  opacity: 0.45;
+  background: var(--chip-disabled-bg);
+  color: var(--chip-disabled-text);
+  border-color: var(--chip-disabled-border);
+  box-shadow: none;
 }
 
 .patchi-picker-sections {
@@ -1388,7 +1482,7 @@ body {
   border: 1px solid var(--border);
   border-radius: 0.65rem;
   background: var(--bg-card);
-  box-shadow: 0 1px 0 rgba(45, 35, 25, 0.04);
+  box-shadow: 0 1px 0 rgba(32, 40, 59, 0.04);
 }
 
 .patchi-picker-block__title {
@@ -1653,6 +1747,78 @@ body {
   color: var(--muted);
 }
 
+.alternate-all-chip-table--thithi {
+  --thithi-col-width: 7.25rem;
+}
+
+.alternate-all-chip-table--thithi .alternate-all-chip-table__thithi-col {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  width: var(--thithi-col-width);
+  min-width: var(--thithi-col-width);
+  background: var(--rose);
+  color: var(--burgundy);
+  font-weight: 700;
+  text-align: center;
+  vertical-align: middle;
+  white-space: normal;
+  line-height: 1.35;
+  padding: 0.55rem 0.4rem;
+}
+
+.alternate-all-chip-table__thithi-names {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+}
+
+.alternate-all-chip-table__thithi-name {
+  display: block;
+  white-space: nowrap;
+  line-height: 1.35;
+}
+
+.alternate-all-chip-table--thithi thead .alternate-all-chip-table__thithi-col--head {
+  z-index: 7;
+  background: var(--surface);
+  color: var(--burgundy);
+}
+
+.alternate-all-chip-table--thithi tbody .patchi-pivot-table__day,
+.alternate-all-chip-table--thithi tbody .alternate-all-chip-table__period-label {
+  left: var(--thithi-col-width);
+}
+
+.alternate-all-chip-table--thithi .alternate-all-chip-table__thithi-col .bi-ta {
+  display: block;
+  font-weight: 700;
+}
+
+.alternate-all-chip-table--thithi .alternate-all-chip-table__thithi-col .bi-en {
+  display: block;
+  margin-top: 0.12rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted);
+  line-height: 1.25;
+}
+
+.schedule-table-card--alternate .alternate-valarpirai-all-chip--thithi .patchi-pivot-table thead th {
+  position: relative;
+  top: auto;
+  z-index: 6;
+  background: var(--surface);
+}
+
+.alternate-valarpirai-all-chip--thithi .alternate-all-chip-table__sticky-head {
+  position: relative;
+  z-index: 6;
+  background: var(--surface);
+}
+
 .alternate-all-chip-table__period-spacer {
   padding: 0.35rem 0.5rem;
   background: color-mix(in srgb, var(--border) 35%, transparent);
@@ -1724,6 +1890,23 @@ body {
 
   .alternate-all-chip-table tbody .patchi-pivot-table__day .bi-en,
   .alternate-all-chip-table thead .alternate-all-chip-table__activity-col .bi-en {
+    display: none;
+  }
+
+  .alternate-all-chip-table--thithi {
+    --thithi-col-width: 6.6rem;
+  }
+
+  .alternate-all-chip-table--thithi .alternate-all-chip-table__thithi-col {
+    padding: 0.4rem 0.3rem;
+    font-size: 0.82rem;
+  }
+
+  .alternate-all-chip-table__thithi-names {
+    gap: 0.35rem;
+  }
+
+  .alternate-all-chip-table--thithi .alternate-all-chip-table__thithi-col .bi-en {
     display: none;
   }
 
@@ -1885,23 +2068,31 @@ body {
   min-height: var(--touch-min);
   padding: 0;
   border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  color: var(--text);
+  border: 1px solid var(--chip-border);
+  background: var(--chip-bg);
+  color: var(--chip-text);
+  box-shadow: inset 0 2px 0 var(--chip-mark);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: background 300ms ease, color 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
   white-space: nowrap;
 }
 
 .language-toggle__btn:hover {
-  border-color: var(--accent);
-  background: var(--accent-soft);
+  border-color: var(--chip-hover-border);
+  background: var(--chip-hover-bg);
+  color: var(--chip-hover-text);
 }
 
 .language-toggle__btn--active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
+  background: var(--chip-active-bg);
+  border-color: var(--chip-active-border);
+  color: var(--chip-active-text);
+  box-shadow: inset 0 2px 0 var(--stellarium-on-accent);
+}
+
+.language-toggle__btn:focus-visible {
+  outline: 2px solid var(--chip-focus);
+  outline-offset: 2px;
 }
 
 .sub {
@@ -1915,7 +2106,7 @@ body {
   border-radius: 1rem;
   padding: 1rem 1.15rem;
   margin-bottom: 1.25rem;
-  box-shadow: 0 2px 12px rgba(45, 35, 25, 0.06);
+  box-shadow: 0 2px 12px rgba(32, 40, 59, 0.06);
   width: 100%;
   max-width: 100%;
   min-width: 0;
@@ -2065,7 +2256,8 @@ body {
 
 .datetime-field__place-suggestion:hover,
 .datetime-field__place-suggestion.is-active {
-  background: rgba(167, 139, 250, 0.12);
+  background: var(--rose);
+  color: var(--ink);
 }
 
 .datetime-field__sunrise-value {
@@ -2158,9 +2350,9 @@ body {
 }
 
 .datetime-card__permission--off {
-  color: #a33b2b;
-  border-color: color-mix(in srgb, #a33b2b 45%, var(--border));
-  background: color-mix(in srgb, #a33b2b 10%, var(--bg-card));
+  color: var(--red);
+  border-color: color-mix(in srgb, var(--red) 45%, var(--border));
+  background: color-mix(in srgb, var(--red) 10%, var(--bg-card));
 }
 
 .datetime-card__permission:hover {
@@ -2290,7 +2482,7 @@ body {
   border: 1px solid var(--border);
   border-radius: 1rem;
   padding: 1rem;
-  box-shadow: 0 2px 12px rgba(45, 35, 25, 0.06);
+  box-shadow: 0 2px 12px rgba(32, 40, 59, 0.06);
   min-width: 0;
   max-width: 100%;
   overflow-x: clip;
@@ -2303,7 +2495,7 @@ body {
 }
 
 .status--error {
-  color: #b42318;
+  color: var(--red);
 }
 
 .sheet-table-wrap {
@@ -2442,7 +2634,7 @@ body {
 
 .days-view .sheet-table.natchathira-patchi-table .natchathira-patchi-table__patchi {
   font-weight: 700;
-  background: rgba(196, 92, 38, 0.06);
+  background: color-mix(in srgb, var(--rose) 65%, white);
 }
 
 .days-view .sheet-table.natchathira-patchi-table .natchathira-patchi-table__patchi .inline-emoji-label {
@@ -2484,11 +2676,11 @@ body {
 }
 
 .thithi-patchi-table__row--current td {
-  background: rgba(196, 92, 38, 0.12);
+  background: var(--rose);
 }
 
 .thithi-patchi-table__cell--current {
-  background: rgba(196, 92, 38, 0.12);
+  background: var(--rose);
 }
 
 .thithi-patchi-table__thithi-item--current {
@@ -2538,7 +2730,7 @@ body {
 .sheet-table th,
 .sheet-table td {
   border: 1px solid var(--border);
-  padding: 0.5pt;
+  padding: 0.45rem 0.4rem;
   text-align: center;
   vertical-align: middle;
 }
@@ -2556,7 +2748,7 @@ body {
 .sheet-table__group {
   font-weight: 700;
   font-size: 1.05rem;
-  background: var(--accent-soft);
+  background: var(--white);
   color: var(--accent);
   vertical-align: top;
 }
@@ -2584,7 +2776,7 @@ body {
 }
 
 .sheet-table__yama-row--active td {
-  background: rgba(196, 92, 38, 0.12);
+  background: var(--rose);
 }
 
 .sheet-table__yama-row--active .sheet-table__yama {
@@ -2595,7 +2787,7 @@ body {
 .sheet-table__yama {
   font-weight: 600;
   white-space: nowrap;
-  background: rgba(45, 35, 25, 0.03);
+  background: rgba(32, 40, 59, 0.03);
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
@@ -2610,13 +2802,13 @@ body {
   background: var(--bg);
   font-weight: 700;
   color: var(--muted);
-  padding: 0.5pt;
+  padding: 0.45rem 0.4rem;
   text-align: center;
   vertical-align: middle;
 }
 
 .sheet-table__section-header-row .sheet-table__period-header {
-  background: rgba(45, 35, 25, 0.03);
+  background: rgba(32, 40, 59, 0.03);
   white-space: nowrap;
 }
 
@@ -2680,8 +2872,8 @@ body {
 
   :root {
     --app-header-offset: 3.75rem;
-    --page-pad-x: 0.65rem;
-    --page-pad-y: 1rem;
+    --page-pad-x: 0.85rem;
+    --page-pad-y: 1.15rem;
   }
 }
 
@@ -2978,7 +3170,7 @@ body {
 
 .context-card--home {
   --home-label-width: 7.25rem;
-  --home-label-gap: 0.5rem;
+  --home-label-gap: 1.15rem;
   --home-label-size: 0.88rem;
   --home-value-size: 1.02rem;
   padding: 0.85rem 0.9rem;
@@ -3024,6 +3216,7 @@ body {
   display: grid;
   grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
   column-gap: var(--home-label-gap);
+  row-gap: 0.55rem;
   align-items: center;
   min-width: 0;
 }
@@ -3038,30 +3231,20 @@ body {
   min-width: 0;
 }
 
-.context-card--home .context-row--home-details > .context-row--home-pirai {
-  display: block;
-  grid-column: 1 / -1;
-  width: 100%;
-  min-width: 0;
-  padding: 0.12rem 0 0.2rem;
-}
-
+.context-card--home .context-row--home-details > .context-row--home-pirai,
 .context-card--home .context-row--home-details > .context-row--home-thithi {
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  column-gap: var(--home-label-gap);
+  display: grid;
+  grid-template-columns: subgrid;
   grid-column: 1 / -1;
+  align-items: center;
   width: 100%;
   min-width: 0;
+  padding: 0.2rem 0;
 }
 
+.context-card--home .home-pirai-line,
 .context-card--home .context-row--home-thithi .context-inline-item {
-  display: flex;
-  align-items: center;
-  gap: var(--home-label-gap);
-  width: 100%;
-  min-width: 0;
+  display: contents;
 }
 
 .context-card--home .context-row--home-thithi .context-label {
@@ -3116,17 +3299,25 @@ body {
 }
 
 .context-card--home .home-field-select {
+  appearance: none;
   font-family: inherit;
+  font-size: 0.8rem;
   font-weight: 700;
-  line-height: 1.3;
-  color: var(--text);
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 0.45rem;
-  padding: 0.2rem 1.6rem 0.2rem 0.45rem;
+  line-height: 1.35;
+  color: var(--ink);
+  background-color: var(--white);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%231c1c1c' d='M1.4.8 6 5.4 10.6.8 12 2.2 6 8 0 2.2z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  border: 1px solid rgba(28, 28, 28, 0.16);
+  border-radius: 999px;
+  box-shadow: inset 0 -3px 0 var(--gold);
+  padding: 0.35rem 1.9rem 0.35rem 0.85rem;
   min-height: var(--touch-min);
+  width: max-content;
   max-width: 100%;
-  min-width: 0;
+  min-width: 7.75rem;
+  justify-self: start;
   box-sizing: border-box;
   cursor: pointer;
   field-sizing: content;
@@ -3138,47 +3329,25 @@ body {
 }
 
 .context-card--home .context-value--home-thithi-name {
-  justify-self: stretch;
-  width: 100%;
-  min-width: 0;
-  max-width: 100%;
-}
-
-.context-card--home .context-value--home-thithi-name {
-  flex: 0 1 auto;
+  justify-self: start;
   width: auto;
+  min-width: 0;
   max-width: 100%;
 }
 
 .context-card--home .context-value--home-thithi-name .home-field-select {
-  width: auto;
+  width: max-content;
   max-width: 100%;
+  justify-self: start;
   flex-shrink: 0;
-  font-size: var(--home-value-size);
-  color: inherit;
-}
-
-.context-card--home .home-pirai-line {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.45rem;
-  min-width: 0;
-  max-width: 100%;
+  font-size: 0.8rem;
+  color: var(--ink);
 }
 
 .context-card--home .home-field-select--pirai {
-  flex: 0 0 auto;
   width: auto;
-  min-width: 0;
+  min-width: 7.75rem;
   max-width: 100%;
-  font-size: var(--home-label-size);
-  font-weight: 600;
-}
-
-.context-card--home .home-pirai-line .context-value--home-day {
-  flex: 0 0 auto;
-  white-space: nowrap;
 }
 
 .context-card--home .context-row--home-details > .context-row--home-restore {
@@ -3400,7 +3569,7 @@ body {
 @media (max-width: 767px) {
   .context-card--home {
     --home-label-width: 6.75rem;
-    --home-label-gap: 0.5rem;
+    --home-label-gap: 0.85rem;
     --home-label-size: 0.8rem;
     --home-value-size: 0.92rem;
     padding: 0.7rem 0.65rem;
@@ -3998,11 +4167,11 @@ body {
   align-items: center;
   gap: 0.3rem;
   padding: 0.35rem 0.5rem;
-  border: 1px solid rgba(196, 92, 38, 0.32);
+  border: 1px solid color-mix(in srgb, var(--burgundy) 32%, transparent);
   border-radius: 0.5rem;
   background: var(--accent-soft);
   color: var(--accent);
-  box-shadow: 0 1px 2px rgba(196, 92, 38, 0.1);
+  box-shadow: 0 1px 2px var(--rose);
   font-size: 0.72rem;
   line-height: 1.2;
   white-space: nowrap;
@@ -4010,7 +4179,7 @@ body {
   max-width: 100%;
   min-width: 0;
   text-decoration: underline;
-  text-decoration-color: rgba(196, 92, 38, 0.45);
+  text-decoration-color: color-mix(in srgb, var(--burgundy) 45%, transparent);
   text-underline-offset: 2px;
 }
 
@@ -4031,9 +4200,9 @@ body {
 }
 
 .jamam-pair__cell .thozhil-value-btn:hover {
-  background: rgba(196, 92, 38, 0.16);
+  background: var(--rose);
   border-color: var(--accent);
-  box-shadow: 0 2px 5px rgba(196, 92, 38, 0.14);
+  box-shadow: 0 2px 5px var(--rose);
 }
 
 .jamam-pair__cell .thozhil-value-btn:hover::after {
@@ -4042,16 +4211,16 @@ body {
 }
 
 .jamam-pair__cell .thozhil-value-btn[aria-expanded="true"] {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(196, 92, 38, 0.25);
-  text-decoration-color: rgba(255, 255, 255, 0.55);
+  background: var(--rose);
+  border-color: var(--gold);
+  color: var(--ink);
+  box-shadow: inset 0 -3px 0 var(--gold);
+  text-decoration-color: color-mix(in srgb, var(--ink) 45%, transparent);
 }
 
 .jamam-pair__cell .thozhil-value-btn[aria-expanded="true"]:hover {
-  background: #b8521f;
-  border-color: #b8521f;
+  background: var(--cream);
+  border-color: var(--gold);
 }
 
 .jamam-pair__cell .thozhil-value-btn[aria-expanded="true"]::after {
@@ -4065,18 +4234,18 @@ body {
 .jamam-pair__cell .thozhil-value-btn .bi-ta {
   color: inherit;
   text-decoration: underline;
-  text-decoration-color: rgba(196, 92, 38, 0.45);
+  text-decoration-color: color-mix(in srgb, var(--burgundy) 45%, transparent);
   text-underline-offset: 2px;
 }
 
 .jamam-pair__cell .thozhil-value-btn .bi-en {
-  color: rgba(196, 92, 38, 0.82);
+  color: var(--ruby);
 }
 
 .jamam-pair__cell .thozhil-value-btn[aria-expanded="true"] .bi-ta,
 .jamam-pair__cell .thozhil-value-btn[aria-expanded="true"] .bi-en {
-  color: #fff;
-  text-decoration-color: rgba(255, 255, 255, 0.55);
+  color: var(--ink);
+  text-decoration-color: color-mix(in srgb, var(--ink) 45%, transparent);
 }
 
 .context-row--action {
@@ -4134,8 +4303,8 @@ body {
 }
 
 .context-value-btn:hover {
-  background: rgba(196, 92, 38, 0.08);
-  border-color: rgba(196, 92, 38, 0.25);
+  background: color-mix(in srgb, var(--rose) 72%, white);
+  border-color: color-mix(in srgb, var(--burgundy) 28%, transparent);
 }
 
 .context-value-btn:focus-visible {
@@ -4301,7 +4470,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 3;
-  background: rgba(196, 92, 38, 0.12);
+  background: var(--rose);
   box-shadow: 0 1px 0 var(--border);
 }
 
@@ -4517,15 +4686,38 @@ body {
   padding: 0.45rem 0.75rem;
   min-height: var(--touch-min);
   border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--bg-card);
+  border: 1px solid var(--chip-border);
+  background: var(--chip-bg);
+  color: var(--chip-text);
+  box-shadow: inset 0 2px 0 var(--chip-mark);
   cursor: pointer;
+  transition: background 300ms ease, color 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
+}
+
+.paksha-toggle button:hover {
+  border-color: var(--chip-hover-border);
+  background: var(--chip-hover-bg);
+  color: var(--chip-hover-text);
 }
 
 .paksha-toggle button.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
+  background: var(--chip-active-bg);
+  border-color: var(--chip-active-border);
+  color: var(--chip-active-text);
+  box-shadow: inset 0 -3px 0 var(--gold);
+}
+
+.paksha-toggle button:focus-visible {
+  outline: 2px solid var(--chip-focus);
+  outline-offset: 2px;
+}
+
+.paksha-toggle button:disabled {
+  background: var(--chip-disabled-bg);
+  color: var(--chip-disabled-text);
+  border-color: var(--chip-disabled-border);
+  box-shadow: none;
+  cursor: not-allowed;
 }
 
 .active-jamam-card__head {
@@ -4539,7 +4731,7 @@ body {
   display: inline-block;
   padding: 0.25rem 0.65rem;
   border-radius: 999px;
-  background: rgba(45, 35, 25, 0.08);
+  background: rgba(32, 40, 59, 0.08);
   font-weight: 700;
   font-size: 0.9rem;
 }
@@ -4583,12 +4775,12 @@ body {
 .activity-table th,
 .activity-table td {
   border: 1px solid var(--border);
-  padding: 0.5pt;
+  padding: 0.45rem 0.4rem;
   text-align: left;
 }
 
 .activity-table th {
-  background: rgba(45, 35, 25, 0.04);
+  background: rgba(32, 40, 59, 0.04);
   color: var(--muted);
 }
 
@@ -4698,15 +4890,15 @@ th .bilingual .bi-en,
   height: 1px;
   margin: 0.65rem auto;
   width: min(100%, 12rem);
-  background: #c4932f;
-  opacity: 0.65;
+  background: var(--gold);
+  opacity: 0.9;
 }
 
 .find-patchi-result__label {
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
-  color: #71645a;
+  color: var(--muted);
   line-height: 1.3;
 }
 
@@ -4732,11 +4924,11 @@ th .bilingual .bi-en,
 }
 
 .find-patchi-result__value--thithi {
-  color: #8c2f2b;
+  color: var(--burgundy);
 }
 
 .find-patchi-result__value--jamam {
-  color: #d0601d;
+  color: var(--ruby);
 }
 
 .find-patchi-result__meta {
@@ -4757,19 +4949,19 @@ th .bilingual .bi-en,
 }
 
 .find-patchi-result__meta-label {
-  color: #71645a;
+  color: var(--muted);
   font-size: 0.85rem;
   font-weight: 600;
 }
 
 .find-patchi-result__meta-value {
   font-weight: 600;
-  color: #2c1b13;
+  color: var(--ink);
   font-size: 0.95rem;
 }
 
 .find-patchi-result__meta-value--time {
-  color: #d0601d;
+  color: var(--ruby);
   font-variant-numeric: tabular-nums;
 }
 
@@ -4940,7 +5132,7 @@ th .bilingual .bi-en,
   }
 
   .context-card--home {
-    --home-label-gap: 0.35rem;
+    --home-label-gap: 0.7rem;
     --home-label-size: 0.76rem;
     --home-value-size: 0.86rem;
     padding: 0.55rem 0.4rem;
@@ -4986,34 +5178,34 @@ th .bilingual .bi-en,
 /* —— Home page: Tamil-art inspired palette (colors / borders / shadows only) —— */
 
 body:has(.app--home) {
-  background: #f8f4ec;
-  color: #3e342d;
+  background: var(--white);
+  color: var(--ink);
 }
 
 .app--home {
-  --bg: #f8f4ec;
-  --bg-header: #fff9f0;
-  --bg-card: #ffffff;
-  --bg-panel: #f5ebdd;
-  --bg-input: #fffdf8;
-  --border: #ded0bd;
-  --text: #3e342d;
-  --text-heading: #2d1b12;
-  --muted: #75685d;
-  --accent: #8e2f2b;
-  --accent-hover: #70211f;
-  --accent-soft: rgba(142, 47, 43, 0.12);
-  --accent-saffron: #d46a1f;
-  --accent-saffron-hover: #b85714;
-  --accent-saffron-soft: rgba(212, 106, 31, 0.14);
-  --highlight-gold: #c7942e;
-  --highlight-gold-soft: rgba(199, 148, 46, 0.16);
+  --bg: var(--white);
+  --bg-header: var(--white);
+  --bg-card: var(--surface);
+  --bg-panel: var(--rose);
+  --bg-input: var(--surface);
+  --border: rgba(32, 40, 59, 0.12);
+  --text: var(--ink);
+  --text-heading: var(--burgundy);
+  --muted: #4a433a;
+  --accent: var(--burgundy);
+  --accent-hover: var(--ink);
+  --accent-soft: var(--rose);
+  --accent-saffron: var(--ruby);
+  --accent-saffron-hover: var(--burgundy);
+  --accent-saffron-soft: color-mix(in srgb, var(--ruby) 16%, transparent);
+  --highlight-gold: var(--gold);
+  --highlight-gold-soft: color-mix(in srgb, var(--gold) 22%, transparent);
   --success: #287a48;
   --success-soft: rgba(40, 122, 72, 0.14);
-  --warning: #c78118;
-  --error: #b43a36;
-  --card-shadow: 0 6px 20px rgba(69, 45, 28, 0.08);
-  --control-shadow: 0 2px 8px rgba(69, 45, 28, 0.1);
+  --warning: #8a6a32;
+  --error: var(--ruby);
+  --card-shadow: 0 10px 28px rgba(32, 40, 59, 0.06);
+  --control-shadow: none;
   background: var(--bg);
   color: var(--text);
 }
@@ -5037,7 +5229,13 @@ body:has(.app--home) {
   color: var(--accent-hover);
 }
 
-.app--home .language-toggle__btn,
+.app--home .language-toggle__btn {
+  background: var(--chip-bg);
+  border-color: var(--chip-border);
+  color: var(--chip-text);
+  box-shadow: inset 0 2px 0 var(--chip-mark);
+}
+
 .app--home .app-menu__toggle {
   background: var(--bg-card);
   border-color: var(--border);
@@ -5045,7 +5243,12 @@ body:has(.app--home) {
   box-shadow: var(--control-shadow);
 }
 
-.app--home .language-toggle__btn:hover,
+.app--home .language-toggle__btn:hover {
+  background: var(--chip-hover-bg);
+  border-color: var(--chip-hover-border);
+  color: var(--chip-hover-text);
+}
+
 .app--home .app-menu__toggle:hover,
 .app--home .app-menu__toggle[aria-expanded="true"] {
   background: var(--accent-soft);
@@ -5054,29 +5257,27 @@ body:has(.app--home) {
 }
 
 .app--home .language-toggle__btn--active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
-  box-shadow: var(--control-shadow);
+  background: var(--chip-active-bg);
+  border-color: var(--chip-active-border);
+  color: var(--chip-active-text);
+  box-shadow: inset 0 2px 0 var(--stellarium-on-accent);
 }
 
-.app--home .language-toggle__btn:focus-visible,
 .app--home .app-menu__toggle:focus-visible,
 .app--home .header-home-btn:focus-visible,
 .app--home .datetime-card__submit:focus-visible,
 .app--home .datetime-card__refresh:focus-visible,
 .app--home .datetime-card__permission:focus-visible,
-.app--home .patchi-submenu__btn:focus-visible,
 .app--home .datetime-field__input:focus-visible {
   outline: 2px solid var(--accent-saffron);
   outline-offset: 2px;
 }
 
 .app--home .header-home-btn--active {
-  background: var(--accent-soft);
-  border-color: var(--accent);
-  color: var(--accent);
-  box-shadow: var(--control-shadow);
+  background: var(--white);
+  border-color: transparent;
+  color: var(--ink);
+  box-shadow: inset 0 -3px 0 var(--gold);
 }
 
 .app--home .datetime-card,
@@ -5213,22 +5414,23 @@ body:has(.app--home) {
 }
 
 .app--home .context-card--home .patchi-submenu__btn {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  color: var(--text-heading);
-  box-shadow: none;
+  background: var(--chip-bg);
+  border: 1px solid var(--chip-border);
+  color: var(--chip-text);
+  box-shadow: inset 0 2px 0 var(--chip-mark);
 }
 
 .app--home .context-card--home .patchi-submenu__btn:hover {
-  border-color: var(--accent);
-  background: var(--accent-soft);
-  color: var(--accent);
+  border-color: var(--chip-hover-border);
+  background: var(--chip-hover-bg);
+  color: var(--chip-hover-text);
 }
 
 .app--home .context-card--home .patchi-submenu__btn--active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
+  background: var(--chip-active-bg);
+  border-color: var(--chip-active-border);
+  color: var(--chip-active-text);
+  box-shadow: inset 0 2px 0 var(--stellarium-on-accent);
 }
 
 .app--home .status--error {
@@ -5236,7 +5438,7 @@ body:has(.app--home) {
 }
 
 .app--home .app-menu__panel {
-  background: var(--bg-card);
+  background: var(--cream);
   border-left-color: var(--border);
 }
 
@@ -5245,27 +5447,28 @@ body:has(.app--home) {
 }
 
 .app--home .app-menu__item {
-  background: var(--bg-panel);
-  border-color: var(--border);
-  color: var(--text-heading);
+  background: var(--chip-bg);
+  border-color: var(--chip-border);
+  color: var(--chip-text);
 }
 
-.app--home .app-menu__item:hover {
-  border-color: var(--accent);
-  background: var(--accent-soft);
-  color: var(--accent);
+.app--home .app-menu__item:hover,
+.app--home .app-menu__item--open {
+  border-color: var(--chip-hover-border);
+  background: var(--chip-hover-bg);
+  color: var(--chip-hover-text);
 }
 
 .app--home .app-menu__item--active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
+  background: var(--chip-active-bg);
+  border-color: var(--chip-active-border);
+  color: var(--chip-active-text);
 }
 
 .app--home .app-menu__item--active:hover {
-  background: var(--accent-hover);
-  border-color: var(--accent-hover);
-  color: #fff;
+  background: var(--chip-active-bg);
+  border-color: var(--chip-active-border);
+  color: var(--chip-active-text);
 }
 
 
@@ -5273,33 +5476,33 @@ body:has(.app--home) {
 /* --- Find Patchi page: spiritual Tamil palette (colors / borders / shadows only) --- */
 
 body:has(.app--find-patchi) {
-  background: #f7f2e8;
-  color: #2c1b13;
+  background: var(--white);
+  color: var(--ink);
 }
 
 .app--find-patchi {
-  --bg: #f7f2e8;
-  --bg-header: #fffefb;
-  --bg-card: #fffefb;
-  --bg-panel: #faf4e9;
-  --bg-input: #fffdf8;
-  --border: #ded1bf;
-  --text: #2c1b13;
-  --text-heading: #2c1b13;
-  --muted: #71645a;
-  --accent: #8c2f2b;
-  --accent-hover: #6f211e;
-  --accent-soft: rgba(140, 47, 43, 0.12);
-  --accent-saffron: #d0601d;
-  --accent-saffron-hover: #b04f14;
-  --accent-saffron-soft: rgba(208, 96, 29, 0.14);
-  --highlight-gold: #c4932f;
-  --highlight-gold-soft: rgba(196, 147, 47, 0.18);
+  --bg: var(--white);
+  --bg-header: var(--white);
+  --bg-card: var(--surface);
+  --bg-panel: var(--rose);
+  --bg-input: var(--surface);
+  --border: rgba(32, 40, 59, 0.12);
+  --text: var(--ink);
+  --text-heading: var(--burgundy);
+  --muted: #4a433a;
+  --accent: var(--burgundy);
+  --accent-hover: var(--ink);
+  --accent-soft: var(--rose);
+  --accent-saffron: var(--ruby);
+  --accent-saffron-hover: var(--burgundy);
+  --accent-saffron-soft: color-mix(in srgb, var(--ruby) 16%, transparent);
+  --highlight-gold: var(--gold);
+  --highlight-gold-soft: color-mix(in srgb, var(--gold) 22%, transparent);
   --success: #287a49;
   --success-soft: rgba(40, 122, 73, 0.14);
-  --error: #b43a36;
-  --card-shadow: 0 6px 20px rgba(65, 43, 27, 0.08);
-  --control-shadow: 0 2px 8px rgba(65, 43, 27, 0.1);
+  --error: var(--ruby);
+  --card-shadow: 0 10px 28px rgba(32, 40, 59, 0.06);
+  --control-shadow: none;
   --radius-card: 18px;
   --radius-control: 14px;
   background: var(--bg);
@@ -5325,7 +5528,14 @@ body:has(.app--find-patchi) {
   color: var(--accent-hover);
 }
 
-.app--find-patchi .language-toggle__btn,
+.app--find-patchi .language-toggle__btn {
+  background: var(--chip-bg);
+  border-color: var(--chip-border);
+  color: var(--chip-text);
+  box-shadow: inset 0 2px 0 var(--chip-mark);
+  border-radius: 999px;
+}
+
 .app--find-patchi .app-menu__toggle {
   background: var(--bg-card);
   border-color: var(--border);
@@ -5334,7 +5544,12 @@ body:has(.app--find-patchi) {
   border-radius: 999px;
 }
 
-.app--find-patchi .language-toggle__btn:hover,
+.app--find-patchi .language-toggle__btn:hover {
+  background: var(--chip-hover-bg);
+  border-color: var(--chip-hover-border);
+  color: var(--chip-hover-text);
+}
+
 .app--find-patchi .app-menu__toggle:hover,
 .app--find-patchi .app-menu__toggle[aria-expanded="true"] {
   background: var(--accent-soft);
@@ -5343,9 +5558,10 @@ body:has(.app--find-patchi) {
 }
 
 .app--find-patchi .language-toggle__btn--active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
+  background: var(--chip-active-bg);
+  border-color: var(--chip-active-border);
+  color: var(--chip-active-text);
+  box-shadow: inset 0 2px 0 var(--stellarium-on-accent);
 }
 
 .app--find-patchi .language-toggle__btn:focus-visible,
@@ -5360,10 +5576,10 @@ body:has(.app--find-patchi) {
 }
 
 .app--find-patchi .header-home-btn--active {
-  background: var(--accent-soft);
-  border-color: var(--accent);
-  color: var(--accent);
-  box-shadow: var(--control-shadow);
+  background: var(--white);
+  border-color: transparent;
+  color: var(--ink);
+  box-shadow: inset 0 -3px 0 var(--gold);
 }
 
 .app--find-patchi .datetime-card {
@@ -5470,13 +5686,13 @@ body:has(.app--find-patchi) {
 }
 
 .app--find-patchi .find-patchi-result__card--thithi {
-  background: rgba(140, 47, 43, 0.08);
-  border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border));
+  background: var(--cream);
+  border: 1px solid color-mix(in srgb, var(--gold) 55%, var(--border));
 }
 
 .app--find-patchi .find-patchi-result__card--jamam {
-  background: rgba(208, 96, 29, 0.1);
-  border: 1px solid color-mix(in srgb, var(--accent-saffron) 24%, var(--border));
+  background: var(--rose);
+  border: 1px solid color-mix(in srgb, var(--gold) 70%, var(--border));
 }
 
 .app--find-patchi .find-patchi-result__divider {
@@ -5524,7 +5740,7 @@ body:has(.app--find-patchi) {
 }
 
 .app--find-patchi .app-menu__panel {
-  background: var(--bg-card);
+  background: var(--cream);
   border-left-color: var(--border);
 }
 
@@ -5533,28 +5749,29 @@ body:has(.app--find-patchi) {
 }
 
 .app--find-patchi .app-menu__item {
-  background: var(--bg-panel);
-  border-color: var(--border);
-  color: var(--text-heading);
+  background: var(--chip-bg);
+  border-color: var(--chip-border);
+  color: var(--chip-text);
   border-radius: var(--radius-control);
 }
 
-.app--find-patchi .app-menu__item:hover {
-  border-color: var(--accent);
-  background: var(--accent-soft);
-  color: var(--accent);
+.app--find-patchi .app-menu__item:hover,
+.app--find-patchi .app-menu__item--open {
+  border-color: var(--chip-hover-border);
+  background: var(--chip-hover-bg);
+  color: var(--chip-hover-text);
 }
 
 .app--find-patchi .app-menu__item--active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
+  background: var(--chip-active-bg);
+  border-color: var(--chip-active-border);
+  color: var(--chip-active-text);
 }
 
 .app--find-patchi .app-menu__item--active:hover {
-  background: var(--accent-hover);
-  border-color: var(--accent-hover);
-  color: #fff;
+  background: var(--chip-active-bg);
+  border-color: var(--chip-active-border);
+  color: var(--chip-active-text);
 }
 
 .app--find-patchi .datetime-card__submit:disabled,
@@ -5566,12 +5783,12 @@ body:has(.app--find-patchi) {
 
 /* Home uses the shared centered Antharam / Naal dialog shell. */
 .anthara-dialog-overlay--home {
-  background: rgba(45, 35, 25, 0.5);
+  background: rgba(32, 40, 59, 0.5);
 }
 
 .anthara-dialog-overlay--home .anthara-dialog--home {
   border-radius: 0.9rem;
-  box-shadow: 0 16px 48px rgba(45, 35, 25, 0.22);
+  box-shadow: 0 16px 48px rgba(32, 40, 59, 0.22);
 }
 
 .anthara-dialog-overlay--home .jamam-segments-panel__head {
@@ -5586,10 +5803,18 @@ body:has(.app--find-patchi) {
   --dialog-max-width: 56rem;
 }
 
-/* Thithi Details — moon phase table (USNO). Independent of Home pirai/thithi selectors. */
+/* Thithi Details — Stellarium Light colors. Columns stay intact; narrow screens scroll. */
 .moon-phase-card {
   max-width: 100%;
   min-width: 0;
+  background: var(--stellarium-surface);
+  border-color: var(--stellarium-border);
+  color: var(--stellarium-text);
+}
+
+.moon-phase-card .schedule-table-card__title {
+  color: var(--stellarium-text);
+  box-shadow: inset 0 -2px 0 var(--stellarium-accent);
 }
 
 .moon-phase {
@@ -5598,6 +5823,12 @@ body:has(.app--find-patchi) {
   gap: 0.75rem;
   padding: 0.85rem;
   min-width: 0;
+  max-width: 100%;
+}
+
+.moon-phase > * {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .moon-phase-today {
@@ -5605,26 +5836,31 @@ body:has(.app--find-patchi) {
   flex-direction: column;
   gap: 0.2rem;
   margin: 0;
+  min-width: 0;
 }
 
 .moon-phase-today__label {
-  color: var(--muted);
+  color: var(--stellarium-accent);
   font-size: 0.82rem;
   font-weight: 700;
+  overflow-wrap: break-word;
 }
 
 .moon-phase-today__date {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
-  align-items: baseline;
+  display: block;
   font-size: 1.05rem;
-  color: var(--text);
+  color: var(--stellarium-text);
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  line-height: 1.45;
 }
 
 .moon-phase-today__iso,
 .moon-phase-table__iso {
-  color: var(--muted);
+  display: inline;
+  margin-left: 0.45rem;
+  color: var(--stellarium-muted);
   font-size: 0.82rem;
   font-weight: 600;
 }
@@ -5633,19 +5869,21 @@ body:has(.app--find-patchi) {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  gap: 0.45rem;
+  gap: 0.5rem;
   min-width: 0;
+  max-width: 100%;
 }
 
 .moon-phase-controls__field {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  flex: 1 1 9rem;
-  min-width: 0;
+  flex: 1 1 12rem;
+  min-width: min(100%, 12rem);
+  max-width: 100%;
   font-size: 0.78rem;
   font-weight: 700;
-  color: var(--muted);
+  color: var(--stellarium-accent);
 }
 
 .moon-phase-controls select,
@@ -5653,17 +5891,28 @@ body:has(.app--find-patchi) {
 .moon-phase-controls__step,
 .moon-phase-retry {
   font: inherit;
-  color: var(--text);
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+  color: var(--stellarium-text);
+  background: var(--stellarium-surface);
+  border: 1px solid var(--stellarium-border);
   border-radius: 0.55rem;
   min-height: var(--touch-min);
+  box-shadow: inset 0 2px 0 var(--stellarium-accent);
 }
 
 .moon-phase-controls select,
 .moon-phase-controls input {
   width: 100%;
-  padding: 0.35rem 0.55rem;
+  max-width: 100%;
+  padding: 0.35rem 1.6rem 0.35rem 0.55rem;
+}
+
+.moon-phase-controls select:focus,
+.moon-phase-controls input:focus,
+.moon-phase-controls__step:focus-visible,
+.moon-phase-retry:focus-visible {
+  outline: 2px solid var(--stellarium-accent);
+  outline-offset: 2px;
+  border-color: var(--stellarium-accent);
 }
 
 .moon-phase-controls__step {
@@ -5672,10 +5921,21 @@ body:has(.app--find-patchi) {
   font-size: 1.35rem;
   line-height: 1;
   cursor: pointer;
+  padding: 0;
+}
+
+.moon-phase-controls__step:hover:not(:disabled),
+.moon-phase-retry:hover {
+  background: var(--stellarium-blush);
+  border-color: var(--stellarium-accent);
+  color: var(--stellarium-accent);
 }
 
 .moon-phase-controls__step:disabled {
-  opacity: 0.45;
+  background: var(--stellarium-wash);
+  color: var(--stellarium-text);
+  border-color: var(--stellarium-border);
+  box-shadow: none;
   cursor: not-allowed;
 }
 
@@ -5683,36 +5943,39 @@ body:has(.app--find-patchi) {
   margin: 0;
   font-size: 0.86rem;
   line-height: 1.45;
-  color: var(--text);
-  overflow-wrap: anywhere;
+  color: var(--stellarium-text);
+  overflow-wrap: break-word;
+  min-width: 0;
 }
 
 .moon-phase-note--quiet {
-  color: var(--muted);
+  color: var(--stellarium-muted);
   font-size: 0.8rem;
 }
 
 .moon-phase-note__zone {
-  display: inline-block;
+  display: inline;
   margin-left: 0.35rem;
-  color: var(--muted);
+  color: var(--stellarium-accent);
   font-weight: 700;
+  overflow-wrap: break-word;
 }
 
 .moon-phase-status {
   margin: 0;
   padding: 0.85rem 0.2rem;
-  color: var(--muted);
+  color: var(--stellarium-text);
+  overflow-wrap: break-word;
 }
 
 .moon-phase-status--error {
-  color: #b42318;
+  color: var(--stellarium-accent);
 }
 
 .moon-phase-status__detail {
   margin: 0.35rem 0 0;
   font-size: 0.82rem;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
 .moon-phase-retry {
@@ -5720,20 +5983,26 @@ body:has(.app--find-patchi) {
   padding: 0.35rem 0.9rem;
   font-weight: 700;
   cursor: pointer;
-  color: var(--accent);
 }
 
 .moon-phase-table-wrap {
   max-width: 100%;
   min-width: 0;
   overflow-x: auto;
+  overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  border: 1px solid var(--border);
+  border-radius: 0.45rem;
+  background: var(--stellarium-wash);
 }
 
 .moon-phase-table {
-  width: 100%;
+  width: max-content;
+  min-width: 100%;
   border-collapse: collapse;
   font-size: 0.9rem;
+  background: var(--stellarium-surface);
 }
 
 .moon-phase-table__caption {
@@ -5751,21 +6020,24 @@ body:has(.app--find-patchi) {
 .moon-phase-table th,
 .moon-phase-table td {
   border: 1px solid var(--border);
-  padding: 0.55rem 0.65rem;
+  padding: 0.55rem 0.75rem;
   text-align: left;
   vertical-align: top;
   line-height: 1.45;
-  overflow-wrap: anywhere;
+  white-space: nowrap;
+  word-break: normal;
 }
 
 .moon-phase-table thead th {
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: var(--stellarium-accent);
+  color: var(--stellarium-on-accent);
   font-weight: 700;
+  border-color: var(--stellarium-accent);
 }
 
 .moon-phase-table__row--today td {
-  background: rgba(196, 92, 38, 0.1);
+  background: var(--stellarium-blush);
+  color: var(--stellarium-text);
 }
 
 .moon-phase-table__date {
@@ -5784,85 +6056,344 @@ body:has(.app--find-patchi) {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
-  max-width: 100%;
 }
 
 .moon-phase-event {
   display: inline-flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 0.35rem;
   align-items: center;
-  width: fit-content;
-  max-width: 100%;
+  width: max-content;
   padding: 0.2rem 0.5rem;
   border-radius: 999px;
-  background: var(--accent);
-  color: #fff;
+  background: var(--stellarium-accent);
+  color: var(--stellarium-on-accent);
   font-size: 0.78rem;
   font-weight: 700;
   line-height: 1.35;
+  white-space: nowrap;
+  box-shadow: inset 3px 0 0 var(--gold);
 }
 
-@media (max-width: 640px) {
-  .moon-phase-table thead {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
+/* McDonald’s birthday palette: cream page, white navigation, gold active underline, red actions. */
 
-  .moon-phase-table,
-  .moon-phase-table tbody,
-  .moon-phase-table tr,
-  .moon-phase-table td {
-    display: block;
-    width: auto;
-  }
+h1,
+h2,
+h3,
+.header h1,
+.header h1 .bi-ta,
+.schedule-table-card__title,
+.app-menu__panel-title,
+.content__section-title,
+.home-panel__title,
+.patchi-schedule-patchi-section__title {
+  color: var(--burgundy);
+}
 
-  .moon-phase-table {
-    border-collapse: separate;
-    border-spacing: 0 0.65rem;
-  }
+.header h1 .bi-en,
+.app--home .header h1 .bi-en {
+  color: var(--muted);
+  font-weight: 600;
+}
 
-  .moon-phase-table tr {
-    border: 1px solid var(--border);
-    border-radius: 0.7rem;
-    padding: 0.35rem 0.55rem 0.5rem;
-    background: var(--bg-card);
-  }
+html,
+body,
+#root,
+body:has(.app--home),
+body:has(.app--find-patchi),
+.app,
+.app--home,
+.app--find-patchi {
+  background: var(--white);
+}
 
-  .moon-phase-table td {
-    display: grid;
-    grid-template-columns: minmax(6.5rem, 42%) minmax(0, 1fr);
-    gap: 0.35rem 0.65rem;
-    align-items: start;
-    border: 0;
-    padding: 0.35rem 0;
-  }
+.context-card:not(.context-card--home),
+.active-jamam-card,
+.activity-card,
+.timeline-card,
+.athikara-panel,
+.sheet-table-panel,
+.anthara-dialog,
+.naal-dialog {
+  background: var(--white);
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 28px rgba(28, 28, 28, 0.06);
+}
 
-  .moon-phase-table td::before {
-    content: attr(data-label);
-    font-weight: 700;
-    color: var(--muted);
-    overflow-wrap: anywhere;
-  }
+.datetime-card,
+.content,
+.schedule-table-card,
+.app--home .datetime-card,
+.app--home .content,
+.app--home .context-card--home,
+.app--find-patchi .datetime-card,
+.app--find-patchi .content,
+.app--find-patchi .find-patchi-result__panel {
+  background: var(--panel-yellow);
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 28px rgba(28, 28, 28, 0.06);
+}
 
-  .moon-phase-table__row--today {
-    box-shadow: inset 0 0 0 2px var(--accent);
-  }
+.datetime-field__input,
+.datetime-card input,
+.datetime-card select,
+.app--home .datetime-field__input,
+.app--find-patchi .datetime-field__input {
+  background-color: var(--white);
+}
 
-  .moon-phase-table__value {
-    min-width: 0;
-    overflow-wrap: anywhere;
-  }
+.app-menu__panel,
+.app--home .app-menu__panel,
+.app--find-patchi .app-menu__panel {
+  background: var(--cream);
+}
 
-  .moon-phase-event {
-    width: auto;
-    border-radius: 0.55rem;
+.schedule-table-card {
+  border-radius: 1rem;
+  box-shadow: 0 10px 28px rgba(28, 28, 28, 0.06);
+}
+
+.moon-phase-card .schedule-table-card__title {
+  color: var(--burgundy);
+  box-shadow: inset 0 -2px 0 var(--gold);
+}
+
+.sheet-table thead th,
+.patchi-pivot-table thead th,
+.schedule-table th,
+.activity-table th,
+.moon-phase-table thead th,
+.alternate-all-chip-table.patchi-pivot-table thead .alternate-all-chip-table__jamam-row th,
+.schedule-table-card--alternate .alternate-valarpirai-all-chip--thithi .patchi-pivot-table thead th,
+.anthara-dialog .jamam-segments-table--matrix thead th {
+  background: var(--white);
+  color: var(--ink);
+  box-shadow: inset 0 -2px 0 var(--gold);
+}
+
+.moon-phase-table__row--today td,
+.patchi-pivot-table__row--today td,
+.sheet-table__group-row--highlight td,
+.schedule-table__row--active {
+  background: var(--rose);
+}
+
+.moon-phase-table__row--today td:first-child,
+.patchi-pivot-table__row--today .patchi-pivot-table__day {
+  box-shadow: inset 3px 0 0 var(--gold);
+}
+
+.language-toggle__btn,
+.app-menu__item,
+.sheet-picker__btn,
+.paksha-toggle button,
+.patchi-submenu__btn,
+.moon-phase-controls select,
+.moon-phase-controls input,
+.moon-phase-controls__step,
+.moon-phase-retry,
+.app--home .language-toggle__btn,
+.app--home .context-card--home .patchi-submenu__btn,
+.app--home .app-menu__item {
+  box-shadow: none;
+}
+
+.context-card--home .patchi-submenu__btn[aria-pressed="true"],
+.app--home .context-card--home .patchi-submenu__btn--active,
+.app--home .context-card--home .patchi-submenu__btn[aria-pressed="true"] {
+  background-color: var(--chip-active-bg);
+  color: var(--chip-active-text);
+  border: 1px solid var(--chip-border);
+  border-radius: var(--chip-radius);
+  box-shadow: none;
+}
+
+.language-toggle__btn--active,
+.app-menu__item--active,
+.sheet-picker__btn--active,
+.paksha-toggle button.active,
+.patchi-submenu__btn--active,
+.patchi-submenu__btn[aria-pressed="true"],
+.header-home-btn--active,
+.app--home .language-toggle__btn--active,
+.app--home .context-card--home .patchi-submenu__btn--active,
+.app--home .app-menu__item--active,
+.app--home .header-home-btn--active,
+.app--find-patchi .language-toggle__btn--active,
+.app--find-patchi .app-menu__item--active,
+.app--find-patchi .header-home-btn--active {
+  background-color: var(--chip-active-bg);
+  border: 1px solid var(--chip-border);
+  color: var(--chip-active-text);
+  box-shadow: none;
+}
+
+.datetime-card__submit,
+.app--home .datetime-card__submit,
+.app--find-patchi .datetime-card__submit,
+.jamam-badge--active,
+.schedule-table__badge:not(.schedule-table__badge--idle),
+.moon-phase-retry {
+  background: var(--ruby);
+  border-color: var(--ruby);
+  color: #fff;
+}
+
+.datetime-card__submit:hover,
+.app--home .datetime-card__submit:hover,
+.app--find-patchi .datetime-card__submit:hover,
+.moon-phase-retry:hover {
+  background: var(--red-deep);
+  border-color: var(--red-deep);
+  color: var(--white);
+}
+
+button:focus-visible,
+[role="tab"]:focus-visible,
+select:focus-visible,
+input:focus-visible,
+.app--home .app-menu__toggle:focus-visible,
+.app--home .header-home-btn:focus-visible,
+.app--home .datetime-card__submit:focus-visible,
+.app--home .datetime-card__refresh:focus-visible,
+.app--home .datetime-card__permission:focus-visible,
+.app--home .datetime-field__input:focus-visible,
+.app--home .datetime-field__input:focus,
+.app--find-patchi .datetime-field__input:focus,
+.language-toggle__btn:focus-visible,
+.app-menu__item:focus-visible,
+.sheet-picker__btn:focus-visible,
+.paksha-toggle button:focus-visible,
+.patchi-submenu__btn:focus-visible,
+.moon-phase-controls select:focus,
+.moon-phase-controls input:focus,
+.moon-phase-controls__step:focus-visible,
+.moon-phase-retry:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--gold) 50%, transparent);
+}
+
+.app-menu__list {
+  padding: 1rem;
+  gap: 0.55rem;
+}
+
+.datetime-card {
+  padding: 1.15rem 1.25rem;
+}
+
+.app--home .context-card--home .patchi-submenu__btn--active,
+.app--home .context-card--home .patchi-submenu__btn[aria-pressed="true"] {
+  background-color: var(--chip-active-bg);
+  color: var(--chip-active-text);
+  border: 1px solid var(--chip-border);
+  border-radius: var(--chip-radius);
+  box-shadow: none;
+}
+
+.app--home .context-card--home .jamam-pair__cell--home-stack {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  column-gap: var(--home-label-gap);
+  row-gap: 0.45rem;
+  align-items: center;
+}
+
+.app--home .context-card--home .jamam-pair__cell--home-jamam {
+  display: contents;
+}
+
+.app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.4rem;
+  box-sizing: border-box;
+  width: max-content;
+  max-width: 100%;
+  justify-self: start;
+  min-height: var(--touch-min);
+  padding: 0.35rem 0.7rem;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--ink);
+  background: var(--white);
+  border: 1px solid rgba(28, 28, 28, 0.16);
+  border-radius: 999px;
+  box-shadow: none;
+  text-decoration: none;
+  text-align: left;
+  white-space: normal;
+}
+
+.app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn > span,
+.app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn .bi-ta,
+.app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn .bi-en {
+  overflow: visible;
+  text-overflow: unset;
+  text-decoration: none;
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  white-space: normal;
+}
+
+.app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn::after {
+  content: "";
+  flex: 0 0 auto;
+  width: 12px;
+  height: 8px;
+  margin-left: 0.15rem;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%231c1c1c' d='M1.4.8 6 5.4 10.6.8 12 2.2 6 8 0 2.2z'/%3E%3C/svg%3E") center / 12px 8px no-repeat;
+  opacity: 1;
+  transform: none;
+}
+
+.app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn:hover {
+  border-color: var(--gold);
+  background: var(--rose);
+  color: var(--ink);
+  box-shadow: none;
+}
+
+.app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn:hover::after {
+  opacity: 1;
+  transform: none;
+}
+
+.app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn[aria-expanded="true"] {
+  background-color: var(--chip-active-bg);
+  color: var(--chip-active-text);
+  border: 1px solid var(--chip-border);
+  border-radius: var(--chip-radius);
+  box-shadow: none;
+  text-decoration: none;
+}
+
+.app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn[aria-expanded="true"]:hover {
+  background-color: var(--chip-active-bg);
+  border-color: var(--chip-border);
+  color: var(--chip-active-text);
+  box-shadow: none;
+}
+
+.app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn[aria-expanded="true"]::after,
+.app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn[aria-expanded="true"] .bi-ta,
+.app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn[aria-expanded="true"] .bi-en {
+  color: var(--ink);
+  text-decoration: none;
+  opacity: 1;
+}
+
+@media (max-width: 767px) {
+  .app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn {
+    min-height: var(--touch-min);
+    padding: 0.35rem 0.55rem;
+    font-size: 0.78rem;
+    border-radius: 999px;
   }
 }

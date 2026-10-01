@@ -1,5 +1,7 @@
-import { PATCHI_ORDER } from "./bilingual";
+import { bi, PATCHI_ORDER, type Bilingual } from "./bilingual";
 import {
+  ALTERNATE_WEEKDAY_ORDER,
+  getAlternateEatingPatchi,
   getMorningDieNightEatDayForPatchi,
   getMorningDieNightEatWeekdayForPatchi,
 } from "./alternateCalculation";
@@ -13,8 +15,8 @@ import {
   getThithiPlanetWeekday,
   THITHI_NUMBERS_BY_GROUP,
   THITHI_PATCHI_BY_PAKSHA,
+  THITHI_PLANET_DAYS,
 } from "./thithiPatchi";
-import type { Bilingual } from "./bilingual";
 
 export type ThithiPatchiEntry = {
   thithi: Bilingual;
@@ -317,4 +319,74 @@ export function getNextThithiPatchiEntryAfterWeekday(
   const lastThithiNumber = THITHI_NUMBERS_BY_GROUP[groupIndex]?.[2];
   if (lastThithiNumber == null) return null;
   return getNextThithiPatchiEntry(pakshaId, lastThithiNumber);
+}
+
+function thithiGroupForScheduleWeekday(pakshaId: PakshaId, weekday: number) {
+  const matches = THITHI_PATCHI_BY_PAKSHA[pakshaId].filter(
+    (group) =>
+      Object.prototype.hasOwnProperty.call(THITHI_PLANET_DAYS, group.planet.ta) &&
+      getThithiPlanetWeekday(group.planet) === weekday,
+  );
+  return matches.length === 1 ? matches[0] : null;
+}
+
+/**
+ * Thithi names, in Thithi Patchi order, for one schedule weekday.
+ * Returns null when the source row cannot be matched uniquely.
+ */
+export function getThithiHeadingsForScheduleWeekday(
+  pakshaId: PakshaId,
+  weekday: number,
+): readonly Bilingual[] | null {
+  return thithiGroupForScheduleWeekday(pakshaId, weekday)?.thithis ?? null;
+}
+
+/**
+ * Bird that should Eat in Jamam 1 morning on the Thithi Schedule for each
+ * Thithi Patchi group, in that table's group order. Not the Information
+ * Athikara bird.
+ */
+const THITHI_SCHEDULE_JAMAM1_EAT_BIRD = {
+  theipirai: ["காகம்", "ஆந்தை", "வல்லூறு", "மயில்", "கோழி"],
+  valarpirai: ["வல்லூறு", "ஆந்தை", "காகம்", "கோழி", "மயில்"],
+} as const satisfies Record<
+  "valarpirai" | "theipirai",
+  readonly (typeof PATCHI_ORDER)[number][]
+>;
+
+/**
+ * Weekday whose day and night grids belong under a Thithi Schedule group:
+ * the Pancha day where this group's bird Eats in Jamam 1 morning.
+ * Returns null when that day cannot be matched uniquely.
+ */
+export function getThithiScheduleActivityWeekday(
+  pakshaId: "valarpirai" | "theipirai",
+  weekday: number,
+): number | null {
+  const groups = THITHI_PATCHI_BY_PAKSHA[pakshaId];
+  const groupIndex = groups.findIndex((group) => thithiGroupForScheduleWeekday(pakshaId, weekday) === group);
+  if (groupIndex < 0) return null;
+  const eatBird = THITHI_SCHEDULE_JAMAM1_EAT_BIRD[pakshaId][groupIndex];
+  if (!eatBird) return null;
+  const matches = ALTERNATE_WEEKDAY_ORDER.filter(
+    (day) => getAlternateEatingPatchi(pakshaId, day, 1, "day") === eatBird,
+  );
+  return matches.length === 1 ? matches[0] : null;
+}
+
+/**
+ * Joined thithi names for one Day Scheduler weekday, taken from the Thithi
+ * Patchi group whose planet weekday is that schedule weekday.
+ * Returns null when the source row cannot be matched uniquely.
+ */
+export function getThithiLabelsForScheduleWeekday(
+  pakshaId: PakshaId,
+  weekday: number,
+): Bilingual | null {
+  const headings = getThithiHeadingsForScheduleWeekday(pakshaId, weekday);
+  if (!headings) return null;
+  return bi(
+    headings.map((thithi) => thithi.ta).join(" · "),
+    headings.map((thithi) => thithi.en).join(" · "),
+  );
 }

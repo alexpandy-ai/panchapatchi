@@ -61,7 +61,6 @@ import {
   getAlternatePaduPatchiForJamam,
   getAlternatePatchiJamamActivityForWeekday,
   getDayEatingPatchiOnThithiBracketDay,
-  getPatchiDaysDayForAthikaraPatchi,
   getPatchiDaysWeekdayForAthikaraPatchi,
 } from "../utils/alternateCalculation";
 
@@ -198,12 +197,6 @@ export function PatchiStatusView({
     }
     return thithiPatchiEntry.weekday;
   }, [athikaraPatchi, isHome, pakshaId, thithiPatchiEntry.weekday]);
-
-  /** Home: day next to Pirai — Patchi Days row for Athikara under current pirai. */
-  const athikaraPatchiDay = useMemo(() => {
-    if (!isHome || (pakshaId !== "valarpirai" && pakshaId !== "theipirai")) return null;
-    return getPatchiDaysDayForAthikaraPatchi(pakshaId, athikaraPatchi);
-  }, [athikaraPatchi, isHome, pakshaId]);
 
   /**
    * Home jamam / anthara / naal column: Day Scheduler weekday in brackets
@@ -635,6 +628,7 @@ export function PatchiStatusView({
                 <label className="visually-hidden" htmlFor="home-pirai-select">
                   <BilingualText text={UI.pirai} block={false} />
                 </label>
+                <span className="context-label" aria-hidden="true" />
                 <span className="home-pirai-line">
                   <select
                     id="home-pirai-select"
@@ -653,19 +647,14 @@ export function PatchiStatusView({
                       {pickBilingual(PAKSHA_BI.theipirai, language)}
                     </option>
                   </select>
-                  <span className="context-value context-value--home-day">
-                    <BilingualText
-                      text={athikaraPatchiDay ?? thithiPatchiEntry.day}
-                      block={false}
-                    />
-                  </span>
                 </span>
               </div>
               <div className="context-row context-row--home-thithi">
+                <label className="visually-hidden" htmlFor="home-thithi-select">
+                  <BilingualText text={UI.thithi} block={false} />
+                </label>
+                <span className="context-label" aria-hidden="true" />
                 <span className="context-inline-item">
-                  <label className="context-label" htmlFor="home-thithi-select">
-                    <BilingualText text={UI.thithi} block={false} />
-                  </label>
                   <span className="context-value context-value--home-thithi-name">
                     <select
                       id="home-thithi-select"
