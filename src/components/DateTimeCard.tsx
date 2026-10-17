@@ -133,8 +133,7 @@ export function DateTimeCard({
   onSubmit,
 }: DateTimeCardProps) {
 
-  const { coords, geoCoords, manualCoords, source, locationDisplay, applyLocation, requestGeolocation, geoPermission } =
-    useLocation();
+  const { coords, geoCoords, manualCoords, source, locationDisplay, applyLocation } = useLocation();
   const { language } = useLanguage();
 
   const dateLabel = selectFieldLabels ? UI.selectDate : UI.date;
@@ -142,6 +141,7 @@ export function DateTimeCard({
   const locationLabel = selectFieldLabels ? UI.selectLocation : UI.location;
 
   const listId = useId();
+  const dayLabelId = useId();
 
   const [dateInput, setDateInput] = useState(() => toDateInputValue(value));
   const [timeInput, setTimeInput] = useState(() => toTimeInputValue(value));
@@ -396,20 +396,6 @@ export function DateTimeCard({
     onSubmit?.({ date: nextDateTime, coords: submittedCoords });
   };
 
-  const handleRefresh = () => {
-    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
-    clearPlaceSuggestions();
-
-    const now = new Date();
-    draftDirtyRef.current = false;
-    setDateInput(toDateInputValue(now));
-    setTimeInput(toTimeInputValue(now));
-    onChange(now);
-    requestGeolocation();
-  };
-
-  const locationPermissionOn = geoPermission === "granted" || source === "geolocation";
-
   const { sunrise } = getDayCycleBounds(value, coords);
 
   return (
@@ -442,32 +428,30 @@ export function DateTimeCard({
             </span>
           )}
 
-          <div className="datetime-field__date-row">
+          <span id={dayLabelId} className="datetime-field__coord-label datetime-field__day-label">
 
-            <span className="datetime-card__weekday" aria-hidden="true">
+            <BilingualText text={weekdayBi} />
 
-              <BilingualText text={weekdayBi} />
+          </span>
 
-            </span>
+          <input
 
-            <input
+            type="date"
 
-              type="date"
+            className="datetime-field__input"
 
-              className="datetime-field__input"
+            value={dateInput}
 
-              value={dateInput}
+            aria-label={hideDateLabel ? pickBilingual(dateLabel, language) : undefined}
 
-              aria-label={hideDateLabel ? pickBilingual(dateLabel, language) : undefined}
+            aria-describedby={dayLabelId}
 
-              onChange={(event) => {
-                draftDirtyRef.current = true;
-                setDateInput(event.target.value);
-              }}
+            onChange={(event) => {
+              draftDirtyRef.current = true;
+              setDateInput(event.target.value);
+            }}
 
-            />
-
-          </div>
+          />
 
         </label>
 
@@ -497,6 +481,30 @@ export function DateTimeCard({
               draftDirtyRef.current = true;
               setTimeInput(event.target.value);
             }}
+
+          />
+
+        </label>
+
+        <label className="datetime-field__coord datetime-field__coord--sunrise">
+
+          <span className="datetime-field__coord-label">
+
+            <BilingualText text={UI.sunrise} />
+
+          </span>
+
+          <input
+
+            type="text"
+
+            readOnly
+
+            className="datetime-field__input datetime-field__sunrise-value"
+
+            value={formatTime(sunrise)}
+
+            aria-label={pickBilingual(UI.sunrise, language)}
 
           />
 
@@ -641,25 +649,7 @@ export function DateTimeCard({
 
 
 
-        <div className="datetime-field datetime-field--coords">
-
-          <div className="datetime-field__coords-row">
-
-            <div className="datetime-field__coord datetime-field__coord--sunrise">
-
-              <span className="datetime-field__coord-label">
-
-                <BilingualText text={UI.sunrise} />
-
-              </span>
-
-              <span className="datetime-field__sunrise-value" aria-live="polite">
-
-                {formatTime(sunrise)}
-
-              </span>
-
-            </div>
+        <div className="datetime-card__coords-submit">
 
             <label className="datetime-field__coord datetime-field__coord--lat">
 
@@ -732,48 +722,6 @@ export function DateTimeCard({
               />
 
             </label>
-
-          </div>
-
-        </div>
-
-
-
-        <div className="datetime-card__actions">
-          <button
-            type="button"
-            className={[
-              "datetime-card__permission",
-              locationPermissionOn
-                ? "datetime-card__permission--on"
-                : "datetime-card__permission--off",
-            ].join(" ")}
-            onClick={() => requestGeolocation()}
-            aria-label={pickBilingual(
-              locationPermissionOn ? UI.locationPermissionOn : UI.locationPermissionOff,
-              language,
-            )}
-            title={pickBilingual(
-              locationPermissionOn ? UI.locationPermissionOn : UI.locationPermissionOff,
-              language,
-            )}
-          >
-            <svg viewBox="0 0 24 24" aria-hidden="true" className="datetime-card__permission-icon">
-              <path
-                d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z"
-                fill="currentColor"
-              />
-            </svg>
-          </button>
-
-          <button
-            type="button"
-            className="datetime-card__refresh"
-            onClick={handleRefresh}
-            aria-label={pickBilingual(UI.refreshDefaults, language)}
-          >
-            <BilingualText text={UI.refreshDefaults} />
-          </button>
 
           <button
             type="button"

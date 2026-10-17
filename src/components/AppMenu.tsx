@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { BilingualText } from "./BilingualText";
+import { useLanguage, type AppLanguage } from "../context/LanguageContext";
+import { useLocation } from "../context/LocationContext";
 import { useNavigation } from "../context/NavigationContext";
-import { MENU_ITEMS, UI, type Bilingual } from "../utils/bilingual";
+import { MENU_ITEMS, pickBilingual, UI, type Bilingual } from "../utils/bilingual";
 import type { InformationSection } from "../utils/navigationState";
 
 export type AppView =
@@ -46,6 +48,89 @@ export function HomeNavButton({ active, onNavigate, label }: HomeNavButtonProps)
           stroke="currentColor"
           strokeWidth="2"
           strokeLinejoin="round"
+        />
+      </svg>
+    </button>
+  );
+}
+
+interface RefreshPageButtonProps {
+  label: Bilingual;
+}
+
+export function RefreshPageButton({ label }: RefreshPageButtonProps) {
+  return (
+    <button
+      type="button"
+      className="app-menu__toggle header-refresh-btn"
+      aria-label={`${label.ta} ${label.en}`}
+      title={`${label.ta} / ${label.en}`}
+      onClick={() => window.location.reload()}
+    >
+      <svg className="app-menu__icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </button>
+  );
+}
+
+const LANGUAGE_SWITCH: Record<AppLanguage, { next: AppLanguage; glyph: string; label: string }> = {
+  ta: { next: "en", glyph: "A", label: "Switch to English" },
+  en: { next: "ta", glyph: "அ", label: "Switch to Tamil" },
+};
+
+export function LanguageToggleButton() {
+  const { language, setLanguage } = useLanguage();
+  const { next, glyph, label } = LANGUAGE_SWITCH[language];
+
+  return (
+    <button
+      type="button"
+      className="app-menu__toggle header-lang-btn"
+      aria-label={label}
+      title={label}
+      onClick={() => setLanguage(next)}
+    >
+      <span className="header-lang-btn__glyph" lang={next} aria-hidden="true">
+        {glyph}
+      </span>
+    </button>
+  );
+}
+
+export function LocationDetectButton() {
+  const { geoPermission, geoPending, source, requestGeolocation } = useLocation();
+  const { language } = useLanguage();
+  const permissionOn = geoPermission === "granted" || source === "geolocation";
+  const label = `${pickBilingual(UI.detectLocation, language)} (${pickBilingual(
+    permissionOn ? UI.locationPermissionOn : UI.locationPermissionOff,
+    language,
+  )})`;
+
+  return (
+    <button
+      type="button"
+      className={[
+        "app-menu__toggle",
+        "header-location-btn",
+        permissionOn ? "header-location-btn--on" : "header-location-btn--off",
+      ].join(" ")}
+      aria-label={label}
+      title={label}
+      aria-busy={geoPending || undefined}
+      onClick={() => requestGeolocation()}
+    >
+      <svg className="app-menu__icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z"
+          fill="currentColor"
         />
       </svg>
     </button>

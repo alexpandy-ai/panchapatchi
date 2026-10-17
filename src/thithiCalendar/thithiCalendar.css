@@ -1,0 +1,382 @@
+.thithi-calendar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  min-width: 0;
+  color: var(--ink);
+}
+
+.thithi-calendar__intro {
+  max-width: 46rem;
+}
+
+.thithi-calendar__eyebrow {
+  color: var(--red-deep);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.thithi-calendar h2 {
+  margin: 0.35rem 0 0.45rem;
+  font-size: clamp(1.35rem, 2.4vw, 1.8rem);
+  line-height: 1.45;
+  font-weight: 650;
+}
+
+.thithi-calendar__intro p,
+.thithi-calendar__hint,
+.thithi-calendar__method,
+.thithi-calendar__footer {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.thithi-calendar__lookup,
+.thithi-calendar__panel {
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1rem;
+}
+
+.thithi-calendar__actions,
+.thithi-calendar__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.thithi-calendar label {
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.thithi-calendar input,
+.thithi-calendar select,
+.thithi-calendar__actions button,
+.thithi-calendar__chart-controls button {
+  font: inherit;
+  color: var(--ink);
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 0.55rem;
+  padding: 0.45rem 0.7rem;
+}
+
+.thithi-calendar__actions button,
+.thithi-calendar__chart-controls button,
+.thithi-calendar__date-button {
+  cursor: pointer;
+}
+
+.thithi-calendar__actions button:hover,
+.thithi-calendar__chart-controls button:hover,
+.thithi-calendar__date-button:hover {
+  border-color: var(--red);
+  color: var(--red-deep);
+}
+
+.thithi-calendar__result {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.thithi-calendar__value {
+  border-left: 3px solid var(--red);
+  padding-left: 0.9rem;
+}
+
+.thithi-calendar__value small,
+.thithi-calendar__scroll small {
+  display: block;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.thithi-calendar__value strong {
+  display: block;
+  margin: 0.2rem 0;
+  font-size: 1.35rem;
+}
+
+.thithi-calendar__sub {
+  color: var(--muted);
+  font-size: 0.85rem;
+  border-top: 1px solid var(--border);
+  padding-top: 0.75rem;
+}
+
+.thithi-calendar__tabs {
+  margin: 0.2rem 0;
+}
+
+.thithi-calendar__toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.thithi-calendar__toolbar h3,
+.thithi-calendar__chart h3,
+.thithi-calendar__sequence h3 {
+  margin: 0;
+  color: var(--red-deep);
+  font-size: 1.05rem;
+}
+
+.thithi-calendar__toolbar p {
+  margin: 0.2rem 0 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.thithi-calendar__scroll {
+  overflow: auto;
+  max-width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 0.7rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.thithi-calendar table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 56rem;
+  font-size: 0.82rem;
+}
+
+.thithi-calendar th,
+.thithi-calendar td {
+  padding: 0.45rem;
+  text-align: center;
+  border-top: 1px solid rgba(28, 28, 28, 0.08);
+}
+
+.thithi-calendar th {
+  background: var(--gold-soft);
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.thithi-calendar th:first-child,
+.thithi-calendar td:first-child {
+  position: sticky;
+  left: 0;
+  text-align: left;
+  min-width: 8.5rem;
+  background: var(--cream);
+  z-index: 1;
+}
+
+.thithi-calendar__date-button {
+  border: 0;
+  background: transparent;
+  border-radius: 0.35rem;
+  min-width: 2.4rem;
+  padding: 0.15rem 0.4rem;
+  color: inherit;
+}
+
+.thithi-calendar__event {
+  background: #eed0c5;
+}
+
+.thithi-calendar__event .thithi-calendar__date-button {
+  color: #792f35;
+  font-weight: 700;
+}
+
+.thithi-calendar__empty {
+  color: #baaaa0;
+}
+
+.thithi-calendar__critical {
+  background: #fff0b3 !important;
+  color: #694500 !important;
+  border: 1px solid #c28b22 !important;
+}
+
+.thithi-calendar__critical-row td {
+  background: #fff8df;
+}
+
+.thithi-calendar__pournami td {
+  background: #eed0c5;
+  font-weight: 700;
+}
+
+.thithi-calendar__effective-row td {
+  box-shadow: inset 0 2px 0 var(--red), inset 0 -2px 0 var(--red);
+}
+
+.thithi-calendar__effective-row td:first-child {
+  box-shadow: inset 3px 0 0 var(--red), inset 0 2px 0 var(--red), inset 0 -2px 0 var(--red);
+}
+
+.thithi-calendar__review {
+  background: #fff4cf;
+  color: #694500;
+  padding: 0.8rem;
+  border-left: 3px solid #c28b22;
+}
+
+.thithi-calendar__review ul {
+  margin: 0.4rem 0 0 1.1rem;
+}
+
+.thithi-calendar__review-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.45rem;
+}
+
+.thithi-calendar__monthly {
+  max-height: 70vh;
+}
+
+.thithi-calendar__monthly table {
+  min-width: 40rem;
+}
+
+.thithi-calendar__monthly th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  white-space: normal;
+}
+
+.thithi-calendar__monthly td {
+  text-align: left;
+}
+
+.thithi-calendar__sequence {
+  margin-top: 1.4rem;
+  padding-top: 1rem;
+  border-top: 2px solid var(--border);
+}
+
+.thithi-calendar__section {
+  margin-top: 1rem;
+}
+
+.thithi-calendar details {
+  border-top: 1px solid var(--border);
+  padding-top: 0.8rem;
+}
+
+.thithi-calendar summary {
+  cursor: pointer;
+  color: var(--red-deep);
+  font-weight: 650;
+}
+
+.thithi-calendar__method p + p {
+  margin-top: 0.7rem;
+}
+
+.thithi-calendar__method a {
+  color: var(--red-deep);
+}
+
+.thithi-calendar__footer {
+  text-align: center;
+  font-size: 0.78rem;
+}
+
+.thithi-calendar__chart {
+  text-align: center;
+}
+
+.thithi-calendar__chart-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  margin: 0.8rem 0;
+}
+
+.thithi-calendar__chart-controls input {
+  padding: 0;
+}
+
+.thithi-calendar__chart-status {
+  color: var(--red-deep);
+  font-size: 0.85rem;
+}
+
+.thithi-calendar__drawing {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.thithi-calendar__drawing svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.thithi-calendar__anchors {
+  margin-top: 0.8rem;
+}
+
+.thithi-calendar__anchors-toggle {
+  font: inherit;
+  font-weight: 650;
+  color: var(--red-deep);
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 0.55rem;
+  padding: 0.45rem 0.8rem;
+  cursor: pointer;
+}
+
+.thithi-calendar__anchors-toggle:hover {
+  border-color: var(--red);
+}
+
+.thithi-calendar__anchors p {
+  margin-top: 0.7rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 650px) {
+  .thithi-calendar__lookup,
+  .thithi-calendar__panel {
+    padding: 0.85rem;
+  }
+
+  .thithi-calendar__actions {
+    width: 100%;
+  }
+
+  .thithi-calendar__actions button {
+    font-size: 0.78rem;
+  }
+
+  .thithi-calendar__monthly table {
+    min-width: 32rem;
+  }
+
+  .thithi-calendar__scroll {
+    max-height: 650px;
+  }
+}
+
+.home-patchi__miss {
+  display: block;
+  color: #8a4b08;
+  font-size: 0.85rem;
+  line-height: 1.35;
+}

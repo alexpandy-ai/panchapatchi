@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" style="color:#352724;font:14px Arial,sans-serif" viewBox="0 0 736 640" width="100%" role="img" aria-label="32 sectors of 11.25 degrees. Amavasai occupies 0 to 11.25 degrees; following thithis occupy successive sectors. Two sectors remain unnamed.">
+<circle cx="368" cy="320" r="255" fill="none" stroke="currentColor" stroke-width="2"/>
+<line x1="368" y1="320" x2="113.000" y2="320.000" stroke="currentColor" stroke-width="1"/>
+<text x="88.000" y="320.000" text-anchor="middle" dominant-baseline="middle" fill="currentColor">0°</text>
+<text transform="translate(185.881 302.063) rotate(5.625)" text-anchor="middle" dominant-baseline="middle" fill="currentColor">Amavasai</text>
+<line x1="368" y1="320" x2="117.900" y2="270.252" stroke="currentColor" stroke-width="1"/>
+<text x="93.380" y="265.375" text-anchor="middle" dominant-baseline="middle" fill="currentColor">11.25°</text>
+<text transform="translate(192.880 266.878) rotate(16.875)" text-anchor="middle" dominant-baseline="middle" fill="currentColor">Prathamai</text>
+<line x1="368" y1="320" x2="132.411" y2="222.416" stroke="currentColor" stroke-width="1"/>
+<text x="109.314" y="212.849" text-anchor="middle" dominant-baseline="middle" fill="currentColor">22.5°</text>
+<text transform="translate(206.608 233.734) rotate(28.125)" text-anchor="middle" dominant-baseline="middle" fill="currentColor">Thvidiyai</text>
+<line x1="368" y1="320" x2="155.975" y2="178.330" stroke="currentColor" stroke-width="1"/>
+<text x="135.189" y="164.440" text-anchor="middle" dominant-baseline="middle" fill="currentColor">33.75°</text>
+<text transform="translate(226.539 203.906) rotate(39.375)" text-anchor="middle" dominant-baseline="middle" fill="currentColor">Thirithiyai</text>
+<line x1="368" y1="320" x2="187.688" y2="139.688" stroke="currentColor" stroke-width="1"/>
+<text x="170.010" y="122.010" text-anchor="middle" dominant-baseline="middle" fill="currentColor">45°</text>
+<text transform="translate(251.906 178.539) rotate(50.625)" text-anchor="middle" dominant-baseline="middle" fill="currentColor">Chaturthi</text>
+<line x1="368" y1="320" x2="226.330" y2="107.975" stroke="currentColor" stroke-width="1"/>
+<text x="212.440" y="87.189" text-anchor="middle" dominant-baseline="middle" fill="currentColor">56.25°</text>
+<text transform="translate(281.734 158.608) rotate(61.875)" text-anchor="middle" dominant-baseline="middle" fill="currentColor">Panchami</text>
+<line x1="368" y1="320" x2="270.416" y2="84.411" stroke="currentColor" stroke-width="1"/>
+<text x="260.849" y="61.314" text-anchor="middle" dominant-baseline="middle" fill="currentColor">67.5°</text>
+<text transform="translate(314.878 144.880) rotate(73.125)" text-anchor="middle" dominant-baseline="middle" fill="currentColor">Shashti</text>
+<line x1="368" y1="320" x2="318.252" y2="69.900" stroke="currentColor" stroke-width="1"/>
+<text x="313.375" y="45.380" text-anchor="middle" dominant-baseline="middle" fill="currentColor">78.75°</text>
+<text transform="translate(350.063 137.881) rotate(84.375)" text-anchor="middle" dominant-baseline="middle" fill="currentColor">Sapthami</text>
+<line x1="368" y1="320" x2="368.000" y2="65.000" stroke="currentColor" stroke-width="1"/>
+<text x="368.000" y="40.000" text-anchor="middle" dominant-baseline="middle" fill="currentColor">90°</text>
+<text transform="translate(385.937 137.881) rotate(-84.375)" text-anchor="middle" dominant-baseline="middle" fill="currentColor">Ashtami</text>
+<line x1="368" y1="320" x2="417.748" y2="69.900" stroke="currentColor" stroke-width="1"/>
+<text x="422.625" y="45.380" text-anchor="middle" dominant-baseline="middle" fill="currentColor">101.25°</text>
+<text transform="translate(421.122 144.880) rotate(-73.125)" text-anchor="middle" dominant-baseline="middle" fill="currentColor">Navami</text>
+<line x1="368" y1="320" x2="465.584" y2="84.411" stroke="currentColor" stroke-width="1"/>
+<text x="475.151" y="61.314" text-anchor="middle" dominant-baseline="middle" fill="currentColor">112.5°</text>
+<text transform="translate(454.266 158.608) rotate(-61.875)" text-anchor="middle" dominant-baseline="middle" fill="currentColor">Dasami</text>
+<line x1="368" y1="320" x2="509.670" y2="107.975" stroke="currentColor" stroke-width="1"/>
+<text x="523.560" y="87.189" text-anchor="middle" dominant-baseline="middle" fill="currentColor">123.75°</text>
+<text transform="translate(484.094 178.539) rotate(-50.625)" text-anchor="middle" dominant-baseline="middle" fill="currentColor">Ekadasi</text>
+<line x1="368" y1="320" x2="548.312" y2="139.688" stroke="currentColor" stroke-width="1"/>
+<text x="565.990" y="122.010" text-anchor="middle" dominant-baseline="middle" fill="currentColor">135°</text>
+<text transform="translate(509.461 203.906) rotate(-39.375)" text-anchor="middle" dominant-baseline="middle" fill="currentColor">Dwadasi</text>
+<line x1="368" y1="320" x2="580.025" y2="178.330" stroke="currentColor" stroke-width="1"/>
+<text x="600.811" y="164.440" text-anchor="middle" dominant-baseline="middle" fill="currentColor">146.25°</text>
+<text transform="translate(529.392 233.734) rotate(-28.125)" text-anchor="middle" dominant-baseline="middle" fill="currentColor">Thrayodasi</text>
+<line x1="368" y1="320" x2="603.589" y2="222.416" stroke="currentColor" stroke-width="1"/>
+<text x="626.686" y="212.849" text-anchor="middle" dominant-baseline="middle" fill="currentColor">157.5°</text>
+<text transform="translate(543.120 266.878) rotate(-16.875)" text-anchor="middle" dominant-baseline="middle" fill="currentColor">Chaturdasi</text>
+<line x1="368" y1="320" x2="618.100" y2="270.252" stroke="currentColor" stroke-width="1"/>
+<text x="642.620" y="265.375" text-anchor="middle" dominant-baseline="middle" fill="currentColor">168.75°</text>
+<line x1="368" y1="320" x2="623.000" y2="320.000" stroke="currentColor" stroke-width="1"/>
+<text x="648.000" y="320.000" text-anchor="middle" dominant-baseline="middle" fill="currentColor">180°</text>
+<text transform="translate(550.119 337.937) rotate(5.625)" text-anchor="middle" dominant-baseline="middle" fill="currentColor">Pournami</text>
+<line x1="368" y1="320" x2="618.100" y2="369.748" stroke="currentColor" stroke-width="1"/>
+<text x="642.620" y="374.625" text-anchor="middle" dominant-baseline="middle" fill="currentColor">191.25°</text>
+<text transform="translate(543.120 373.122) rotate(16.875)" text-anchor="middle" dominant-baseline="middle" fill="currentColor">Prathamai</text>
+<line x1="368" y1="320" x2="603.589" y2="417.584" stroke="currentColor" stroke-width="1"/>
+<text x="626.686" y="427.151" text-anchor="middle" dominant-baseline="middle" fill="currentColor">202.5°</text>
+<text transform="translate(529.392 406.266) rotate(28.125)" text-anchor="middle" dominant-baseline="middle" fill="currentColor">Thvidiyai</text>
+<line x1="368" y1="320" x2="580.025" y2="461.670" stroke="currentColor" stroke-width="1"/>
+<text x="600.811" y="475.560" text-anchor="middle" dominant-baseline="middle" fill="currentColor">213.75°</text>
+<text transform="translate(509.461 436.094) rotate(39.375)" text-anchor="middle" dominant-baseline="middle" fill="currentColor">Thirithiyai</text>
+<line x1="368" y1="320" x2="548.312" y2="500.312" stroke="currentColor" stroke-width="1"/>
+<text x="565.990" y="517.990" text-anchor="middle" dominant-baseline="middle" fill="currentColor">225°</text>
+<text transform="translate(484.094 461.461) rotate(50.625)" text-anchor="middle" dominant-baseline="middle" fill="currentColor">Chaturthi</text>
+<line x1="368" y1="320" x2="509.670" y2="532.025" stroke="currentColor" stroke-width="1"/>
+<text x="523.560" y="552.811" text-anchor="middle" dominant-baseline="middle" fill="currentColor">236.25°</text>
+<text transform="translate(454.266 481.392) rotate(61.875)" text-anchor="middle" dominant-baseline="middle" fill="currentColor">Panchami</text>
+<line x1="368" y1="320" x2="465.584" y2="555.589" stroke="currentColor" stroke-width="1"/>
+<text x="475.151" y="578.686" text-anchor="middle" dominant-baseline="middle" fill="currentColor">247.5°</text>
+<text transform="translate(421.122 495.120) rotate(73.125)" text-anchor="middle" dominant-baseline="middle" fill="currentColor">Shashti</text>
+<line x1="368" y1="320" x2="417.748" y2="570.100" stroke="currentColor" stroke-width="1"/>
+<text x="422.625" y="594.620" text-anchor="middle" dominant-baseline="middle" fill="currentColor">258.75°</text>
+<text transform="translate(385.937 502.119) rotate(84.375)" text-anchor="middle" dominant-baseline="middle" fill="currentColor">Sapthami</text>
+<line x1="368" y1="320" x2="368.000" y2="575.000" stroke="currentColor" stroke-width="1"/>
+<text x="368.000" y="600.000" text-anchor="middle" dominant-baseline="middle" fill="currentColor">270°</text>
+<text transform="translate(350.063 502.119) rotate(275.625)" text-anchor="middle" dominant-baseline="middle" fill="currentColor">Ashtami</text>
+<line x1="368" y1="320" x2="318.252" y2="570.100" stroke="currentColor" stroke-width="1"/>
+<text x="313.375" y="594.620" text-anchor="middle" dominant-baseline="middle" fill="currentColor">281.25°</text>
+<text transform="translate(314.878 495.120) rotate(286.875)" text-anchor="middle" dominant-baseline="middle" fill="currentColor">Navami</text>
+<line x1="368" y1="320" x2="270.416" y2="555.589" stroke="currentColor" stroke-width="1"/>
+<text x="260.849" y="578.686" text-anchor="middle" dominant-baseline="middle" fill="currentColor">292.5°</text>
+<text transform="translate(281.734 481.392) rotate(298.125)" text-anchor="middle" dominant-baseline="middle" fill="currentColor">Dasami</text>
+<line x1="368" y1="320" x2="226.330" y2="532.025" stroke="currentColor" stroke-width="1"/>
+<text x="212.440" y="552.811" text-anchor="middle" dominant-baseline="middle" fill="currentColor">303.75°</text>
+<text transform="translate(251.906 461.461) rotate(309.375)" text-anchor="middle" dominant-baseline="middle" fill="currentColor">Ekadasi</text>
+<line x1="368" y1="320" x2="187.688" y2="500.312" stroke="currentColor" stroke-width="1"/>
+<text x="170.010" y="517.990" text-anchor="middle" dominant-baseline="middle" fill="currentColor">315°</text>
+<text transform="translate(226.539 436.094) rotate(320.625)" text-anchor="middle" dominant-baseline="middle" fill="currentColor">Dwadasi</text>
+<line x1="368" y1="320" x2="155.975" y2="461.670" stroke="currentColor" stroke-width="1"/>
+<text x="135.189" y="475.560" text-anchor="middle" dominant-baseline="middle" fill="currentColor">326.25°</text>
+<text transform="translate(206.608 406.266) rotate(331.875)" text-anchor="middle" dominant-baseline="middle" fill="currentColor">Thrayodasi</text>
+<line x1="368" y1="320" x2="132.411" y2="417.584" stroke="currentColor" stroke-width="1"/>
+<text x="109.314" y="427.151" text-anchor="middle" dominant-baseline="middle" fill="currentColor">337.5°</text>
+<text transform="translate(192.880 373.122) rotate(343.125)" text-anchor="middle" dominant-baseline="middle" fill="currentColor">Chaturdasi</text>
+<line x1="368" y1="320" x2="117.900" y2="369.748" stroke="currentColor" stroke-width="1"/>
+<text x="93.380" y="374.625" text-anchor="middle" dominant-baseline="middle" fill="currentColor">348.75°</text>
+</svg>

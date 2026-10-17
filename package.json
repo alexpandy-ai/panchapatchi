@@ -8,9 +8,10 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "test": "npx --yes tsx --test src/utils/nextMorningThithi.test.ts src/utils/kolkataCivil.test.ts"
+    "test": "npx --yes tsx --test src/utils/nextMorningThithi.test.ts src/utils/kolkataCivil.test.ts src/thithiCalendar/calendar.test.ts src/thithiCalendar/dailyThithi.test.ts src/utils/thithiSchedule.test.ts"
   },
   "dependencies": {
+    "astronomy-engine": "^2.1.19",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "suncalc": "^2.0.1",

@@ -1,7 +1,13 @@
 import { useState } from "react";
-import { AppMenu, HomeNavButton, viewTitle } from "./components/AppMenu";
+import {
+  AppMenu,
+  HomeNavButton,
+  LanguageToggleButton,
+  LocationDetectButton,
+  RefreshPageButton,
+  viewTitle,
+} from "./components/AppMenu";
 import { BilingualText } from "./components/BilingualText";
-import { useLanguage } from "./context/LanguageContext";
 import { useNavigation } from "./context/NavigationContext";
 import { DateTimeCard } from "./components/DateTimeCard";
 import { DaysView } from "./components/DaysView";
@@ -15,7 +21,6 @@ import { UI } from "./utils/bilingual";
 import "./index.css";
 
 export default function App() {
-  const { language, setLanguage } = useLanguage();
   const { view: activeView, setView: setActiveView } = useNavigation();
   const [selectedDateTime, setSelectedDateTime] = useState(() => new Date());
   const [findPatchiQuery, setFindPatchiQuery] = useState<FindPatchiQuery | null>(null);
@@ -33,34 +38,8 @@ export default function App() {
       <header className="header">
         <div className="header__toolbar">
           <div className="header__actions">
-            <nav className="language-toggle" role="tablist" aria-label="Language">
-              <button
-                type="button"
-                role="tab"
-                aria-selected={language === "ta"}
-                className={
-                  language === "ta"
-                    ? "language-toggle__btn language-toggle__btn--active"
-                    : "language-toggle__btn"
-                }
-                onClick={() => setLanguage("ta")}
-              >
-                த
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={language === "en"}
-                className={
-                  language === "en"
-                    ? "language-toggle__btn language-toggle__btn--active"
-                    : "language-toggle__btn"
-                }
-                onClick={() => setLanguage("en")}
-              >
-                E
-              </button>
-            </nav>
+            <LanguageToggleButton />
+            <LocationDetectButton />
           </div>
           <h1>
             <BilingualText
@@ -73,6 +52,7 @@ export default function App() {
               onNavigate={() => setActiveView("home")}
               label={UI.home}
             />
+            <RefreshPageButton label={UI.refreshPage} />
             <AppMenu activeView={activeView} onNavigate={setActiveView} />
           </div>
         </div>
@@ -81,13 +61,12 @@ export default function App() {
       {activeView !== "schedule" &&
         activeView !== "alternateSchedule" &&
         activeView !== "thithiSchedule" &&
-        activeView !== "thithiDetails" &&
         activeView !== "days" && (
         <DateTimeCard
           value={selectedDateTime}
           onChange={setSelectedDateTime}
-          hideDateLabel={activeView === "home"}
-          hideTimeLabel={activeView === "home"}
+          hideDateLabel={activeView === "home" || activeView === "thithiDetails"}
+          hideTimeLabel={activeView === "home" || activeView === "thithiDetails"}
           selectFieldLabels={activeView === "status"}
           onSubmit={
             activeView === "status"
@@ -116,7 +95,12 @@ export default function App() {
           <ThithiScheduleView selectedDateTime={selectedDateTime} />
         )}
 
-        {activeView === "thithiDetails" && <ThithiDetailsView />}
+        {activeView === "thithiDetails" && (
+          <ThithiDetailsView
+            selectedDateTime={selectedDateTime}
+            onDateTimeChange={setSelectedDateTime}
+          />
+        )}
 
         {activeView === "days" && <DaysView selectedDateTime={selectedDateTime} />}
       </main>

@@ -22,10 +22,8 @@ import { getPakshaGroupDayBilingual } from "../utils/dayGroup";
 import {
   alternatePakshaSupportsNight,
   ALTERNATE_WEEKDAY_ORDER,
-  getAlternateDayActivity,
   getAlternateDayBirdForActivity,
   getAlternateGroupKey,
-  getAlternateNightActivity,
   getAlternateNightBirdForActivity,
   ALTERNATE_ANTHARA_SEGMENT_COUNT,
   ALTERNATE_NIGHT_ACTIVITY_TA,
@@ -48,9 +46,12 @@ import {
   getThithiHeadingsForScheduleWeekday,
   getThithiLabelsForScheduleWeekday,
   getThithiPatchiEntryForDate,
-  getThithiScheduleActivityWeekday,
+  getThithiPatchiEntryForThithiNumber,
   logAntharaThithiDebug,
+  type ThithiPatchiEntry,
 } from "../utils/thithi";
+import { thithiScheduleActivityWeekday, thithiScheduleBirdActivity } from "../utils/thithiSchedule";
+import { useDailyThithi } from "../thithiCalendar/useDailyThithi";
 
 const SHEET_TABS: { id: PakshaId; label: (typeof PAKSHA_BI)[PakshaId] }[] = [
   { id: "valarpirai", label: PAKSHA_BI.valarpirai },
@@ -160,6 +161,17 @@ export function DaySchedulerTable({
     [selectedDateTime, coords],
   );
 
+  /** Thithi Schedule: night antharam 6–10 step from the same calculated thithi Home shows. */
+  const { daily } = useDailyThithi(selectedDateTime, rowHeading === "thithi");
+  const dailySelection = daily?.status === "ready" ? daily.selection : null;
+  const nightThithi = useMemo(
+    () =>
+      dailySelection
+        ? getThithiPatchiEntryForThithiNumber(dailySelection.pakshaId, dailySelection.thithiNumber)
+        : undefined,
+    [dailySelection],
+  );
+
   const showAlternatePakshaTables =
     activePaksha === "valarpirai" || activePaksha === "theipirai";
 
@@ -211,6 +223,7 @@ export function DaySchedulerTable({
             selectedPatchi={selectedPatchi}
             selectedDateTime={selectedDateTime}
             rowHeading={rowHeading}
+            nightThithi={nightThithi}
           />
         </div>
       ) : null}
@@ -224,12 +237,14 @@ function AlternatePakshaScheduleView({
   selectedPatchi,
   selectedDateTime,
   rowHeading,
+  nightThithi,
 }: {
   jamamColumns: DaySchedulerJamamColumn[];
   pakshaId: "valarpirai" | "theipirai";
   selectedPatchi: PatchiSelection;
   selectedDateTime?: Date;
   rowHeading: "day" | "thithi";
+  nightThithi?: ThithiPatchiEntry;
 }) {
   const { coords } = useLocation();
   const [antharaSelection, setAntharaSelection] = useState<AlternateAntharaSelection | null>(
@@ -256,8 +271,9 @@ function AlternatePakshaScheduleView({
       jamamInstant: jamamSlot.start,
       coords,
       allJamamSlots,
+      nightThithi,
     });
-  }, [allJamamSlots, antharaSelection, coords, jamamSlot, pakshaId]);
+  }, [allJamamSlots, antharaSelection, coords, jamamSlot, nightThithi, pakshaId]);
 
   const nextMorningContext = antharaClick?.matrixOptions?.nextMorningThithiContext ?? null;
 
@@ -461,8 +477,7 @@ function AlternatePakshaDayNightTables({
     for (const weekday of ALTERNATE_WEEKDAY_ORDER) {
       const groupKey = getAlternateGroupKey(pakshaId, weekday);
       if (!groupKey) continue;
-      const activityWeekday =
-        getThithiScheduleActivityWeekday(pakshaId, weekday) ?? weekday;
+      const activityWeekday = thithiScheduleActivityWeekday(pakshaId, weekday);
       const morningKey = morningActivityKey(pakshaId, activityWeekday, jamamColumns);
       const headings =
         getThithiHeadingsForScheduleWeekday(pakshaId, weekday) ?? [EMPTY_SCHEDULE_LABEL];
@@ -861,9 +876,7 @@ function AlternatePakshaSingleBirdPeriodTable({
               const groupKey = getAlternateGroupKey(pakshaId, weekday);
               if (!groupKey) return null;
               const activityWeekday =
-                rowHeading === "thithi"
-                  ? (getThithiScheduleActivityWeekday(pakshaId, weekday) ?? weekday)
-                  : weekday;
+                rowHeading === "thithi" ? thithiScheduleActivityWeekday(pakshaId, weekday) : weekday;
 
               return (
                 <tr key={groupKey}>
@@ -873,9 +886,13 @@ function AlternatePakshaSingleBirdPeriodTable({
                     />
                   </th>
                   {jamamColumns.map((column) => {
-                    const activity = isDay
-                      ? getAlternateDayActivity(pakshaId, activityWeekday, column.yama, bird)
-                      : getAlternateNightActivity(pakshaId, activityWeekday, column.yama, bird);
+                    const activity = thithiScheduleBirdActivity(
+                      pakshaId,
+                      activityWeekday,
+                      column.yama,
+                      period,
+                      bird,
+                    );
 
                     const isSelected = activity
                       ? isAlternateAntharaCellSelected(

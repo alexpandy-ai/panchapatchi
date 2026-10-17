@@ -1,315 +1,494 @@
-import { useEffect, useState } from "react";
-import { BilingualText } from "./BilingualText";
-import { useLanguage } from "../context/LanguageContext";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ThithiMoonChart } from "./ThithiMoonChart";
+import { useLanguage, type AppLanguage } from "../context/LanguageContext";
 import { useLocation } from "../context/LocationContext";
-import { pickBilingual, UI } from "../utils/bilingual";
-import { DEFAULT_PLACE } from "../utils/geocode";
-import { kolkataDateKey, kolkataToday, type CivilDate } from "../utils/kolkataCivil";
+import { pickBilingual, type Bilingual } from "../utils/bilingual";
+import { LOCATION_DISPLAY, type GeoCoords } from "../utils/location";
 import {
-  CALENDAR_WEEKDAYS,
-  GREGORIAN_MONTHS,
-  MOON_UI,
-  USNO_YEAR_MAX,
-  USNO_YEAR_MIN,
-} from "../utils/moonPhaseLabels";
-import { resolvePlaceZone } from "../utils/placeTimeZone";
+  calendarYear,
+  downloadCsv,
+  firstCalendarYear,
+  formatPlaceTime,
+  lastCalendarYear,
+  monthCells,
+  peekCalendarYear,
+  placeKey,
+  placeToday,
+  placeWallClock,
+  rowsThroughToday,
+  thithiLabel,
+  degreeRange,
+  type CalendarDay,
+  type ThithiPlace,
+} from "../thithiCalendar/calendar";
+import { cardDateKey } from "../thithiCalendar/dailyThithi";
 import {
-  loadMoonMonth,
-  moonMonthCacheKey,
-  peekMoonMonth,
-  type MoonMonthResult,
-} from "../utils/usnoMoon";
+  criticalDateAria,
+  MONTH_NUMBERS,
+  monthName,
+  outOfRangeText,
+  PIRAI_NAMES,
+  reviewReasonText,
+  TD,
+  thithiNameBi,
+  weekdayName,
+} from "../thithiCalendar/labels";
+import { thithiIndexToSelection } from "../thithiCalendar/thithiIds";
+import { useDailyThithi } from "../thithiCalendar/useDailyThithi";
+import "../thithiCalendar/thithiCalendar.css";
 
-type LoadStatus = "locating" | "loading" | "ready" | "error";
+type CalendarMode = "annual" | "chart" | "daily";
 
-function formatClock(hour: number, minute: number): string {
-  return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+const TABS: { id: CalendarMode; label: Bilingual }[] = [
+  { id: "annual", label: TD.tabAnnual },
+  { id: "chart", label: TD.tabChart },
+  { id: "daily", label: TD.tabDaily },
+];
+
+function DateButton({
+  row,
+  label,
+  language,
+  onChoose,
+}: {
+  row: CalendarDay;
+  label: string;
+  language: AppLanguage;
+  onChoose: (date: string) => void;
+}) {
+  return (
+    <button
+      type="button"
+      className={row.critical ? "thithi-calendar__date-button thithi-calendar__critical" : "thithi-calendar__date-button"}
+      aria-label={row.critical ? criticalDateAria(row.date, language) : row.date}
+      onClick={() => onChoose(row.date)}
+    >
+      {label}
+      {row.critical ? " ⚠" : ""}
+    </button>
+  );
 }
 
-function shiftMonth(year: number, month: number, delta: number): { year: number; month: number } | null {
-  const index = year * 12 + (month - 1) + delta;
-  const nextYear = Math.floor(index / 12);
-  const nextMonth = (index % 12) + 1;
-  if (nextYear < USNO_YEAR_MIN || nextYear > USNO_YEAR_MAX) return null;
-  return { year: nextYear, month: nextMonth };
+interface ThithiDetailsViewProps {
+  selectedDateTime: Date;
+  onDateTimeChange: (next: Date) => void;
 }
 
-export function ThithiDetailsView() {
+/** A selection this close to the device clock (initial load or மீட்டமை) follows live time. */
+const LIVE_WINDOW_MS = 2 * 60_000;
+
+function formatLatLng({ lat, lng }: GeoCoords): string {
+  return `${Math.abs(lat).toFixed(4)}° ${lat >= 0 ? "N" : "S"}, ${Math.abs(lng).toFixed(4)}° ${lng >= 0 ? "E" : "W"}`;
+}
+
+function zoneLabel(place: ThithiPlace): string {
+  if (place.timeZone) return place.timeZone;
+  const minutes = place.offsetMinutes ?? 0;
+  const abs = Math.abs(minutes);
+  return `UTC${minutes < 0 ? "−" : "+"}${Math.floor(abs / 60)}:${String(abs % 60).padStart(2, "0")}`;
+}
+
+export function ThithiDetailsView({ selectedDateTime, onDateTimeChange }: ThithiDetailsViewProps) {
+  const { locationDisplay } = useLocation();
   const { language } = useLanguage();
-  const { coords, geoPending } = useLocation();
-  const [today, setToday] = useState(() => kolkataToday());
-  const [year, setYear] = useState(() => today.year);
-  const [month, setMonth] = useState(() => today.month);
-  const [yearDraft, setYearDraft] = useState(() => String(today.year));
-  const [status, setStatus] = useState<LoadStatus>("loading");
-  const [result, setResult] = useState<MoonMonthResult | null>(null);
-  const [errorDetail, setErrorDetail] = useState("");
-  const [retryToken, setRetryToken] = useState(0);
+  const pick = (text: Bilingual) => pickBilingual(text, language);
+  const { place, locating, daily } = useDailyThithi(selectedDateTime);
+  const placeLabel = pick(locationDisplay);
+  const placeSummary = place.coords
+    ? `${placeLabel} · ${formatLatLng(place.coords)} · ${zoneLabel(place)}`
+    : `${placeLabel} · ${pick(TD.fixedSunTimes)} · ${zoneLabel(place)}`;
 
-  const usingDefaultPlace = !coords && !geoPending;
-  const latitude = coords?.lat ?? (usingDefaultPlace ? DEFAULT_PLACE.latitude : null);
-  const longitude = coords?.lng ?? (usingDefaultPlace ? DEFAULT_PLACE.longitude : null);
+  const firstYear = firstCalendarYear();
+  const lastYear = lastCalendarYear(place);
+  const date = cardDateKey(selectedDateTime);
+  const effective = daily && "effective" in daily ? daily.effective : null;
+  const effectiveDate = effective?.effectiveDateKey ?? null;
+  const selected = daily?.status === "ready" || daily?.status === "unnamed" ? daily.day : null;
+  const lookupRef = useRef<HTMLElement>(null);
+  const [year, setYear] = useState(() => Math.min(lastYear, Math.max(firstYear, Number(date.slice(0, 4)))));
+  const [month, setMonth] = useState(() => Number(date.slice(5, 7)));
+  const [mode, setMode] = useState<CalendarMode>("daily");
+  const [calendar, setCalendar] = useState<{ key: string; rows: CalendarDay[] } | null>(null);
+  const [computing, setComputing] = useState(true);
+  const [error, setError] = useState("");
+  const [exporting, setExporting] = useState(false);
+  const [showAnchors, setShowAnchors] = useState(false);
+  const yearKey = `${placeKey(place)}#${year}`;
 
   useEffect(() => {
-    const id = window.setInterval(() => setToday(kolkataToday()), 30_000);
-    return () => window.clearInterval(id);
-  }, []);
+    setYear(Math.min(lastYear, Math.max(firstYear, Number(date.slice(0, 4)))));
+    setMonth(Number(date.slice(5, 7)));
+  }, [date, firstYear, lastYear]);
 
   useEffect(() => {
-    setYearDraft(String(year));
-  }, [year]);
-
-  useEffect(() => {
-    if (latitude === null || longitude === null) {
-      setStatus("locating");
-      setResult(null);
-      setErrorDetail("");
+    setError("");
+    if (locating) {
+      setCalendar(null);
+      setComputing(false);
       return;
     }
 
-    const zone = resolvePlaceZone(latitude, longitude);
-    const cacheKey = moonMonthCacheKey(year, month, latitude, longitude, zone.cacheToken);
-    const cached = peekMoonMonth(cacheKey);
+    const cached = peekCalendarYear(year, place);
     if (cached) {
-      setResult(cached);
-      setStatus("ready");
-      setErrorDetail("");
+      setCalendar({ key: yearKey, rows: cached });
+      setComputing(false);
       return;
     }
 
-    let ignore = false;
-    setStatus("loading");
-    setResult(null);
-    setErrorDetail("");
-    loadMoonMonth(year, month, latitude, longitude)
-      .then((data) => {
-        if (ignore) return;
-        setResult(data);
-        setStatus("ready");
-      })
-      .catch((error: unknown) => {
-        if (ignore) return;
-        setResult(null);
-        setStatus("error");
-        setErrorDetail(error instanceof Error ? error.message : "");
-      });
-
+    setCalendar(null);
+    let cancel = false;
+    setComputing(true);
+    const handle = window.setTimeout(() => {
+      try {
+        const rows = calendarYear(year, place);
+        if (cancel) return;
+        setCalendar({ key: yearKey, rows });
+        setComputing(false);
+      } catch (caught) {
+        if (cancel) return;
+        setCalendar(null);
+        setComputing(false);
+        setError(caught instanceof Error ? caught.message : String(caught));
+      }
+    }, 0);
     return () => {
-      ignore = true;
+      cancel = true;
+      window.clearTimeout(handle);
     };
-  }, [latitude, longitude, year, month, retryToken]);
+  }, [year, yearKey, place, locating]);
 
-  const todayMonth = GREGORIAN_MONTHS[today.month - 1];
-  const todayWeekday = CALENDAR_WEEKDAYS[today.weekday];
-  const todayLabel = todayMonth && todayWeekday
-    ? `${today.day} ${pickBilingual(todayMonth, language)} ${today.year} · ${pickBilingual(todayWeekday, language)}`
-    : kolkataDateKey(today);
+  useEffect(() => {
+    if (!effective || Math.abs(selectedDateTime.getTime() - Date.now()) > LIVE_WINDOW_MS) return;
+    // The card's wall clock is read as the place's wall clock, so fire when the device clock shows the next sunrise's place time.
+    const end = placeWallClock(place, effective.cycleEnd);
+    const boundary = new Date(end.year, end.month - 1, end.day, end.hour, end.minute, end.second + 1);
+    const handle = window.setTimeout(
+      () => onDateTimeChange(new Date()),
+      Math.max(0, boundary.getTime() - Date.now()),
+    );
+    return () => window.clearTimeout(handle);
+  }, [effective, place, selectedDateTime, onDateTimeChange]);
 
-  const dateHeader = pickBilingual(UI.date, language);
-  const dayHeader = pickBilingual(UI.day, language);
-  const phaseHeader = pickBilingual(MOON_UI.moonPhase, language);
-  const illuminationHeader = pickBilingual(MOON_UI.illumination, language);
-  const previous = shiftMonth(year, month, -1);
-  const next = shiftMonth(year, month, 1);
+  const rows = calendar?.key === yearKey ? calendar.rows : null;
+  const monthRows = useMemo(() => rows?.filter((row) => row.month === month) ?? [], [rows, month]);
+  const monthLabel = monthName(month, language);
 
-  function commitYear(value: string) {
-    const parsed = Number(value);
-    if (Number.isInteger(parsed) && parsed >= USNO_YEAR_MIN && parsed <= USNO_YEAR_MAX) {
-      setYear(parsed);
-      return;
-    }
-    setYearDraft(String(year));
-  }
-
-  function applyMonth(nextMonth: CivilDate["month"], nextYear = year) {
-    setMonth(nextMonth);
+  function chooseDate(next: string) {
+    const [nextYear, nextMonth, nextDay] = next.split("-").map(Number);
+    const nextDateTime = new Date(selectedDateTime);
+    nextDateTime.setFullYear(nextYear, nextMonth - 1, nextDay);
+    onDateTimeChange(nextDateTime);
     setYear(nextYear);
+    setMonth(nextMonth);
+    lookupRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   }
+
+  async function exportAll() {
+    setExporting(true);
+    try {
+      const allRows = await rowsThroughToday(place);
+      downloadCsv(allRows, `Thithi_1950_${placeToday(place)}.csv`, placeSummary, language);
+    } finally {
+      setExporting(false);
+    }
+  }
+
+  const years = Array.from({ length: lastYear - firstYear + 1 }, (_, index) => firstYear + index);
 
   return (
-    <section className="schedule-table-card moon-phase-card" aria-busy={status === "loading" || status === "locating"}>
-      <h2 className="schedule-table-card__title">
-        <BilingualText text={UI.thithiDetails} />
-      </h2>
-      <div className="moon-phase">
-        <p className="moon-phase-today">
-          <span className="moon-phase-today__label">
-            <BilingualText text={MOON_UI.todayKolkata} />
-          </span>
-          <strong className="moon-phase-today__date">
-            {todayLabel}
-            <span className="moon-phase-today__iso">{kolkataDateKey(today)}</span>
-          </strong>
-        </p>
+    <section className="thithi-calendar">
+      <div className="thithi-calendar__intro">
+        <p className="thithi-calendar__eyebrow">{pick(TD.eyebrow)}</p>
+      </div>
 
-        <div className="moon-phase-controls">
+      <section className="thithi-calendar__lookup" ref={lookupRef} aria-live="polite">
+        <div className="thithi-calendar__result">
+          {daily?.status === "locating" ? (
+            <p>{pick(LOCATION_DISPLAY.detecting)}</p>
+          ) : daily?.status === "error" ? (
+            <p className="thithi-calendar__review" title={daily.detail}>
+              {pick(daily.effective ? TD.calculationFailed : TD.sunriseFailed)}
+            </p>
+          ) : daily?.status === "outOfRange" ? (
+            <p>{outOfRangeText(effectiveDate, language)}</p>
+          ) : selected && effective ? (
+            <>
+              <div className="thithi-calendar__value">
+                <strong>{thithiLabel(selected.assumed, language)}</strong>
+              </div>
+              <p className="thithi-calendar__hint">
+                {pick(TD.calculationDate)}: {effective.effectiveDateKey} · {weekdayName(effective.effectiveDateKey, language)}
+                {effective.beforeSunrise ? ` · ${pick(TD.beforeSunrise)}` : null}
+              </p>
+              {selected.critical ? (
+                <div className="thithi-calendar__review">
+                  <strong>{pick(TD.reviewDate)}</strong>
+                  <ul>
+                    {selected.reasons.map((reason, index) => (
+                      <li key={`${reason.code}-${index}`}>{reviewReasonText(reason, language)}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+            </>
+          ) : (
+            <p>{pick(TD.computing)}</p>
+          )}
+        </div>
+      </section>
+
+      <div className="tabs thithi-calendar__tabs" role="tablist" aria-label={pick(TD.tabList)}>
+        {TABS.map((tab) => (
           <button
+            key={tab.id}
             type="button"
-            className="moon-phase-controls__step"
-            disabled={!previous}
-            aria-label={pickBilingual(MOON_UI.previousMonth, language)}
-            onClick={() => {
-              if (previous) applyMonth(previous.month, previous.year);
-            }}
+            role="tab"
+            aria-selected={mode === tab.id}
+            className={mode === tab.id ? "tabs__btn tabs__btn--active" : "tabs__btn"}
+            onClick={() => setMode(tab.id)}
           >
-            ‹
+            {pick(tab.label)}
           </button>
-          <label className="moon-phase-controls__field moon-phase-controls__field--month">
-            <span className="moon-phase-controls__label">
-              <BilingualText text={MOON_UI.month} />
-            </span>
+        ))}
+      </div>
+
+      <section className="thithi-calendar__panel">
+        <div className="thithi-calendar__toolbar">
+          <div>
+            <h3>{pick(mode === "annual" ? TD.tabAnnual : mode === "chart" ? TD.tabChart : TD.headingDaily)}</h3>
+            {mode !== "chart" ? <p>{pick(TD.legend)}</p> : null}
+          </div>
+          <div className="thithi-calendar__actions">
+            <label htmlFor="thithi-year">{pick(TD.year)}</label>
             <select
-              id="moon-phase-month"
-              value={month}
-              onChange={(event) => applyMonth(Number(event.target.value))}
+              id="thithi-year"
+              value={year}
+              onChange={(event) => setYear(Number(event.target.value))}
             >
-              {GREGORIAN_MONTHS.map((label, index) => (
-                <option key={label.en} value={index + 1}>
-                  {pickBilingual(label, language)}
+              {years.map((value) => (
+                <option key={value} value={value}>
+                  {value}
                 </option>
               ))}
             </select>
-          </label>
-          <label className="moon-phase-controls__field moon-phase-controls__field--year">
-            <span className="moon-phase-controls__label">
-              <BilingualText text={MOON_UI.year} />
-            </span>
-            <input
-              id="moon-phase-year"
-              type="number"
-              inputMode="numeric"
-              min={USNO_YEAR_MIN}
-              max={USNO_YEAR_MAX}
-              value={yearDraft}
-              onChange={(event) => setYearDraft(event.target.value)}
-              onBlur={() => commitYear(yearDraft)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  event.currentTarget.blur();
-                }
-              }}
-            />
-          </label>
-          <button
-            type="button"
-            className="moon-phase-controls__step"
-            disabled={!next}
-            aria-label={pickBilingual(MOON_UI.nextMonth, language)}
-            onClick={() => {
-              if (next) applyMonth(next.month, next.year);
-            }}
-          >
-            ›
-          </button>
-        </div>
-
-        <p className="moon-phase-note">
-          <BilingualText text={MOON_UI.phaseAtLocalNoon} />
-          {result ? <span className="moon-phase-note__zone">{result.timeZoneLabel}</span> : null}
-        </p>
-        <p className="moon-phase-note moon-phase-note--quiet">
-          <BilingualText text={MOON_UI.notTithi} />
-        </p>
-        {usingDefaultPlace ? (
-          <p className="moon-phase-note moon-phase-note--quiet">
-            <BilingualText text={MOON_UI.defaultPlace} />
-          </p>
-        ) : null}
-
-        {status === "locating" ? (
-          <p className="moon-phase-status" role="status">
-            <BilingualText text={MOON_UI.locating} />
-          </p>
-        ) : null}
-
-        {status === "loading" ? (
-          <p className="moon-phase-status" role="status">
-            <BilingualText text={MOON_UI.loading} />
-          </p>
-        ) : null}
-
-        {status === "error" ? (
-          <div className="moon-phase-status moon-phase-status--error" role="alert">
-            <p>
-              <BilingualText text={MOON_UI.loadError} />
-            </p>
-            {errorDetail ? <p className="moon-phase-status__detail">{errorDetail}</p> : null}
-            <button type="button" className="moon-phase-retry" onClick={() => setRetryToken((token) => token + 1)}>
-              <BilingualText text={MOON_UI.retry} />
+            <label htmlFor="thithi-month">{pick(TD.month)}</label>
+            <select
+              id="thithi-month"
+              value={month}
+              onChange={(event) => setMonth(Number(event.target.value))}
+            >
+              {MONTH_NUMBERS.map((value) => (
+                <option key={value} value={value}>
+                  {monthName(value, language)}
+                </option>
+              ))}
+            </select>
+            <button type="button" onClick={() => void exportAll()} disabled={exporting || locating}>
+              {pick(exporting ? TD.exporting : TD.exportAll)}
             </button>
           </div>
+        </div>
+        {error ? (
+          <p className="thithi-calendar__review" title={error}>
+            {pick(TD.calculationFailed)}
+          </p>
+        ) : null}
+        {locating ? <p>{pick(LOCATION_DISPLAY.detecting)}</p> : null}
+        {computing && !rows ? <p>{pick(TD.computing)}</p> : null}
+
+        {rows && mode === "chart" ? <ThithiMoonChart year={year} month={month} place={place} /> : null}
+
+        {rows && mode === "daily" ? (
+          <>
+            <h3 className="thithi-calendar__section">
+              {monthLabel} {year}
+            </h3>
+            <div className="thithi-calendar__scroll thithi-calendar__monthly">
+              <table>
+                <thead>
+                  <tr>
+                    <th>{pick(TD.date)}</th>
+                    <th>{pick(TD.angleSunsetThithi)}</th>
+                    <th>{pick(TD.sunriseThithi)}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {monthRows.map((row) => (
+                    <tr
+                      key={row.date}
+                      className={
+                        [
+                          row.critical ? "thithi-calendar__critical-row" : row.assumed === 29 ? "thithi-calendar__pournami" : "",
+                          row.date === effectiveDate ? "thithi-calendar__effective-row" : "",
+                        ]
+                          .filter(Boolean)
+                          .join(" ") || undefined
+                      }
+                      aria-current={row.date === effectiveDate ? "date" : undefined}
+                    >
+                      <td>
+                        <DateButton row={row} label={row.date} language={language} onChoose={chooseDate} />
+                        {row.date === effectiveDate ? <small>◆ {pick(TD.calculationDate)}</small> : null}
+                      </td>
+                      <td>
+                        {thithiLabel(row.assumed, language)}
+                        <small>
+                          {row.angle}°–{row.endAngle}°
+                        </small>
+                      </td>
+                      <td>{thithiLabel(row.actual, language)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         ) : null}
 
-        {status === "ready" && result ? (
-          <div className="moon-phase-table-wrap">
-            <table className="moon-phase-table">
-              <caption className="moon-phase-table__caption">
-                <BilingualText text={MOON_UI.phaseAtLocalNoon} />
-              </caption>
-              <thead>
-                <tr>
-                  <th scope="col">{dateHeader}</th>
-                  <th scope="col">{dayHeader}</th>
-                  <th scope="col">{phaseHeader}</th>
-                  <th scope="col">{illuminationHeader}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {result.rows.map((row) => {
-                  const iso = kolkataDateKey(row);
-                  const isToday = row.year === today.year && row.month === today.month && row.day === today.day;
-                  const weekday = CALENDAR_WEEKDAYS[row.weekday];
-                  return (
-                    <tr
-                      key={iso}
-                      className={[
-                        isToday ? "moon-phase-table__row--today" : "",
-                        row.quarters.length > 0 ? "moon-phase-table__row--event" : "",
-                      ].filter(Boolean).join(" ")}
-                    >
-                      <td data-label={dateHeader}>
-                        <span className="moon-phase-table__value">
-                          <span className="moon-phase-table__date">{row.day}</span>
-                          <span className="moon-phase-table__iso">{iso}</span>
-                        </span>
-                      </td>
-                      <td data-label={dayHeader}>
-                        <span className="moon-phase-table__value">
-                          {weekday ? pickBilingual(weekday, language) : ""}
-                        </span>
-                      </td>
-                      <td data-label={phaseHeader}>
-                        <span className="moon-phase-table__value moon-phase-table__phase">
-                          <span>{row.phase}</span>
-                          {row.quarters.length > 0 ? (
-                            <span className="moon-phase-events">
-                              {row.quarters.map((quarter) => (
-                                <span
-                                  key={`${quarter.phase}-${quarter.hour}-${quarter.minute}`}
-                                  className="moon-phase-event"
-                                >
-                                  <span className="moon-phase-event__name">{quarter.phase}</span>
-                                  <time dateTime={`${iso}T${formatClock(quarter.hour, quarter.minute)}`}>
-                                    {formatClock(quarter.hour, quarter.minute)}
-                                  </time>
-                                  <span className="moon-phase-event__zone">Asia/Kolkata</span>
-                                </span>
-                              ))}
-                            </span>
-                          ) : null}
-                        </span>
-                      </td>
-                      <td data-label={illuminationHeader}>
-                        <span className="moon-phase-table__value">{row.illumination}</span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+        {rows && mode === "annual" ? (
+          <div>
+            <h3 className="thithi-calendar__sequence">{pick(TD.annualHeading)}</h3>
+            <p className="thithi-calendar__hint">{pick(TD.annualHint)}</p>
+            {[0, 1].map((side) => (
+              <section key={side} className="thithi-calendar__section">
+                <h3>
+                  {pick(PIRAI_NAMES[side ? "valarpirai" : "theipirai"])} · {year}
+                </h3>
+                <div className="thithi-calendar__scroll">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>{pick(TD.thithi)}</th>
+                        {MONTH_NUMBERS.map((value) => (
+                          <th key={value}>{monthName(value, language)}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Array.from({ length: 15 }, (_, index) => {
+                        const thithiIndex = index + side * 15;
+                        return (
+                          <tr key={thithiIndex}>
+                            <td>
+                              {pick(thithiNameBi(thithiIndexToSelection(thithiIndex)))}
+                              <small>{degreeRange(thithiIndex)}</small>
+                            </td>
+                            {MONTH_NUMBERS.map((value) => {
+                              const records = monthCells(rows, thithiIndex, value);
+                              if (records.length === 0) {
+                                return (
+                                  <td key={value} className="thithi-calendar__empty">
+                                    —
+                                  </td>
+                                );
+                              }
+                              const marked = records.some((record) => record.mark);
+                              return (
+                                <td key={value} className={marked ? "thithi-calendar__event" : undefined}>
+                                  {records.map((record, recordIndex) => (
+                                    <span key={record.date}>
+                                      {recordIndex > 0 ? ", " : null}
+                                      <DateButton
+                                        row={record}
+                                        label={`${record.d}${record.mark}`}
+                                        language={language}
+                                        onChoose={chooseDate}
+                                      />
+                                    </span>
+                                  ))}
+                                </td>
+                              );
+                            })}
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+            ))}
           </div>
         ) : null}
-      </div>
+
+        {rows && mode !== "chart" ? (
+          <section className="thithi-calendar__review">
+            <strong>
+              {pick(TD.reviewDates)} · {monthLabel}
+            </strong>
+            <div className="thithi-calendar__review-list">
+              {monthRows.some((row) => row.critical) ? (
+                monthRows
+                  .filter((row) => row.critical)
+                  .map((row) => (
+                    <DateButton
+                      key={row.date}
+                      row={row}
+                      label={String(row.d)}
+                      language={language}
+                      onChoose={chooseDate}
+                    />
+                  ))
+              ) : (
+                <span>{pick(TD.none)}</span>
+              )}
+            </div>
+          </section>
+        ) : null}
+
+        {rows && mode !== "chart" ? (
+          <div className="thithi-calendar__anchors">
+            <button
+              type="button"
+              className="thithi-calendar__anchors-toggle"
+              aria-expanded={showAnchors}
+              aria-controls="thithi-anchor-list"
+              onClick={() => setShowAnchors((open) => !open)}
+            >
+              {showAnchors ? "▾" : "▸"} {pick(TD.listingDates)}
+            </button>
+            {showAnchors ? (
+              <div id="thithi-anchor-list">
+                {monthRows
+                  .flatMap((row) => row.events)
+                  .map((event) => (
+                    <p key={`${event.sector}-${event.full}`}>
+                      {thithiLabel(event.index, language)}: <b>{event.date}</b> · {event.angle}° {pick(TD.eventTime)}:{" "}
+                      {formatPlaceTime(event.full, place, language)}
+                      <br />
+                      {pick(TD.sunsetInterval)}: {formatPlaceTime(event.intervalStart, place, language)} →{" "}
+                      {formatPlaceTime(event.intervalEnd, place, language)}
+                    </p>
+                  ))}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+      </section>
+
+      <details>
+        <summary>{pick(TD.methodSummary)}</summary>
+        <div className="thithi-calendar__method">
+          <p>{pick(TD.method1)}</p>
+          <p>{pick(TD.method2)}</p>
+          <p>{pick(TD.method3)}</p>
+          <p>{pick(TD.method4)}</p>
+          <p>
+            {pick(TD.method5)} {pick(TD.place)}: {locating ? pick(LOCATION_DISPLAY.detecting) : placeSummary}.
+            {pick(place.coords ? TD.placeZoneNote : TD.fixedPlaceNote)}
+          </p>
+          <p>
+            {pick(TD.sources)}:{" "}
+            <a href="https://github.com/cosinekitty/astronomy" target="_blank" rel="noopener">
+              Astronomy Engine
+            </a>{" "}
+            ·{" "}
+            <a href="https://aa.usno.navy.mil/data/MoonPhases" target="_blank" rel="noopener">
+              {pick(TD.usnoLink)}
+            </a>
+          </p>
+        </div>
+      </details>
+      <p className="thithi-calendar__footer">{pick(TD.footer)}</p>
     </section>
   );
 }

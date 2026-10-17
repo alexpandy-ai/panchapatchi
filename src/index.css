@@ -61,12 +61,15 @@
 
 html {
   overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 html,
 body,
 #root {
   min-height: 100vh;
+  min-height: 100dvh;
   max-width: 100%;
   width: 100%;
 }
@@ -199,6 +202,7 @@ body {
   right: 0;
   width: min(18rem, 88vw);
   height: 100vh;
+  height: 100dvh;
   background: var(--cream);
   border-left: 1px solid var(--border);
   box-shadow: -8px 0 24px rgba(32, 40, 59, 0.12);
@@ -212,6 +216,7 @@ body {
   from {
     transform: translateX(100%);
   }
+
   to {
     transform: translateX(0);
   }
@@ -525,7 +530,7 @@ body {
   line-height: 1.45;
 }
 
-.schedule-table-card--alternate > .patchi-schedule-patchi-picker,
+.schedule-table-card--alternate>.patchi-schedule-patchi-picker,
 .schedule-table-card--alternate .patchi-filter-chips.patchi-schedule-patchi-picker {
   flex-wrap: wrap;
   align-items: stretch;
@@ -576,7 +581,7 @@ body {
   vertical-align: middle;
 }
 
-.schedule-table-card--alternate > .patchi-pivot-tables {
+.schedule-table-card--alternate>.patchi-pivot-tables {
   max-width: 100%;
   min-width: 0;
   padding: 0 0.85rem 0.85rem;
@@ -1218,8 +1223,7 @@ body {
   left: 7.5rem;
 }
 
-.jamam-segments-table--home-compact.jamam-segments-table--matrix:not(.jamam-segments-table--matrix-with-previous)
-  .jamam-segments-table__segment-time-col {
+.jamam-segments-table--home-compact.jamam-segments-table--matrix:not(.jamam-segments-table--matrix-with-previous) .jamam-segments-table__segment-time-col {
   left: 0;
   width: 8.75rem;
 }
@@ -1547,7 +1551,7 @@ body {
   }
 }
 
-.context-card:has(.patchi-picker-sections) .patchi-picker-sections + .context-row {
+.context-card:has(.patchi-picker-sections) .patchi-picker-sections+.context-row {
   border-top: 1px solid var(--border);
   padding-top: 0.75rem;
   margin-top: 0.15rem;
@@ -1661,11 +1665,11 @@ body {
   margin-top: 0;
 }
 
-.schedule-table-card--alternate > .patchi-schedule-patchi-picker {
+.schedule-table-card--alternate>.patchi-schedule-patchi-picker {
   padding: 0.4rem 0.85rem 0.2rem;
 }
 
-.schedule-table-card--alternate > .patchi-pivot-tables {
+.schedule-table-card--alternate>.patchi-pivot-tables {
   padding-top: 0;
 }
 
@@ -1842,17 +1846,18 @@ body {
   color: var(--text);
 }
 
-.alternate-all-chip-table__weekday-start--spaced > th,
-.alternate-all-chip-table__weekday-start--spaced > td {
+.alternate-all-chip-table__weekday-start--spaced>th,
+.alternate-all-chip-table__weekday-start--spaced>td {
   border-top: 2px solid var(--border);
 }
 
-.alternate-all-chip-table__night-start > th,
-.alternate-all-chip-table__night-start > td {
+.alternate-all-chip-table__night-start>th,
+.alternate-all-chip-table__night-start>td {
   border-top: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
 }
 
 @media (max-width: 767px) {
+
   .alternate-all-chip-table.patchi-pivot-table thead .alternate-all-chip-table__activity-col,
   .alternate-all-chip-table.patchi-pivot-table tbody th.patchi-pivot-table__day,
   .alternate-all-chip-table.patchi-pivot-table tbody th.alternate-all-chip-table__period-label {
@@ -1943,7 +1948,7 @@ body {
   }
 }
 
-.alternate-valarpirai-day-group + .alternate-valarpirai-day-group {
+.alternate-valarpirai-day-group+.alternate-valarpirai-day-group {
   margin-top: 1.25rem;
   padding-top: 0.85rem;
   border-top: 1px solid var(--border);
@@ -1979,17 +1984,17 @@ body {
   padding: 0.15rem 0.85rem 0;
 }
 
-.alternate-valarpirai-single-bird__period + .alternate-valarpirai-single-bird__period {
+.alternate-valarpirai-single-bird__period+.alternate-valarpirai-single-bird__period {
   margin-top: 0.5rem;
 }
 
-.patchi-schedule-patchi-section + .patchi-schedule-patchi-section {
+.patchi-schedule-patchi-section+.patchi-schedule-patchi-section {
   border-top: 1px solid var(--border);
   margin-top: 0.35rem;
   padding-top: 0.25rem;
 }
 
-.schedule-table-card > .patchi-pivot-tables {
+.schedule-table-card>.patchi-pivot-tables {
   padding: 0 0.85rem 0.85rem;
 }
 
@@ -2040,59 +2045,31 @@ body {
   word-break: normal;
 }
 
-.header__toolbar > h1 {
+.header__toolbar>h1 {
   justify-self: center;
   width: 100%;
   max-width: none;
 }
 
-.language-toggle {
-  display: inline-flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  gap: 0.3rem;
-  width: max-content;
-  max-width: 100%;
-}
-
-.language-toggle__btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-family: inherit;
-  font-size: 0.8rem;
-  font-weight: 700;
-  width: var(--touch-min);
-  height: var(--touch-min);
-  min-width: var(--touch-min);
-  min-height: var(--touch-min);
+.header-lang-btn {
+  flex-shrink: 0;
   padding: 0;
-  border-radius: 999px;
-  border: 1px solid var(--chip-border);
-  background: var(--chip-bg);
-  color: var(--chip-text);
-  box-shadow: inset 0 2px 0 var(--chip-mark);
-  cursor: pointer;
-  transition: background 300ms ease, color 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
-  white-space: nowrap;
+  font-family: inherit;
+  line-height: 1;
 }
 
-.language-toggle__btn:hover {
-  border-color: var(--chip-hover-border);
-  background: var(--chip-hover-bg);
-  color: var(--chip-hover-text);
+.header-lang-btn__glyph {
+  font-size: 1.15rem;
+  font-weight: 700;
 }
 
-.language-toggle__btn--active {
-  background: var(--chip-active-bg);
-  border-color: var(--chip-active-border);
-  color: var(--chip-active-text);
-  box-shadow: inset 0 2px 0 var(--stellarium-on-accent);
+.header-location-btn {
+  flex-shrink: 0;
+  padding: 0;
 }
 
-.language-toggle__btn:focus-visible {
-  outline: 2px solid var(--chip-focus);
-  outline-offset: 2px;
+.header-location-btn[aria-busy="true"] .app-menu__icon {
+  opacity: 0.55;
 }
 
 .sub {
@@ -2123,8 +2100,47 @@ body {
   min-width: 0;
 }
 
+/* Date → Time → Sunrise: always one row. Track minimums are the measured widths of
+   "10/18/2026" + calendar icon and "01:51 AM" + clock icon at the input font size. */
 .datetime-card__datetime-row {
-  display: contents;
+  display: grid;
+  grid-area: dts;
+  grid-template-columns: minmax(8.6rem, 1.3fr) minmax(6.3rem, 1fr) minmax(3.5rem, 1fr);
+  grid-template-areas: "date time sunrise";
+  column-gap: 0.5rem;
+  align-items: end;
+  flex: 1 1 22rem;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.datetime-card__datetime-row > * {
+  min-width: 0;
+}
+
+.datetime-card__datetime-row .datetime-field__input {
+  height: var(--touch-min);
+  padding-inline: 0.45rem 0.3rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.datetime-card__datetime-row .datetime-field__input::-webkit-calendar-picker-indicator {
+  margin-inline-start: 0.15rem;
+  padding: 0.1rem;
+}
+
+.datetime-card__datetime-row .datetime-field__sunrise-value {
+  cursor: default;
+}
+
+.datetime-field__day-label {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .datetime-field__date-row {
@@ -2277,16 +2293,6 @@ body {
   white-space: nowrap;
 }
 
-.datetime-field--coords {
-  flex-shrink: 0;
-}
-
-.datetime-field__coords-row {
-  display: flex;
-  align-items: flex-end;
-  gap: 0.45rem;
-}
-
 .datetime-field__coord {
   display: flex;
   flex-direction: column;
@@ -2311,80 +2317,13 @@ body {
   box-sizing: border-box;
 }
 
-.datetime-card__actions {
+.datetime-card__coords-submit {
   display: flex;
   flex-wrap: wrap;
-  flex-shrink: 1;
-  align-self: flex-end;
-  align-items: center;
-  gap: 0.45rem;
+  align-items: flex-end;
+  gap: 0.5rem;
   min-width: 0;
   max-width: 100%;
-}
-
-.datetime-card__permission {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--touch-min);
-  height: var(--touch-min);
-  min-width: var(--touch-min);
-  min-height: var(--touch-min);
-  padding: 0;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: var(--bg-card);
-  cursor: pointer;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
-}
-
-.datetime-card__permission-icon {
-  width: 1.2rem;
-  height: 1.2rem;
-}
-
-.datetime-card__permission--on {
-  color: #1f7a3a;
-  border-color: color-mix(in srgb, #1f7a3a 45%, var(--border));
-  background: color-mix(in srgb, #1f7a3a 12%, var(--bg-card));
-}
-
-.datetime-card__permission--off {
-  color: var(--red);
-  border-color: color-mix(in srgb, var(--red) 45%, var(--border));
-  background: color-mix(in srgb, var(--red) 10%, var(--bg-card));
-}
-
-.datetime-card__permission:hover {
-  border-color: var(--accent);
-}
-
-.datetime-card__refresh {
-  flex: 1 1 auto;
-  min-width: 0;
-  font-family: inherit;
-  font-size: 0.85rem;
-  font-weight: 700;
-  padding: 0.5rem 0.85rem;
-  min-height: var(--touch-min);
-  border: 1px solid var(--border);
-  border-radius: 0.6rem;
-  background: var(--bg-card);
-  color: var(--text);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.15s, border-color 0.15s;
-}
-
-.datetime-card__refresh:hover {
-  border-color: var(--accent);
-  background: var(--accent-soft);
-}
-
-.datetime-card__refresh:focus-visible,
-.datetime-card__permission:focus-visible {
-  outline: 2px solid var(--accent-soft);
-  outline-offset: 2px;
 }
 
 .datetime-card__submit {
@@ -2556,7 +2495,7 @@ body {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .days-view__details-tables > :last-child:nth-child(odd) {
+  .days-view__details-tables> :last-child:nth-child(odd) {
     grid-column: 1 / -1;
     max-width: calc(50% - 0.625rem);
   }
@@ -2642,6 +2581,7 @@ body {
 }
 
 @media (max-width: 767px) {
+
   .days-view .sheet-table.natchathira-patchi-table th,
   .days-view .sheet-table.natchathira-patchi-table td {
     padding: 0.35rem 0.3rem;
@@ -2816,8 +2756,8 @@ body {
   border-top: 2px solid var(--border);
 }
 
-.sheet-table__section-header-row + tr .sheet-table__yama,
-.sheet-table__section-header-row + tr td {
+.sheet-table__section-header-row+tr .sheet-table__yama,
+.sheet-table__section-header-row+tr td {
   border-top: none;
 }
 
@@ -2851,6 +2791,7 @@ body {
 }
 
 @media (max-width: 767px) {
+
   .days-table--two-col th:first-child,
   .days-table--two-col td:first-child,
   .days-table--two-col th.days-table__row-label {
@@ -2893,13 +2834,11 @@ body {
 
   .datetime-card__row {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
     grid-template-areas:
-      "date date"
-      "time sunrise"
-      "location location"
-      "lat lng"
-      "actions actions";
+      "dts"
+      "location"
+      "coords";
     column-gap: 0.4rem;
     row-gap: 0.55rem;
     align-items: end;
@@ -2907,10 +2846,9 @@ body {
     min-width: 0;
   }
 
-  .datetime-card__datetime-row,
-  .datetime-field--coords,
-  .datetime-field__coords-row {
-    display: contents;
+  .datetime-card__datetime-row {
+    grid-template-columns: minmax(8rem, 1.3fr) minmax(5.7rem, 1fr) minmax(3rem, 1fr);
+    column-gap: 0.35rem;
   }
 
   .datetime-field--date {
@@ -2952,8 +2890,7 @@ body {
   .datetime-field--date .datetime-field__input {
     min-width: 0;
     width: 100%;
-    padding-inline: 0.35rem;
-    padding-right: 1.75rem;
+    padding-inline: 0.35rem 0.2rem;
     font-size: 0.85rem;
     min-height: var(--touch-min);
   }
@@ -2961,8 +2898,8 @@ body {
   .datetime-field--time .datetime-field__input {
     min-width: 0;
     width: 100%;
-    padding-inline: 0.35rem;
-    padding-right: 1.75rem;
+    padding-inline: 0.35rem 0.2rem;
+    font-size: 0.85rem;
     min-height: var(--touch-min);
   }
 
@@ -3014,22 +2951,13 @@ body {
     width: 100%;
   }
 
-  .datetime-field__coord--lat {
-    grid-area: lat;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    min-width: 0;
-    width: 100%;
+  .datetime-card__coords-submit {
+    grid-area: coords;
   }
 
+  .datetime-field__coord--lat,
   .datetime-field__coord--lng {
-    grid-area: lng;
-    display: flex;
-    flex-direction: column;
     gap: 0.25rem;
-    min-width: 0;
-    width: 100%;
   }
 
   .datetime-field__coord-label {
@@ -3054,25 +2982,7 @@ body {
     justify-content: flex-start;
   }
 
-  .datetime-card__actions {
-    grid-area: actions;
-    flex: unset;
-    width: 100%;
-    justify-content: stretch;
-  }
-
-  .datetime-card__permission {
-    flex: 0 0 auto;
-  }
-
-  .datetime-card__refresh,
-  .datetime-card__submit {
-    flex: 1 1 0;
-    min-height: var(--touch-min);
-  }
-
-  .datetime-field--location .datetime-field__input,
-  .datetime-field--coords .datetime-field__input {
+  .datetime-field--location .datetime-field__input {
     width: 100%;
   }
 
@@ -3168,216 +3078,23 @@ body {
   padding: 0.35rem 0;
 }
 
+/* —— Home Patchi card: chip picker + selected Patchi details ——
+   Narrow cards: chips form a wrapping grid above full-width details.
+   Wide cards: chips become a vertical column beside the details.
+   Breakpoints are container queries on the card, so the layout follows the
+   space the card actually has rather than the device. */
 .context-card--home {
-  --home-label-width: 7.25rem;
-  --home-label-gap: 1.15rem;
   --home-label-size: 0.88rem;
   --home-value-size: 1.02rem;
+  --home-control-size: 0.8rem;
+  --home-control-radius: calc(var(--touch-min) / 2);
+  --home-gap: 0.75rem;
+  container: home-card / inline-size;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   padding: 0.85rem 0.9rem;
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
-}
-
-.context-card--home .context-row {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 0.28rem 0;
-  gap: 0;
-}
-
-.context-card--home .context-label,
-.context-card--home .context-label--athikara,
-.context-card--home .context-label--naal,
-.context-card--home .context-label--padu,
-.context-card--home .context-label--antharam {
-  flex: 0 0 auto;
-  width: auto;
-  max-width: none;
-  font-size: var(--home-label-size);
-  font-weight: 600;
-  line-height: 1.45;
-  color: var(--muted);
-  text-align: left;
-  white-space: normal;
-  overflow-wrap: anywhere;
-  word-break: normal;
-  min-width: 0;
-}
-
-.context-card--home .context-row--home-thithi {
-  flex-wrap: nowrap;
-  min-width: 0;
-}
-
-/* Shared label | value columns so every value shares one left edge */
-.context-card--home .context-row--home-details {
-  display: grid;
-  grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
-  column-gap: var(--home-label-gap);
-  row-gap: 0.55rem;
-  align-items: center;
-  min-width: 0;
-}
-
-.context-card--home .context-row--home-details > .context-row:not(.context-row--jamam-pair):not(.context-row--home-restore):not(.context-row--home-pirai):not(.context-row--home-thithi) {
-  display: grid;
-  grid-template-columns: subgrid;
-  grid-column: 1 / -1;
-  column-gap: var(--home-label-gap);
-  align-items: center;
-  width: 100%;
-  min-width: 0;
-}
-
-.context-card--home .context-row--home-details > .context-row--home-pirai,
-.context-card--home .context-row--home-details > .context-row--home-thithi {
-  display: grid;
-  grid-template-columns: subgrid;
-  grid-column: 1 / -1;
-  align-items: center;
-  width: 100%;
-  min-width: 0;
-  padding: 0.2rem 0;
-}
-
-.context-card--home .home-pirai-line,
-.context-card--home .context-row--home-thithi .context-inline-item {
-  display: contents;
-}
-
-.context-card--home .context-row--home-thithi .context-label {
-  flex: 0 0 auto;
-  width: auto;
-}
-
-.context-card--home .context-row--home-details .context-inline-item,
-.context-card--home .context-row--home-details .context-inline-item--athikara,
-.context-card--home .context-row--home-details .context-inline-item--naal,
-.context-card--home .context-row--home-details .context-inline-item--padu {
-  display: contents;
-}
-
-.context-card--home .context-row--home-details > .context-row--jamam-pair {
-  grid-column: 1 / -1;
-  display: block;
-  width: 100%;
-  min-width: 0;
-  padding-top: 0.35rem;
-}
-
-.context-card--home .context-row--home-athikara,
-.context-card--home .context-row--home-naal,
-.context-card--home .context-row--home-padu {
-  min-width: 0;
-}
-
-.context-card--home .context-value--home-thithi-name,
-.context-card--home .context-value--home-athikara,
-.context-card--home .context-value--home-naal,
-.context-card--home .context-value--home-padu,
-.context-card--home .context-value--home-day,
-.context-card--home .context-value--home-pirai {
-  justify-self: start;
-  text-align: left;
-  min-width: 0;
-}
-
-.context-card--home .context-value--home-pirai {
-  font-size: var(--home-label-size);
-  font-weight: 600;
-  line-height: 1.45;
-  color: var(--muted);
-  white-space: normal;
-  overflow-wrap: anywhere;
-  word-break: normal;
-  justify-self: stretch;
-  width: auto;
-  max-width: 100%;
-  min-width: 0;
-}
-
-.context-card--home .home-field-select {
-  appearance: none;
-  font-family: inherit;
-  font-size: 0.8rem;
-  font-weight: 700;
-  line-height: 1.35;
-  color: var(--ink);
-  background-color: var(--white);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%231c1c1c' d='M1.4.8 6 5.4 10.6.8 12 2.2 6 8 0 2.2z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  border: 1px solid rgba(28, 28, 28, 0.16);
-  border-radius: 999px;
-  box-shadow: inset 0 -3px 0 var(--gold);
-  padding: 0.35rem 1.9rem 0.35rem 0.85rem;
-  min-height: var(--touch-min);
-  width: max-content;
-  max-width: 100%;
-  min-width: 7.75rem;
-  justify-self: start;
-  box-sizing: border-box;
-  cursor: pointer;
-  field-sizing: content;
-}
-
-.context-card--home .home-field-select:focus {
-  outline: 2px solid var(--accent-soft);
-  border-color: var(--accent);
-}
-
-.context-card--home .context-value--home-thithi-name {
-  justify-self: start;
-  width: auto;
-  min-width: 0;
-  max-width: 100%;
-}
-
-.context-card--home .context-value--home-thithi-name .home-field-select {
-  width: max-content;
-  max-width: 100%;
-  justify-self: start;
-  flex-shrink: 0;
-  font-size: 0.8rem;
-  color: var(--ink);
-}
-
-.context-card--home .home-field-select--pirai {
-  width: auto;
-  min-width: 7.75rem;
-  max-width: 100%;
-}
-
-.context-card--home .context-row--home-details > .context-row--home-restore {
-  display: flex;
-  grid-column: 1 / -1;
-  justify-content: flex-start;
-  padding-top: 0.15rem;
-}
-
-.context-card--home .home-thithi-restore {
-  font-family: inherit;
-  font-size: 0.78rem;
-  font-weight: 700;
-  line-height: 1.3;
-  min-height: var(--touch-min);
-  padding: 0.35rem 0.7rem;
-  border: 1px solid var(--border);
-  border-radius: 0.6rem;
-  background: var(--bg-card);
-  color: var(--text);
-  cursor: pointer;
-  white-space: normal;
-  text-align: center;
-}
-
-.context-card--home .home-thithi-restore:hover,
-.context-card--home .home-thithi-restore:focus-visible {
-  border-color: var(--accent);
-  background: var(--accent-soft);
-  outline: none;
 }
 
 .visually-hidden {
@@ -3392,250 +3109,281 @@ body {
   border: 0;
 }
 
-.context-card--home .context-value--home-thithi-name,
-.context-card--home .context-value--home-athikara,
-.context-card--home .context-value--home-naal,
-.context-card--home .context-value--home-padu,
-.context-card--home .context-value--home-day {
-  font-size: var(--home-value-size);
-  font-weight: 700;
-  color: var(--accent);
-  line-height: 1.45;
-  white-space: normal;
-  overflow-wrap: anywhere;
-  word-break: normal;
-}
-
-.context-card--home .context-value--home-athikara,
-.context-card--home .context-value--home-naal,
-.context-card--home .context-value--home-padu,
-.context-card--home .context-value--home-day {
-  white-space: normal;
-}
-
-.context-card--home .context-value--home-athikara .bi-ta,
-.context-card--home .context-value--home-naal .bi-ta,
-.context-card--home .context-value--home-padu .bi-ta,
-.context-card--home .context-value--home-thithi-name .bi-ta,
-.context-card--home .context-value--home-day .bi-ta,
-.context-card--home .context-value--home-pirai .bi-ta {
-  font-weight: 700;
-  font-size: inherit;
-  line-height: inherit;
-}
-
-.context-card--home .context-row--home-main {
+.context-card--home .home-patchi {
   display: grid;
-  grid-template-columns: minmax(4.25rem, 7.25rem) minmax(0, 1fr);
-  column-gap: 0.65rem;
-  align-items: stretch;
-  width: 100%;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--home-gap);
+  align-items: start;
   min-width: 0;
-  padding: 0.1rem 0 0.2rem;
 }
 
-.context-card--home .context-row--home-chips {
-  display: flex;
-  align-items: stretch;
+.context-card--home .home-patchi__chips {
   min-width: 0;
+}
+
+.context-card--home .home-patchi__chips .patchi-filter-chips {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.4rem;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
   padding: 0;
 }
 
-.context-card--home .context-row--home-chips .patchi-filter-chips {
+/* Same box in every state: selecting a chip only swaps its colours. */
+.context-card--home .home-patchi__chips .patchi-submenu__btn {
   display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
-  flex-wrap: nowrap;
-  align-items: stretch;
-  justify-content: space-between;
-  gap: 0.3rem;
-  padding: 0;
-  min-width: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.context-card--home .context-row--home-chips .patchi-submenu__btn {
-  display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex: 1 1 0;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: var(--touch-min);
+  margin: 0;
+  padding: 0.35rem 0.5rem;
+  border-width: 1px;
+  border-radius: var(--home-control-radius);
+  font-size: var(--home-control-size);
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  transform: none;
+}
+
+@container home-card (min-width: 10rem) {
+  .context-card--home .home-patchi__chips .patchi-filter-chips {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container home-card (min-width: 15rem) {
+  .context-card--home .home-patchi__chips .patchi-filter-chips {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@container home-card (min-width: 28rem) {
+  .context-card--home .home-patchi__chips .patchi-filter-chips {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+@container home-card (min-width: 36rem) {
+  .context-card--home .home-patchi {
+    grid-template-columns: minmax(6.5rem, max-content) minmax(0, 1fr);
+    column-gap: 1rem;
+  }
+
+  .context-card--home .home-patchi__chips .patchi-filter-chips {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.context-card--home .home-patchi__details {
+  container: home-details / inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: var(--home-gap);
+  min-width: 0;
+}
+
+/* Pirai + Thithi always share one row of two equal columns. */
+.context-card--home .home-pirai-thithi-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.context-card--home .home-pirai-thithi-row__field {
+  display: flex;
+  min-width: 0;
+}
+
+.context-card--home .home-field-select {
+  appearance: none;
+  -webkit-appearance: none;
+  display: block;
+  flex: 1 1 auto;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: var(--touch-min);
+  margin: 0;
+  padding: 0.55rem 2.1rem 0.55rem 0.85rem;
+  font-family: inherit;
+  font-size: var(--home-control-size);
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--ink);
+  background-color: var(--white);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%231c1c1c' d='M1.4.8 6 5.4 10.6.8 12 2.2 6 8 0 2.2z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.8rem center;
+  background-size: 12px 8px;
+  border: 1px solid rgba(28, 28, 28, 0.16);
+  border-radius: var(--home-control-radius);
+  box-shadow: inset 0 -3px 0 var(--gold);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.context-card--home .home-field-select:focus {
+  outline: 2px solid var(--accent-soft);
+  border-color: var(--accent);
+}
+
+/* Label | value rows share one value edge. */
+.context-card--home .home-patchi__facts {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  column-gap: 1rem;
+  row-gap: 0.55rem;
+  align-items: center;
+  min-width: 0;
+  margin: 0;
+}
+
+.context-card--home .home-patchi__fact {
+  display: contents;
+}
+
+.context-card--home .home-patchi__facts dt {
+  min-width: 0;
+  font-size: var(--home-label-size);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--muted);
+  overflow-wrap: break-word;
+}
+
+.context-card--home .home-patchi__facts dd {
+  min-width: 0;
+  margin: 0;
+}
+
+.context-card--home .home-patchi__facts .context-value {
+  font-size: var(--home-value-size);
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--accent);
+  overflow-wrap: break-word;
+}
+
+/* Bird name and its emoji stay on one line; the name only breaks if the
+   column is narrower than the word itself, and the emoji stays beside it. */
+.context-card--home .inline-emoji-label {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.15em;
+  max-width: 100%;
+}
+
+.context-card--home .inline-emoji-label__text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.context-card--home .inline-emoji-label__emoji {
+  flex: none;
+}
+
+.context-card--home .home-patchi__control {
+  display: flex;
+  min-width: 0;
+}
+
+.context-card--home .home-patchi__dropdown {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
   min-height: var(--touch-min);
-  padding: 0.35rem 0.4rem;
-  font-size: 0.8rem;
-  line-height: 1.35;
-  white-space: normal;
-  overflow-wrap: anywhere;
-  word-break: normal;
-}
-
-.context-card--home .context-row--home-chips .patchi-submenu__btn .bilingual,
-.context-card--home .context-row--home-chips .patchi-submenu__btn .bi-ta,
-.context-card--home .context-row--home-chips .patchi-submenu__btn .bi-en {
-  display: inline;
-  font-size: inherit;
-  font-weight: inherit;
-  line-height: inherit;
   margin: 0;
-}
-
-.context-card--home .context-inline-item {
-  min-width: 0;
-}
-
-.context-card--home .context-value--thithi-paksha {
-  display: inline-flex;
-  flex-wrap: nowrap;
-  align-items: baseline;
-  gap: 0.35rem;
-}
-
-.context-card--home .context-value__sep {
-  color: var(--muted);
-  font-weight: 500;
-}
-
-.jamam-pair--single {
-  width: 100%;
-}
-
-.context-card--home .context-row--jamam-pair {
-  padding-top: 0.35rem;
-}
-
-.context-card--home .jamam-pair__cell--home-stack {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0.35rem;
-  width: 100%;
-}
-
-.context-card--home .jamam-pair__cell--home-jamam {
-  display: grid;
-  grid-template-columns: max-content minmax(0, 1fr);
-  column-gap: var(--home-label-gap);
-  align-items: center;
-  width: 100%;
-  min-width: 0;
-}
-
-.context-card--home .jamam-pair__cell--home-jamam .context-label {
-  width: auto;
-  max-width: none;
-  flex: unset;
-  justify-self: start;
-}
-
-.context-card--home .jamam-pair__cell--home-jamam .context-value-btn,
-.context-card--home .jamam-pair__cell--home-jamam .context-value {
-  width: auto;
-  max-width: 100%;
-  min-width: 0;
-  justify-self: start;
+  padding: 0.45rem 0.85rem;
+  font-family: inherit;
+  font-size: var(--home-control-size);
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--ink);
   text-align: left;
-}
-
-.context-card--home .jamam-pair__cell--home-antharam .context-value--home-antharam,
-.context-card--home .jamam-pair__cell--home-antharam .thozhil-value-btn {
-  font-size: var(--home-value-size);
-  font-weight: 700;
-  color: var(--accent);
-  line-height: 1.45;
+  text-decoration: none;
   white-space: normal;
-  overflow-wrap: anywhere;
-  word-break: normal;
+  overflow-wrap: break-word;
+  background: var(--white);
+  border: 1px solid rgba(28, 28, 28, 0.16);
+  border-radius: var(--home-control-radius);
+  box-shadow: none;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
 }
 
-.context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn {
-  font-size: var(--home-value-size);
-  font-weight: 700;
+.context-card--home .home-patchi__dropdown>span {
+  min-width: 0;
 }
 
-.context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn .bi-ta {
-  font-size: inherit;
-  font-weight: 700;
+.context-card--home .home-patchi__dropdown::after {
+  content: "";
+  flex: 0 0 12px;
+  height: 8px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%231c1c1c' d='M1.4.8 6 5.4 10.6.8 12 2.2 6 8 0 2.2z'/%3E%3C/svg%3E") center / 12px 8px no-repeat;
 }
 
-.context-card--home .jamam-summary__value {
-  white-space: normal;
-  overflow-wrap: anywhere;
+.context-card--home .home-patchi__dropdown:hover {
+  border-color: var(--gold);
+  background: var(--rose);
 }
 
-/* Home — mobile: even type scale, aligned label column, readable chips */
+.context-card--home .home-patchi__dropdown[aria-expanded="true"],
+.context-card--home .home-patchi__dropdown[aria-expanded="true"]:hover {
+  background: var(--chip-active-bg);
+  border-color: var(--chip-border);
+  color: var(--chip-active-text);
+}
+
+/* Not enough room beside the label: jamam / antharam controls go full width below it. */
+@container home-details (max-width: 19rem) {
+  .context-card--home .home-patchi__fact--control>dt,
+  .context-card--home .home-patchi__fact--control>dd {
+    grid-column: 1 / -1;
+  }
+
+  .context-card--home .home-patchi__fact--control>dt {
+    margin-top: 0.2rem;
+  }
+}
+
+/* Very narrow (large text / zoom): every label sits above its value. */
+@container home-details (max-width: 14rem) {
+  .context-card--home .home-patchi__facts {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0.15rem;
+  }
+
+  .context-card--home .home-patchi__facts dd {
+    margin-bottom: 0.45rem;
+  }
+}
+
 @media (max-width: 767px) {
   .context-card--home {
-    --home-label-width: 6.75rem;
-    --home-label-gap: 0.85rem;
     --home-label-size: 0.8rem;
     --home-value-size: 0.92rem;
+    --home-control-size: 0.78rem;
+    --home-gap: 0.65rem;
     padding: 0.7rem 0.65rem;
     border-radius: 0.65rem;
-  }
-
-  .context-card--home .context-row {
-    padding: 0.22rem 0;
-  }
-
-  .context-card--home .context-row--home-pirai {
-    gap: 0;
-  }
-
-  .context-card--home .context-value--home-athikara,
-  .context-card--home .context-value--home-naal,
-  .context-card--home .context-value--home-padu,
-  .context-card--home .context-value--home-day,
-  .context-card--home .jamam-pair__cell--home-antharam .context-value--home-antharam {
-    font-size: var(--home-value-size);
-  }
-
-  .context-card--home .context-row--home-main {
-    grid-template-columns: minmax(4.25rem, 6.5rem) minmax(0, 1fr);
-    column-gap: 0.5rem;
-  }
-
-  .context-card--home .context-row--home-chips {
-    padding: 0;
-  }
-
-  .context-card--home .context-row--home-chips .patchi-filter-chips {
-    gap: 0.28rem;
-    flex-wrap: nowrap;
-    flex-direction: column;
-  }
-
-  .context-card--home .context-row--home-chips .patchi-submenu__btn {
-    min-height: var(--touch-min);
-    padding: 0.35rem 0.3rem;
-    font-size: 0.78rem;
-    border-radius: 0.4rem;
-    flex: 1 1 0;
-    width: 100%;
-  }
-
-  .context-card--home .jamam-pair__cell--home-stack {
-    gap: 0.28rem;
-  }
-
-  .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn,
-  .context-card--home .jamam-pair__cell--home-jamam .context-value {
-    font-size: var(--home-value-size);
-  }
-
-  .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn {
-    padding: 0.45rem 0.5rem;
-    min-height: var(--touch-min);
-    max-width: 100%;
-  }
-
-  .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn .bi-ta,
-  .context-card--home .jamam-pair__cell--home-antharam .thozhil-value-btn .bi-ta,
-  .context-card--home .jamam-pair__cell--home-antharam .context-value--home-antharam .bi-ta {
-    white-space: normal;
-    overflow-wrap: anywhere;
   }
 
   .datetime-card--form-grid {
@@ -3644,25 +3392,17 @@ body {
   }
 }
 
-@media (max-width: 480px) {
-  .context-card--home .context-value--home-thithi-name .home-field-select,
-  .context-card--home .home-field-select--pirai {
-    max-width: 100%;
-  }
-}
-
-@media (max-width: 400px) {
+@media (max-width: 425px) {
   .context-card--home {
-    --home-label-width: 6.5rem;
-    --home-label-size: 0.8rem;
-    --home-value-size: 0.9rem;
-    padding: 0.6rem 0.55rem;
+    --home-label-size: 0.78rem;
+    --home-value-size: 0.88rem;
+    padding: 0.6rem 0.5rem;
   }
 
-  .context-card--home .context-row--home-chips .patchi-submenu__btn {
-    min-height: var(--touch-min);
-    font-size: 0.78rem;
-    padding: 0.4rem 0.3rem;
+  .context-card--home .home-field-select {
+    padding-left: 0.7rem;
+    padding-right: 1.85rem;
+    background-position: right 0.65rem center;
   }
 }
 
@@ -3684,33 +3424,22 @@ body {
   align-items: end;
 }
 
-/* Flatten wrappers so date/time/coords land in separate grid cells */
-.datetime-card--form-grid .datetime-card__datetime-row,
-.datetime-card--form-grid .datetime-field--coords,
-.datetime-card--form-grid .datetime-field__coords-row {
-  display: contents;
+.datetime-card--form-grid .datetime-card__datetime-row {
+  display: grid;
+  column-gap: 0.5rem;
 }
 
-.datetime-card--form-grid .datetime-field:not(.datetime-field--coords),
-.datetime-card--form-grid .datetime-field--date,
-.datetime-card--form-grid .datetime-field--time,
-.datetime-card--form-grid .datetime-field--location,
-.datetime-card--form-grid .datetime-field__coord,
+.datetime-card--form-grid .datetime-field,
 .datetime-card--form-grid .datetime-field__coord--sunrise,
-.datetime-card--form-grid .datetime-field__coord--lat,
-.datetime-card--form-grid .datetime-field__coord--lng,
-.datetime-card--form-grid .datetime-card__actions {
+.datetime-card--form-grid .datetime-card__coords-submit {
   box-sizing: border-box;
   min-width: 0;
   width: 100%;
   max-width: 100%;
 }
 
-.datetime-card--form-grid .datetime-field:not(.datetime-field--coords),
-.datetime-card--form-grid .datetime-field__coord,
-.datetime-card--form-grid .datetime-field__coord--sunrise,
-.datetime-card--form-grid .datetime-field__coord--lat,
-.datetime-card--form-grid .datetime-field__coord--lng {
+.datetime-card--form-grid .datetime-field,
+.datetime-card--form-grid .datetime-field__coord {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
@@ -3761,7 +3490,7 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: clip;
-  padding-right: 2.25rem;
+  padding-inline: 0.45rem 0.3rem;
 }
 
 .datetime-card--form-grid .datetime-field--date .datetime-field__input {
@@ -3794,17 +3523,10 @@ body {
   text-overflow: clip;
 }
 
-.datetime-card--form-grid .datetime-card__actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+.datetime-card--form-grid .datetime-card__coords-submit {
   gap: 12px;
-  min-width: 0;
-  width: 100%;
-  max-width: 100%;
 }
 
-.datetime-card--form-grid .datetime-card__refresh,
 .datetime-card--form-grid .datetime-card__submit {
   box-sizing: border-box;
   min-height: 48px;
@@ -3815,16 +3537,6 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex: 1 1 auto;
-}
-
-.datetime-card--form-grid .datetime-card__permission {
-  box-sizing: border-box;
-  width: 48px;
-  height: 48px;
-  min-width: 48px;
-  min-height: 48px;
-  flex-shrink: 0;
 }
 
 .datetime-card--form-grid .datetime-card__weekday {
@@ -3854,157 +3566,85 @@ body {
   grid-area: sunrise;
 }
 
-.datetime-card--form-grid .datetime-field__coord--lat {
-  grid-area: lat;
+.datetime-card--form-grid .datetime-card__coords-submit {
+  grid-area: coords;
 }
 
-.datetime-card--form-grid .datetime-field__coord--lng {
-  grid-area: lng;
-}
-
-.datetime-card--form-grid .datetime-card__actions {
-  grid-area: actions;
-}
-
-/* Desktop / laptop ≥1280px — row1 fields, row2 lat/lng + actions */
+/* Desktop / laptop ≥1280px — row1 date·time·sunrise + location, row2 lat/lng/submit */
 @media (min-width: 1280px) {
   .datetime-card--form-grid {
     padding: 1rem 1.25rem;
   }
 
   .datetime-card--form-grid .datetime-card__row {
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.2fr) minmax(0, 2fr) minmax(0, 0.85fr);
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
     grid-template-rows: auto auto;
     grid-template-areas:
-      "date time location sunrise"
-      "lat lng actions actions";
+      "dts location"
+      "coords coords";
     column-gap: 12px;
     row-gap: 12px;
     align-items: end;
   }
-
-  .datetime-card--form-grid .datetime-card__actions {
-    justify-content: flex-start;
-  }
-
-  .datetime-card--form-grid .datetime-card__refresh,
-  .datetime-card--form-grid .datetime-card__submit {
-    flex: 1 1 0;
-  }
 }
 
-/* Tablet 768–1023px — two columns; keep related pairs together */
+/* Tablet 768–1023px — date·time·sunrise beside location; coords below */
 @media (min-width: 768px) and (max-width: 1023px) {
   .datetime-card--form-grid {
     padding: 0.9rem 1rem;
   }
 
   .datetime-card--form-grid .datetime-card__row {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
     grid-template-rows: auto;
     grid-template-areas:
-      "date time"
-      "location sunrise"
-      "lat lng"
-      "actions actions";
+      "dts location"
+      "coords coords";
     column-gap: 10px;
     row-gap: 12px;
     align-items: end;
   }
-
-  .datetime-card--form-grid .datetime-card__actions {
-    justify-content: flex-start;
-  }
-
-  .datetime-card--form-grid .datetime-card__refresh,
-  .datetime-card--form-grid .datetime-card__submit {
-    flex: 1 1 0;
-  }
-
-  .context-card--home .context-row--home-chips .patchi-filter-chips {
-    flex-wrap: nowrap;
-    flex-direction: column;
-  }
 }
 
-/* Small laptop 1024–1279px — three columns */
+/* Small laptop 1024–1279px — date·time·sunrise beside location; coords below */
 @media (min-width: 1024px) and (max-width: 1279px) {
   .datetime-card--form-grid {
     padding: 0.9rem 1rem;
   }
 
   .datetime-card--form-grid .datetime-card__row {
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr) minmax(0, 1.6fr);
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
     grid-template-rows: auto;
     grid-template-areas:
-      "date time location"
-      "sunrise lat lng"
-      "actions actions actions";
+      "dts location"
+      "coords coords";
     column-gap: 12px;
     row-gap: 12px;
     align-items: end;
   }
-
-  .datetime-card--form-grid .datetime-card__actions {
-    justify-content: flex-start;
-  }
-
-  .datetime-card--form-grid .datetime-card__refresh,
-  .datetime-card--form-grid .datetime-card__submit {
-    flex: 1 1 0;
-  }
-
-  .context-card--home .context-row--home-chips .patchi-filter-chips {
-    flex-wrap: nowrap;
-    flex-direction: column;
-  }
 }
 
-/* Phone <768px — paired rows: Day|Date, Time|Sunrise, Lat|Lng; location full width */
+/* Phone <768px — Date|Time|Sunrise row, location full width, Lat|Lng|Submit row */
 @media (max-width: 767px) {
   .datetime-card--form-grid .datetime-card__row {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
     grid-template-rows: none;
     grid-template-areas:
-      "date date"
-      "time sunrise"
-      "location location"
-      "lat lng"
-      "actions actions";
+      "dts"
+      "location"
+      "coords";
     column-gap: 0.4rem;
     row-gap: 0.55rem;
     align-items: end;
   }
 
-  .datetime-card--form-grid .datetime-field--date {
-    grid-area: date;
+  .datetime-card--form-grid .datetime-card__datetime-row {
+    grid-template-columns: minmax(8rem, 1.3fr) minmax(5.7rem, 1fr) minmax(3rem, 1fr);
+    column-gap: 0.35rem;
   }
 
-  .datetime-card--form-grid .datetime-field--time {
-    grid-area: time;
-  }
-
-  .datetime-card--form-grid .datetime-field--location {
-    grid-area: location;
-  }
-
-  .datetime-card--form-grid .datetime-field__coord--sunrise {
-    grid-area: sunrise;
-  }
-
-  .datetime-card--form-grid .datetime-field__coord--lat {
-    grid-area: lat;
-  }
-
-  .datetime-card--form-grid .datetime-field__coord--lng {
-    grid-area: lng;
-  }
-
-  .datetime-card--form-grid .datetime-field:not(.datetime-field--coords),
-  .datetime-card--form-grid .datetime-field__coord,
-  .datetime-card--form-grid .datetime-field__coord--sunrise,
-  .datetime-card--form-grid .datetime-field__coord--lat,
-  .datetime-card--form-grid .datetime-field__coord--lng {
+  .datetime-card--form-grid .datetime-field,
+  .datetime-card--form-grid .datetime-field__coord {
     flex-direction: column;
     align-items: stretch;
     gap: 0.25rem;
@@ -4017,35 +3657,6 @@ body {
     min-height: 1.1rem;
     white-space: normal;
     overflow-wrap: anywhere;
-  }
-
-  /* Day | Date — equal columns inside the date field */
-  .datetime-card--form-grid .datetime-field__date-row {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    align-items: stretch;
-    gap: 0.4rem;
-    width: 100%;
-  }
-
-  .datetime-card--form-grid .datetime-card__weekday {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-self: stretch;
-    min-width: 0;
-    min-height: 48px;
-    max-width: 100%;
-  }
-
-  .datetime-card--form-grid .datetime-card__weekday .bi-ta {
-    font-size: 0.88rem;
-    overflow-wrap: anywhere;
-    white-space: normal;
-  }
-
-  .datetime-card--form-grid .datetime-card__weekday .bi-en {
-    display: none;
   }
 
   .datetime-card--form-grid .datetime-field--date .datetime-field__input,
@@ -4061,22 +3672,11 @@ body {
 
   .datetime-card--form-grid .datetime-field--date .datetime-field__input,
   .datetime-card--form-grid .datetime-field--time .datetime-field__input {
-    padding-right: 1.75rem;
+    padding-right: 0.2rem;
   }
 
-  .datetime-card--form-grid .datetime-card__actions {
-    grid-area: actions;
-    width: 100%;
-    justify-content: stretch;
+  .datetime-card--form-grid .datetime-card__coords-submit {
     gap: 0.45rem;
-  }
-
-  .datetime-card--form-grid .datetime-card__refresh,
-  .datetime-card--form-grid .datetime-card__submit {
-    flex: 1 1 auto;
-    min-width: 0;
-    white-space: normal;
-    overflow-wrap: anywhere;
   }
 }
 
@@ -4183,7 +3783,7 @@ body {
   text-underline-offset: 2px;
 }
 
-.jamam-pair__cell .thozhil-value-btn > span {
+.jamam-pair__cell .thozhil-value-btn>span {
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
@@ -4336,10 +3936,7 @@ body {
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  padding: max(0.75rem, env(safe-area-inset-top, 0px))
-    max(0.75rem, env(safe-area-inset-right, 0px))
-    max(0.75rem, env(safe-area-inset-bottom, 0px))
-    max(0.75rem, env(safe-area-inset-left, 0px));
+  padding: max(0.75rem, env(safe-area-inset-top, 0px)) max(0.75rem, env(safe-area-inset-right, 0px)) max(0.75rem, env(safe-area-inset-bottom, 0px)) max(0.75rem, env(safe-area-inset-left, 0px));
   background: rgba(0, 0, 0, 0.45);
 }
 
@@ -4506,8 +4103,7 @@ body {
   min-width: var(--dialog-time-col);
 }
 
-.anthara-dialog .jamam-segments-table:not(.jamam-segments-table--time-first):not(.jamam-segments-table--single-bird)
-  .jamam-segments-table__segment-time-col {
+.anthara-dialog .jamam-segments-table:not(.jamam-segments-table--time-first):not(.jamam-segments-table--single-bird) .jamam-segments-table__segment-time-col {
   left: var(--dialog-anthara-col);
   box-shadow: -1px 0 0 var(--border);
 }
@@ -4540,8 +4136,7 @@ body {
   min-width: 0;
 }
 
-.anthara-dialog .jamam-segments-table--single-bird:not(.jamam-segments-table--time-first)
-  .jamam-segments-table__segment-time-col {
+.anthara-dialog .jamam-segments-table--single-bird:not(.jamam-segments-table--time-first) .jamam-segments-table__segment-time-col {
   left: auto;
   box-shadow: none;
 }
@@ -4614,10 +4209,7 @@ body {
 
 @media (max-width: 767px) {
   .anthara-dialog-overlay {
-    padding: max(0.5rem, env(safe-area-inset-top, 0px))
-      max(0.5rem, env(safe-area-inset-right, 0px))
-      max(0.5rem, env(safe-area-inset-bottom, 0px))
-      max(0.5rem, env(safe-area-inset-left, 0px));
+    padding: max(0.5rem, env(safe-area-inset-top, 0px)) max(0.5rem, env(safe-area-inset-right, 0px)) max(0.5rem, env(safe-area-inset-bottom, 0px)) max(0.5rem, env(safe-area-inset-left, 0px));
   }
 
   .anthara-dialog {
@@ -5044,11 +4636,6 @@ th .bilingual .bi-en,
   .find-patchi-result__value {
     font-size: 2.15rem;
   }
-
-  .context-card--home .context-row--home-chips .patchi-submenu__btn {
-    flex: 1 1 0;
-    min-width: 0;
-  }
 }
 
 @media (min-width: 1024px) {
@@ -5076,17 +4663,6 @@ th .bilingual .bi-en,
 
   .datetime-card {
     padding: 1.1rem 1.25rem;
-  }
-
-  .context-card--home .context-row--home-chips .patchi-filter-chips {
-    flex-wrap: nowrap;
-    flex-direction: column;
-  }
-
-  .context-card--home .context-row--home-chips .patchi-submenu__btn {
-    flex: 1 1 0;
-    min-width: 0;
-    width: 100%;
   }
 }
 
@@ -5120,8 +4696,12 @@ th .bilingual .bi-en,
     justify-self: end;
   }
 
+  .header__actions {
+    gap: 0.2rem;
+  }
+
   .header h1,
-  .header__toolbar > h1 {
+  .header__toolbar>h1 {
     font-size: clamp(0.92rem, 3.8vw, 1.15rem);
     line-height: 1.15;
   }
@@ -5131,24 +4711,6 @@ th .bilingual .bi-en,
     padding: 0.65rem 0.4rem;
   }
 
-  .context-card--home {
-    --home-label-gap: 0.7rem;
-    --home-label-size: 0.76rem;
-    --home-value-size: 0.86rem;
-    padding: 0.55rem 0.4rem;
-  }
-
-  .context-card--home .context-row--home-main {
-    grid-template-columns: minmax(3.4rem, 5.25rem) minmax(0, 1fr);
-    column-gap: 0.35rem;
-  }
-
-  .context-card--home .context-row--home-chips .patchi-submenu__btn {
-    font-size: 0.72rem;
-    padding: 0.28rem 0.2rem;
-  }
-
-  .datetime-card__refresh,
   .datetime-card__submit {
     white-space: normal;
     overflow-wrap: anywhere;
@@ -5157,16 +4719,29 @@ th .bilingual .bi-en,
 }
 
 @media (max-width: 359px) {
+
   .datetime-card__row,
   .datetime-card--form-grid .datetime-card__row {
     column-gap: 0.28rem;
   }
 
+  .datetime-card__datetime-row,
+  .datetime-card--form-grid .datetime-card__datetime-row {
+    grid-template-columns: minmax(7.25rem, 1.3fr) minmax(5.2rem, 1fr) minmax(2.6rem, 1fr);
+    column-gap: 0.28rem;
+  }
+
+  /* Keeps "சூரியோதயம்" on one line in the narrow sunrise column; Day label stays matched. */
+  .datetime-card__datetime-row .datetime-field__coord-label {
+    font-size: 0.66rem;
+  }
+
   .datetime-field--date .datetime-field__input,
   .datetime-field--time .datetime-field__input,
   .datetime-card--form-grid .datetime-field--date .datetime-field__input,
-  .datetime-card--form-grid .datetime-field--time .datetime-field__input {
-    padding-right: 1.35rem;
+  .datetime-card--form-grid .datetime-field--time .datetime-field__input,
+  .datetime-card--form-grid .datetime-field__sunrise-value {
+    padding-inline: 0.28rem 0.15rem;
     font-size: 0.78rem;
   }
 
@@ -5229,24 +4804,11 @@ body:has(.app--home) {
   color: var(--accent-hover);
 }
 
-.app--home .language-toggle__btn {
-  background: var(--chip-bg);
-  border-color: var(--chip-border);
-  color: var(--chip-text);
-  box-shadow: inset 0 2px 0 var(--chip-mark);
-}
-
 .app--home .app-menu__toggle {
   background: var(--bg-card);
   border-color: var(--border);
   color: var(--text-heading);
   box-shadow: var(--control-shadow);
-}
-
-.app--home .language-toggle__btn:hover {
-  background: var(--chip-hover-bg);
-  border-color: var(--chip-hover-border);
-  color: var(--chip-hover-text);
 }
 
 .app--home .app-menu__toggle:hover,
@@ -5256,18 +4818,9 @@ body:has(.app--home) {
   color: var(--accent);
 }
 
-.app--home .language-toggle__btn--active {
-  background: var(--chip-active-bg);
-  border-color: var(--chip-active-border);
-  color: var(--chip-active-text);
-  box-shadow: inset 0 2px 0 var(--stellarium-on-accent);
-}
-
 .app--home .app-menu__toggle:focus-visible,
 .app--home .header-home-btn:focus-visible,
 .app--home .datetime-card__submit:focus-visible,
-.app--home .datetime-card__refresh:focus-visible,
-.app--home .datetime-card__permission:focus-visible,
 .app--home .datetime-field__input:focus-visible {
   outline: 2px solid var(--accent-saffron);
   outline-offset: 2px;
@@ -5324,37 +4877,6 @@ body:has(.app--home) {
   border-color: var(--accent-saffron-hover);
 }
 
-.app--home .datetime-card__refresh {
-  background: var(--bg-card);
-  border-color: var(--border);
-  color: var(--text-heading);
-  box-shadow: var(--control-shadow);
-}
-
-.app--home .datetime-card__refresh:hover {
-  background: var(--accent-soft);
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.app--home .datetime-card__permission--on {
-  color: var(--success);
-  border-color: color-mix(in srgb, var(--success) 45%, var(--border));
-  background: var(--success-soft);
-  box-shadow: var(--control-shadow);
-}
-
-.app--home .datetime-card__permission--off {
-  color: var(--error);
-  border-color: color-mix(in srgb, var(--error) 40%, var(--border));
-  background: color-mix(in srgb, var(--error) 10%, var(--bg-card));
-  box-shadow: var(--control-shadow);
-}
-
-.app--home .datetime-card__permission:hover {
-  border-color: var(--success);
-}
-
 .app--home .content {
   background: var(--bg-card);
 }
@@ -5365,52 +4887,17 @@ body:has(.app--home) {
   box-shadow: none;
 }
 
-.app--home .context-card--home .context-label,
-.app--home .context-card--home .context-label--athikara,
-.app--home .context-card--home .context-label--naal,
-.app--home .context-card--home .context-label--padu,
-.app--home .context-card--home .context-label--antharam,
-.app--home .context-card--home .context-value--home-pirai {
+.app--home .context-card--home .context-label {
   color: var(--muted);
 }
 
-.app--home .context-card--home .context-value--home-thithi-name,
-.app--home .context-card--home .context-value--home-athikara,
 .app--home .context-card--home .context-value--home-naal,
-.app--home .context-card--home .context-value--home-padu,
-.app--home .context-card--home .context-value--home-day,
-.app--home .context-card--home .jamam-pair__cell--home-antharam .context-value--home-antharam {
+.app--home .context-card--home .context-value--home-padu {
   color: var(--accent-saffron);
 }
 
 .app--home .context-card--home .context-value--home-athikara {
   color: var(--accent);
-}
-
-.app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn {
-  color: var(--accent);
-  border-color: var(--border);
-  background: var(--bg-card);
-}
-
-.app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn:hover,
-.app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn[aria-expanded="true"] {
-  border-color: var(--highlight-gold);
-  background: var(--highlight-gold-soft);
-  color: var(--accent-hover);
-}
-
-.app--home .context-card--home .jamam-pair__cell--home-antharam .thozhil-value-btn {
-  color: var(--accent);
-  border-color: var(--border);
-  background: var(--bg-card);
-}
-
-.app--home .context-card--home .jamam-pair__cell--home-antharam .thozhil-value-btn:hover,
-.app--home .context-card--home .jamam-pair__cell--home-antharam .thozhil-value-btn[aria-expanded="true"] {
-  border-color: var(--highlight-gold);
-  background: var(--highlight-gold-soft);
-  color: var(--accent-hover);
 }
 
 .app--home .context-card--home .patchi-submenu__btn {
@@ -5528,26 +5015,12 @@ body:has(.app--find-patchi) {
   color: var(--accent-hover);
 }
 
-.app--find-patchi .language-toggle__btn {
-  background: var(--chip-bg);
-  border-color: var(--chip-border);
-  color: var(--chip-text);
-  box-shadow: inset 0 2px 0 var(--chip-mark);
-  border-radius: 999px;
-}
-
 .app--find-patchi .app-menu__toggle {
   background: var(--bg-card);
   border-color: var(--border);
   color: var(--text-heading);
   box-shadow: var(--control-shadow);
   border-radius: 999px;
-}
-
-.app--find-patchi .language-toggle__btn:hover {
-  background: var(--chip-hover-bg);
-  border-color: var(--chip-hover-border);
-  color: var(--chip-hover-text);
 }
 
 .app--find-patchi .app-menu__toggle:hover,
@@ -5557,19 +5030,9 @@ body:has(.app--find-patchi) {
   color: var(--accent);
 }
 
-.app--find-patchi .language-toggle__btn--active {
-  background: var(--chip-active-bg);
-  border-color: var(--chip-active-border);
-  color: var(--chip-active-text);
-  box-shadow: inset 0 2px 0 var(--stellarium-on-accent);
-}
-
-.app--find-patchi .language-toggle__btn:focus-visible,
 .app--find-patchi .app-menu__toggle:focus-visible,
 .app--find-patchi .header-home-btn:focus-visible,
 .app--find-patchi .datetime-card__submit:focus-visible,
-.app--find-patchi .datetime-card__refresh:focus-visible,
-.app--find-patchi .datetime-card__permission:focus-visible,
 .app--find-patchi .datetime-field__input:focus-visible {
   outline: 2px solid var(--accent-saffron);
   outline-offset: 2px;
@@ -5638,38 +5101,6 @@ body:has(.app--find-patchi) {
 .app--find-patchi .datetime-card__submit:active {
   background: var(--accent-saffron-hover);
   transform: translateY(1px);
-}
-
-.app--find-patchi .datetime-card__refresh {
-  background: var(--bg-card);
-  border-color: var(--border);
-  color: var(--text-heading);
-  border-radius: var(--radius-control);
-  box-shadow: var(--control-shadow);
-}
-
-.app--find-patchi .datetime-card__refresh:hover {
-  background: var(--accent-soft);
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.app--find-patchi .datetime-card__permission--on {
-  color: var(--success);
-  border-color: color-mix(in srgb, var(--success) 45%, var(--border));
-  background: var(--success-soft);
-  box-shadow: var(--control-shadow);
-}
-
-.app--find-patchi .datetime-card__permission--off {
-  color: var(--error);
-  border-color: color-mix(in srgb, var(--error) 40%, var(--border));
-  background: color-mix(in srgb, var(--error) 10%, var(--bg-card));
-  box-shadow: var(--control-shadow);
-}
-
-.app--find-patchi .datetime-card__permission:hover {
-  border-color: var(--success);
 }
 
 .app--find-patchi .content {
@@ -5774,8 +5205,7 @@ body:has(.app--find-patchi) {
   color: var(--chip-active-text);
 }
 
-.app--find-patchi .datetime-card__submit:disabled,
-.app--find-patchi .datetime-card__refresh:disabled {
+.app--find-patchi .datetime-card__submit:disabled {
   opacity: 0.55;
   cursor: not-allowed;
   box-shadow: none;
@@ -5826,7 +5256,7 @@ body:has(.app--find-patchi) {
   max-width: 100%;
 }
 
-.moon-phase > * {
+.moon-phase>* {
   min-width: 0;
   max-width: 100%;
 }
@@ -6307,7 +5737,6 @@ body:has(.app--find-patchi),
   box-shadow: inset 3px 0 0 var(--gold);
 }
 
-.language-toggle__btn,
 .app-menu__item,
 .sheet-picker__btn,
 .paksha-toggle button,
@@ -6316,7 +5745,6 @@ body:has(.app--find-patchi),
 .moon-phase-controls input,
 .moon-phase-controls__step,
 .moon-phase-retry,
-.app--home .language-toggle__btn,
 .app--home .context-card--home .patchi-submenu__btn,
 .app--home .app-menu__item {
   box-shadow: none;
@@ -6328,22 +5756,18 @@ body:has(.app--find-patchi),
   background-color: var(--chip-active-bg);
   color: var(--chip-active-text);
   border: 1px solid var(--chip-border);
-  border-radius: var(--chip-radius);
   box-shadow: none;
 }
 
-.language-toggle__btn--active,
 .app-menu__item--active,
 .sheet-picker__btn--active,
 .paksha-toggle button.active,
 .patchi-submenu__btn--active,
 .patchi-submenu__btn[aria-pressed="true"],
 .header-home-btn--active,
-.app--home .language-toggle__btn--active,
 .app--home .context-card--home .patchi-submenu__btn--active,
 .app--home .app-menu__item--active,
 .app--home .header-home-btn--active,
-.app--find-patchi .language-toggle__btn--active,
 .app--find-patchi .app-menu__item--active,
 .app--find-patchi .header-home-btn--active {
   background-color: var(--chip-active-bg);
@@ -6379,12 +5803,10 @@ input:focus-visible,
 .app--home .app-menu__toggle:focus-visible,
 .app--home .header-home-btn:focus-visible,
 .app--home .datetime-card__submit:focus-visible,
-.app--home .datetime-card__refresh:focus-visible,
-.app--home .datetime-card__permission:focus-visible,
 .app--home .datetime-field__input:focus-visible,
 .app--home .datetime-field__input:focus,
 .app--find-patchi .datetime-field__input:focus,
-.language-toggle__btn:focus-visible,
+.app-menu__toggle:focus-visible,
 .app-menu__item:focus-visible,
 .sheet-picker__btn:focus-visible,
 .paksha-toggle button:focus-visible,
@@ -6403,8 +5825,10 @@ input:focus-visible,
   gap: 0.55rem;
 }
 
-.datetime-card {
-  padding: 1.15rem 1.25rem;
+@media (min-width: 768px) {
+  .datetime-card {
+    padding: 1.15rem 1.25rem;
+  }
 }
 
 .app--home .context-card--home .patchi-submenu__btn--active,
@@ -6412,112 +5836,132 @@ input:focus-visible,
   background-color: var(--chip-active-bg);
   color: var(--chip-active-text);
   border: 1px solid var(--chip-border);
-  border-radius: var(--chip-radius);
   box-shadow: none;
 }
 
-.app--home .context-card--home .jamam-pair__cell--home-stack {
-  display: grid;
-  grid-template-columns: max-content minmax(0, 1fr);
-  column-gap: var(--home-label-gap);
-  row-gap: 0.45rem;
-  align-items: center;
+/* ── Sunset-based thithi section ─────────────────────────────────────────── */
+
+.sunset-thithi-section {
+  margin-top: 1.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
 }
 
-.app--home .context-card--home .jamam-pair__cell--home-jamam {
-  display: contents;
-}
-
-.app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 0.4rem;
-  box-sizing: border-box;
-  width: max-content;
-  max-width: 100%;
-  justify-self: start;
-  min-height: var(--touch-min);
-  padding: 0.35rem 0.7rem;
-  font-family: inherit;
-  font-size: 0.8rem;
+.sunset-thithi-section__heading {
+  margin: 0;
+  font-size: 1rem;
   font-weight: 700;
-  line-height: 1.35;
-  color: var(--ink);
-  background: var(--white);
-  border: 1px solid rgba(28, 28, 28, 0.16);
+  color: var(--burgundy);
+  padding-bottom: 0.3rem;
+  border-bottom: 2px solid var(--gold);
+  display: inline-block;
+}
+
+.sunset-thithi-section__note {
+  margin-top: 0.15rem;
+}
+
+.sunset-thithi-table__row--pournami td {
+  background: color-mix(in srgb, var(--gold) 18%, transparent);
+}
+
+.sunset-thithi-table__row--pournami td:first-child {
+  box-shadow: inset 3px 0 0 var(--gold);
+}
+
+.sunset-thithi-table__row--dminus1 td {
+  background: color-mix(in srgb, var(--gold) 8%, transparent);
+}
+
+.sunset-thithi-table__thithi {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+}
+
+.sunset-thithi-table__anchor-badge {
+  display: inline-block;
+  padding: 0.1rem 0.45rem;
   border-radius: 999px;
-  box-shadow: none;
-  text-decoration: none;
-  text-align: left;
-  white-space: normal;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.4;
+  background: var(--stellarium-accent);
+  color: var(--stellarium-on-accent);
+  white-space: nowrap;
+  letter-spacing: 0.03em;
 }
 
-.app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn > span,
-.app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn .bi-ta,
-.app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn .bi-en {
-  overflow: visible;
-  text-overflow: unset;
-  text-decoration: none;
-  color: inherit;
-  font-size: inherit;
-  font-weight: inherit;
-  line-height: inherit;
-  white-space: normal;
+.sunset-thithi-table__row--pournami .sunset-thithi-table__anchor-badge {
+  background: var(--gold);
+  color: var(--ink);
 }
 
-.app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn::after {
-  content: "";
+.sunset-thithi-table__pirai {
+  font-size: 0.85rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.sunset-thithi-table__notes {
+  font-size: 0.8rem;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 32ch;
+}
+
+/* ── Date card: Latitude → Longitude → Submit row ────────────────────────── */
+
+.datetime-card .datetime-card__coords-submit .datetime-field__coord {
   flex: 0 0 auto;
-  width: 12px;
-  height: 8px;
-  margin-left: 0.15rem;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%231c1c1c' d='M1.4.8 6 5.4 10.6.8 12 2.2 6 8 0 2.2z'/%3E%3C/svg%3E") center / 12px 8px no-repeat;
-  opacity: 1;
-  transform: none;
+  width: auto;
+  min-width: 0;
 }
 
-.app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn:hover {
-  border-color: var(--gold);
-  background: var(--rose);
-  color: var(--ink);
-  box-shadow: none;
+/* ~10 characters fits values like "-122.41942" without changing stored precision. */
+.datetime-card .datetime-card__coords-submit .datetime-field__coord-input {
+  width: calc(10ch + 1.2rem);
+  max-width: 100%;
+  padding-inline: 0.5rem;
+  font-variant-numeric: tabular-nums;
 }
 
-.app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn:hover::after {
-  opacity: 1;
-  transform: none;
-}
-
-.app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn[aria-expanded="true"] {
-  background-color: var(--chip-active-bg);
-  color: var(--chip-active-text);
-  border: 1px solid var(--chip-border);
-  border-radius: var(--chip-radius);
-  box-shadow: none;
-  text-decoration: none;
-}
-
-.app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn[aria-expanded="true"]:hover {
-  background-color: var(--chip-active-bg);
-  border-color: var(--chip-border);
-  color: var(--chip-active-text);
-  box-shadow: none;
-}
-
-.app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn[aria-expanded="true"]::after,
-.app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn[aria-expanded="true"] .bi-ta,
-.app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn[aria-expanded="true"] .bi-en {
-  color: var(--ink);
-  text-decoration: none;
-  opacity: 1;
+.datetime-card .datetime-card__coords-submit .datetime-card__submit {
+  flex: 0 0 auto;
+  min-width: 7rem;
+  height: 48px;
+  min-height: 48px;
+  padding-inline: 1.25rem;
+  white-space: nowrap;
 }
 
 @media (max-width: 767px) {
-  .app--home .context-card--home .jamam-pair__cell--home-jamam .thozhil-value-btn {
-    min-height: var(--touch-min);
-    padding: 0.35rem 0.55rem;
-    font-size: 0.78rem;
-    border-radius: 999px;
+  .datetime-card .datetime-card__coords-submit .datetime-card__submit {
+    flex: 1 0 auto;
+    min-width: 5.5rem;
   }
+}
+
+/* ── Header location button status colours ──────────────────────────────── */
+
+.header .header-location-btn--on,
+.header .header-location-btn--on:hover {
+  color: var(--success, #1f7a3a);
+  border-color: color-mix(in srgb, var(--success, #1f7a3a) 45%, var(--border));
+  background: color-mix(in srgb, var(--success, #1f7a3a) 12%, var(--bg-card));
+}
+
+.header .header-location-btn--off,
+.header .header-location-btn--off:hover {
+  color: var(--error, var(--red));
+  border-color: color-mix(in srgb, var(--error, var(--red)) 40%, var(--border));
+  background: color-mix(in srgb, var(--error, var(--red)) 10%, var(--bg-card));
+}
+
+.header .header-location-btn:hover {
+  border-color: currentColor;
 }
