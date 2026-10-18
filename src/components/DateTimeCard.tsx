@@ -137,7 +137,7 @@ export function DateTimeCard({
   const { language } = useLanguage();
 
   const dateLabel = selectFieldLabels ? UI.selectDate : UI.date;
-  const timeLabel = selectFieldLabels ? UI.selectTime : UI.time;
+  const timeLabel = UI.time;
   const locationLabel = selectFieldLabels ? UI.selectLocation : UI.location;
 
   const listId = useId();

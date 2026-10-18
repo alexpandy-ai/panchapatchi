@@ -65,7 +65,7 @@ export default function App() {
         <DateTimeCard
           value={selectedDateTime}
           onChange={setSelectedDateTime}
-          hideDateLabel={activeView === "home" || activeView === "thithiDetails"}
+          hideDateLabel={activeView === "home" || activeView === "thithiDetails" || activeView === "status"}
           hideTimeLabel={activeView === "home" || activeView === "thithiDetails"}
           selectFieldLabels={activeView === "status"}
           onSubmit={

@@ -4468,10 +4468,10 @@ th .bilingual .bi-en,
 
 .find-patchi-result__panel {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: stretch;
   gap: 0;
-  max-width: 26rem;
+  max-width: 32rem;
   margin: 0 auto 1rem;
   padding: 0.85rem 0.75rem;
   border-radius: 18px;
@@ -4479,6 +4479,8 @@ th .bilingual .bi-en,
 
 .find-patchi-result__card {
   display: flex;
+  flex: 1 1 0;
+  min-width: 0;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -4489,9 +4491,11 @@ th .bilingual .bi-en,
 }
 
 .find-patchi-result__divider {
-  height: 1px;
-  margin: 0.65rem auto;
-  width: min(100%, 12rem);
+  flex: none;
+  align-self: center;
+  width: 1px;
+  height: min(100%, 4rem);
+  margin: 0 0.6rem;
   background: var(--gold);
   opacity: 0.9;
 }
@@ -4515,6 +4519,7 @@ th .bilingual .bi-en,
 
 .find-patchi-result__value .inline-emoji-label {
   display: inline-flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
@@ -4589,15 +4594,19 @@ th .bilingual .bi-en,
   }
 
   .find-patchi-result__card {
-    padding: 0.75rem 0.7rem;
+    padding: 0.65rem 0.4rem;
+  }
+
+  .find-patchi-result__divider {
+    margin: 0 0.4rem;
   }
 
   .find-patchi-result__label {
-    font-size: 0.95rem;
+    font-size: clamp(0.8rem, 3.6vw, 0.95rem);
   }
 
   .find-patchi-result__value {
-    font-size: clamp(1.55rem, 7vw, 1.95rem);
+    font-size: clamp(1.2rem, 5.6vw, 1.75rem);
   }
 
   .find-patchi-result__meta {

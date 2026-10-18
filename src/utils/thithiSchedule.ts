@@ -62,10 +62,12 @@ export function thithiScheduleBirdActivity(
     : getAlternateNightActivity(pakshaId, activityWeekday, yama, bird);
 }
 
-/** Bird doing `activity` (Tamil id, e.g. ஊண் / சாவு) in Jamam 1 morning of the Schedule row for this Pirai / thithi. */
-export function thithiScheduleJamam1Bird(
+/** Bird doing `activity` (Tamil id, e.g. ஊண் / சாவு) in one jamam of the Schedule row for this Pirai / thithi. */
+export function thithiScheduleBirdDoing(
   pakshaId: PakshaId,
   thithiNumber: number,
+  yama: number,
+  period: PeriodId,
   activity: string,
 ): ThithiScheduleBird | null {
   const rowWeekday = thithiScheduleRowWeekday(pakshaId, thithiNumber);
@@ -73,9 +75,27 @@ export function thithiScheduleJamam1Bird(
   const activityWeekday = thithiScheduleActivityWeekday(pakshaId, rowWeekday);
   return (
     PATCHI_ORDER.find(
-      (bird) => thithiScheduleBirdActivity(pakshaId, activityWeekday, 1, "day", bird) === activity,
+      (bird) => thithiScheduleBirdActivity(pakshaId, activityWeekday, yama, period, bird) === activity,
     ) ?? null
   );
+}
+
+/** Bird doing `activity` (Tamil id, e.g. ஊண் / சாவு) in Jamam 1 morning of the Schedule row for this Pirai / thithi. */
+export function thithiScheduleJamam1Bird(
+  pakshaId: PakshaId,
+  thithiNumber: number,
+  activity: string,
+): ThithiScheduleBird | null {
+  return thithiScheduleBirdDoing(pakshaId, thithiNumber, 1, "day", activity);
+}
+
+/** Jamams of the sunrise-to-sunrise cycle containing `moment`, and the active one (start-inclusive, end-exclusive). */
+export function thithiScheduleActiveJamam(
+  moment: Date,
+  coords: GeoCoords | null,
+): { jamamSlot: JamamSlot; allJamamSlots: JamamSlot[] } {
+  const allJamamSlots = getFullDayJamamSchedule(moment, coords).all;
+  return { jamamSlot: allJamamSlots.find((slot) => slot.isActive) ?? allJamamSlots[0], allJamamSlots };
 }
 
 export interface ThithiScheduleDayFacts {
@@ -162,8 +182,7 @@ export function thithiScheduleBirdNow(input: ThithiScheduleBirdNowInput): Thithi
   if (rowWeekday === null) return { status: "noScheduleRow" };
   const activityWeekday = thithiScheduleActivityWeekday(pakshaId, rowWeekday);
 
-  const allJamamSlots = getFullDayJamamSchedule(moment, coords).all;
-  const jamamSlot = allJamamSlots.find((slot) => slot.isActive) ?? allJamamSlots[0];
+  const { jamamSlot, allJamamSlots } = thithiScheduleActiveJamam(moment, coords);
   const { yama, period } = yamaFromJamamIndex(jamamSlot.index);
   const jamamActivity = thithiScheduleBirdActivity(pakshaId, activityWeekday, yama, period, bird);
 
