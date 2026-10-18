@@ -10,7 +10,7 @@ import {
   type JamamAntharaClickModel,
   type PatchiAntharaColumn,
 } from "./anthara";
-import { bi, patchiBaseName, type Bilingual, type PATCHI_ORDER } from "./bilingual";
+import { bi, PATCHI_ORDER, patchiBaseName, type Bilingual } from "./bilingual";
 import {
   getFullDayJamamSchedule,
   yamaFromJamamIndex,
@@ -62,7 +62,46 @@ export function thithiScheduleBirdActivity(
     : getAlternateNightActivity(pakshaId, activityWeekday, yama, bird);
 }
 
-export type ThithiScheduleMissReason = "noScheduleRow" | "noJamamActivity" | "noAntharaActivity";
+/** Bird doing `activity` (Tamil id, e.g. ஊண் / சாவு) in Jamam 1 morning of the Schedule row for this Pirai / thithi. */
+export function thithiScheduleJamam1Bird(
+  pakshaId: PakshaId,
+  thithiNumber: number,
+  activity: string,
+): ThithiScheduleBird | null {
+  const rowWeekday = thithiScheduleRowWeekday(pakshaId, thithiNumber);
+  if (rowWeekday === null) return null;
+  const activityWeekday = thithiScheduleActivityWeekday(pakshaId, rowWeekday);
+  return (
+    PATCHI_ORDER.find(
+      (bird) => thithiScheduleBirdActivity(pakshaId, activityWeekday, 1, "day", bird) === activity,
+    ) ?? null
+  );
+}
+
+export interface ThithiScheduleDayFacts {
+  /** Eats (ஊண்) in Jamam 1 morning. */
+  athikara: ThithiScheduleBird;
+  /** Dies (சாவு) in Jamam 1 morning. */
+  padu: ThithiScheduleBird | null;
+}
+
+/** Home Athikara and Padu, both read from the Thithi Schedule row for this Pirai / thithi. */
+export function thithiScheduleDayFacts(
+  pakshaId: PakshaId,
+  thithiNumber: number,
+): ThithiScheduleDayFacts | null {
+  const athikara = thithiScheduleJamam1Bird(pakshaId, thithiNumber, "ஊண்");
+  if (!athikara) return null;
+  return {
+    athikara,
+    padu: thithiScheduleJamam1Bird(pakshaId, thithiNumber, "சாவு"),
+  };
+}
+
+export type ThithiScheduleMissReason =
+  | "noScheduleRow"
+  | "noJamamActivity"
+  | "noAntharaActivity";
 
 export const THITHI_SCHEDULE_MISS: Record<ThithiScheduleMissReason, Bilingual> = {
   noScheduleRow: bi(

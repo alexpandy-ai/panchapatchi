@@ -2540,19 +2540,6 @@ body {
   font-weight: 600;
 }
 
-.thithi-patchi-table__athikara {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.15em;
-}
-
-.thithi-patchi-table__athikara-day {
-  font-weight: 600;
-  color: var(--muted);
-  white-space: nowrap;
-}
-
 .days-view__natchathira-patchi-card {
   max-width: none;
 }
@@ -3277,6 +3264,24 @@ body {
   overflow-wrap: break-word;
 }
 
+/* Athikara / Thithi Naal / Padu: smaller label, value set a little further right on a shared edge. */
+.context-card--home .home-patchi__fact--info>dt,
+.context-card--home .home-patchi__fact--info>dd {
+  align-self: baseline;
+  padding-block: 0.15rem;
+}
+
+.context-card--home .home-patchi__fact--info>dt {
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.35;
+}
+
+.context-card--home .home-patchi__fact--info>dd {
+  padding-inline-start: var(--home-info-indent, 0.75rem);
+  line-height: 1.35;
+}
+
 /* Bird name and its emoji stay on one line; the name only breaks if the
    column is narrower than the word itself, and the emoji stays beside it. */
 .context-card--home .inline-emoji-label {
@@ -3374,6 +3379,10 @@ body {
   .context-card--home .home-patchi__facts dd {
     margin-bottom: 0.45rem;
   }
+
+  .context-card--home .home-patchi__fact--info>dd {
+    padding-inline-start: 0;
+  }
 }
 
 @media (max-width: 767px) {
@@ -3382,6 +3391,7 @@ body {
     --home-value-size: 0.92rem;
     --home-control-size: 0.78rem;
     --home-gap: 0.65rem;
+    --home-info-indent: 0.5rem;
     padding: 0.7rem 0.65rem;
     border-radius: 0.65rem;
   }
@@ -4891,9 +4901,12 @@ body:has(.app--home) {
   color: var(--muted);
 }
 
-.app--home .context-card--home .context-value--home-naal,
 .app--home .context-card--home .context-value--home-padu {
   color: var(--accent-saffron);
+}
+
+.app--home .context-card--home .context-value--home-naal {
+  color: var(--success);
 }
 
 .app--home .context-card--home .context-value--home-athikara {

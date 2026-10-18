@@ -142,7 +142,6 @@ function ThithiPakshaTable({
           <tbody>
             {groups.map((group, groupIndex) => {
               const isGroupCurrent = highlightPaksha && currentThithi.groupIndex === groupIndex;
-              const dieEatDay = group.athikaraDisplayDay;
 
               return (
                 <tr
@@ -189,18 +188,7 @@ function ThithiPakshaTable({
                     </span>
                   </td>
                   <td className={isGroupCurrent ? "thithi-patchi-table__cell--current" : undefined}>
-                    {dieEatDay ? (
-                      <span className="thithi-patchi-table__athikara">
-                        <PatchiCell bird={group.patchi} />
-                        <span className="thithi-patchi-table__athikara-day">
-                          {" ("}
-                          <BilingualText text={dieEatDay} block={false} />
-                          {")"}
-                        </span>
-                      </span>
-                    ) : (
-                      <PatchiCell bird={group.patchi} />
-                    )}
+                    <PatchiCell bird={group.patchi} />
                   </td>
                 </tr>
               );

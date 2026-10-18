@@ -19,9 +19,11 @@ import {
 } from "./thithi.ts";
 import {
   thithiScheduleBirdNow,
+  thithiScheduleDayFacts,
   thithiScheduleRowWeekday,
   type ThithiScheduleBird,
 } from "./thithiSchedule.ts";
+import { getThithiPlanetDay, THITHI_PATCHI_BY_PAKSHA } from "./thithiPatchi.ts";
 
 const PIRAIS: PakshaId[] = ["valarpirai", "theipirai"];
 const CHENNAI: GeoCoords = { lat: 13.0827, lng: 80.2707 };
@@ -248,6 +250,35 @@ test("Schedule activity day is not Home's old Day Scheduler bracket day", () => 
       if (r.status !== "ok") continue;
       const bracketDay = getThithiPatchiEntryForThithiNumber(pakshaId, thithiNumber).athikaraWeekday;
       assert.notEqual(r.activityWeekday, bracketDay, `${pakshaId} ${thithiNumber}`);
+    }
+  }
+});
+
+test("Home Athikara Eats and Padu Dies in Jamam 1 morning on the chip's Schedule row; Naal is the Thithi Patchi planet day", () => {
+  const jamam1 = at(18, 7);
+  for (const pakshaId of PIRAIS) {
+    for (let thithiNumber = 1; thithiNumber <= 15; thithiNumber++) {
+      const label = `${pakshaId} ${thithiNumber}`;
+      const facts = thithiScheduleDayFacts(pakshaId, thithiNumber);
+      assert.ok(facts, label);
+      assert.ok(facts.padu, label);
+      assert.notEqual(facts.athikara, facts.padu, label);
+
+      const athikara = home(pakshaId, thithiNumber, facts.athikara, jamam1, null);
+      const padu = home(pakshaId, thithiNumber, facts.padu, jamam1, null);
+      assert.equal(athikara.jamamIndex, 1, label);
+      assert.equal(athikara.jamamActivity, "ஊண்", label);
+      assert.equal(padu.jamamActivity, "சாவு", label);
+      for (const bird of PATCHI_ORDER) {
+        const activity = home(pakshaId, thithiNumber, bird, jamam1, null).jamamActivity;
+        assert.equal(activity === "ஊண்", bird === facts.athikara, `${label} ${bird}`);
+        assert.equal(activity === "சாவு", bird === facts.padu, `${label} ${bird}`);
+      }
+
+      const entry = getThithiPatchiEntryForThithiNumber(pakshaId, thithiNumber);
+      const group = THITHI_PATCHI_BY_PAKSHA[pakshaId][entry.groupIndex];
+      assert.ok(group.thithis.some((thithi) => thithi.en === entry.thithi.en), label);
+      assert.deepEqual(entry.day, getThithiPlanetDay(group.planet), label);
     }
   }
 });

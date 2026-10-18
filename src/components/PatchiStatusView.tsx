@@ -54,9 +54,6 @@ import {
   ALTERNATE_ANTHARA_SEGMENT_COUNT,
   alternatePakshaSupportsNight,
   getAlternateJamamActivitySlotsForThithi,
-  getAlternatePaduPatchiForJamam,
-  getDayEatingPatchiOnThithiBracketDay,
-  getPatchiDaysWeekdayForAthikaraPatchi,
 } from "../utils/alternateCalculation";
 
 import { derivePatchiStatusFromSchedule } from "../utils/patchi";
@@ -69,7 +66,11 @@ import {
   logAntharaThithiDebug,
   resolveNextMorningThithiContext,
 } from "../utils/thithi";
-import { THITHI_SCHEDULE_MISS, thithiScheduleBirdNow } from "../utils/thithiSchedule";
+import {
+  THITHI_SCHEDULE_MISS,
+  thithiScheduleBirdNow,
+  thithiScheduleDayFacts,
+} from "../utils/thithiSchedule";
 
 import {
   outOfRangeText,
@@ -208,35 +209,15 @@ export function PatchiStatusView({
     return getThithiPatchiEntryForDate(selectedDateTime, pakshaId);
   }, [isHome, homeNightThithi, selectedDateTime, pakshaId]);
 
-  /**
-   * Home Athikara: bird Eating on the Thithi Patchi bracket day (Day Scheduler
-   * jamam-1 morning Eat). Status keeps the Thithi table bird.
-   */
-  const athikaraPatchi = useMemo(() => {
-    const tablePatchi = thithiPatchiEntry.patchi;
-    if (isHome && (pakshaId === "valarpirai" || pakshaId === "theipirai")) {
-      return getDayEatingPatchiOnThithiBracketDay(pakshaId, tablePatchi) ?? tablePatchi;
-    }
-    return tablePatchi;
-  }, [isHome, pakshaId, thithiPatchiEntry.patchi]);
+  /** Home: Athikara and Padu from the same Thithi Schedule row the bird chips read. */
+  const homeDayFacts = useMemo(
+    () =>
+      isHome ? thithiScheduleDayFacts(thithiPatchiEntry.pakshaId, thithiPatchiEntry.thithiNumber) : null,
+    [isHome, thithiPatchiEntry.pakshaId, thithiPatchiEntry.thithiNumber],
+  );
 
-  /**
-   * Home schedule column: Patchi Days weekday for that Athikara under current pirai
-   * (Information → Patchi Days). Status keeps Thithi planet weekday for Excel groups.
-   */
-  const thithiScheduleWeekday = useMemo(() => {
-    if (
-      isHome &&
-      (pakshaId === "valarpirai" || pakshaId === "theipirai")
-    ) {
-      const fromPatchiDays = getPatchiDaysWeekdayForAthikaraPatchi(
-        pakshaId,
-        athikaraPatchi,
-      );
-      if (fromPatchiDays !== null) return fromPatchiDays;
-    }
-    return thithiPatchiEntry.weekday;
-  }, [athikaraPatchi, isHome, pakshaId, thithiPatchiEntry.weekday]);
+  /** Home: Jamam 1 morning Eat bird on the Schedule row. Status keeps the Thithi table bird. */
+  const athikaraPatchi = homeDayFacts?.athikara ?? thithiPatchiEntry.patchi;
 
   const homePatchi = homeChipSelection ?? athikaraPatchi;
   const showHomeJamamValue = homeChipSelection != null;
@@ -314,11 +295,7 @@ export function PatchiStatusView({
         ? THITHI_SCHEDULE_MISS.noJamamActivity
         : null;
 
-  /** Home: Padu = Die bird in jamam 1 day for Athikara’s Patchi Days weekday. */
-  const paduPatchi = useMemo(() => {
-    if (!isHome || (pakshaId !== "valarpirai" && pakshaId !== "theipirai")) return null;
-    return getAlternatePaduPatchiForJamam(pakshaId, thithiScheduleWeekday, 1, "day");
-  }, [isHome, pakshaId, thithiScheduleWeekday]);
+  const paduPatchi = homeDayFacts?.padu ?? null;
 
   const derivedNext = useMemo(() => {
     if (isHome) return { myPatchiActivity: null };
@@ -686,7 +663,7 @@ export function PatchiStatusView({
                 ) : null
               ) : (
               <dl className="home-patchi__facts">
-                <div className="home-patchi__fact">
+                <div className="home-patchi__fact home-patchi__fact--info">
                   <dt className="context-label">
                     <BilingualText text={UI.athikaraPatchi} block={false} />
                   </dt>
@@ -699,7 +676,7 @@ export function PatchiStatusView({
                   </dd>
                 </div>
 
-                <div className="home-patchi__fact">
+                <div className="home-patchi__fact home-patchi__fact--info">
                   <dt className="context-label">
                     <BilingualText text={UI.thithiDay} block={false} />
                   </dt>
@@ -709,7 +686,7 @@ export function PatchiStatusView({
                 </div>
 
                 {paduPatchi ? (
-                  <div className="home-patchi__fact">
+                  <div className="home-patchi__fact home-patchi__fact--info">
                     <dt className="context-label">
                       <BilingualText text={UI.paduPatchi} block={false} />
                     </dt>
