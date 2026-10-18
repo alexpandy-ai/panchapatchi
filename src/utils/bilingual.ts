@@ -69,8 +69,8 @@ export const UI = {
   period: bi("பகுதி", "Period"),
   patchi: bi("பட்சி", "Bird"),
   myPatchi: bi("உங்கள் பட்சி", "Your Patchi"),
-  yourPatchiIs: bi("உங்கள் திதி பட்சி", "Your Thithi Patchi"),
-  yourJamamPatchi: bi("உங்கள் ஜாமம் பட்சி", "Your Jamam Patchi"),
+  yourPatchiIs: bi("திதி பட்சி", "Thithi Patchi"),
+  yourJamamPatchi: bi("ஜாமம் பட்சி", "Jamam Patchi"),
   findPatchiHint: bi(
     "தேதி, இடம், நேரம் தேர்ந்து சமர்ப்பிக்கவும்.",
     "Select date, location, and time, then Submit.",
