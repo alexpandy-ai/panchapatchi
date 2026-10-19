@@ -51,7 +51,11 @@ import {
   logAntharaThithiDebug,
   type ThithiPatchiEntry,
 } from "../utils/thithi";
-import { thithiScheduleActivityWeekday, thithiScheduleBirdActivity } from "../utils/thithiSchedule";
+import {
+  thithiScheduleActivityWeekday,
+  thithiScheduleBirdActivity,
+  thithiScheduleEatingRowWeekdays,
+} from "../utils/thithiSchedule";
 import { useDailyThithi } from "../thithiCalendar/useDailyThithi";
 
 const SHEET_TABS: { id: PakshaId; label: (typeof PAKSHA_BI)[PakshaId] }[] = [
@@ -78,6 +82,8 @@ interface ThithiScheduleSection {
   activityWeekday: number;
   weekday: number;
   groupKey: string;
+  /** Blocks to render; omitted = Day and Night. */
+  periods?: readonly PeriodId[];
 }
 
 /** Morning bird grid for one activity weekday. Matching grids share one tithi cell. */
@@ -232,6 +238,68 @@ export function DaySchedulerTable({
   );
 }
 
+/**
+ * Patchi Schedule: one bird in the Thithi Schedule table format. The Day table comes from the Schedule
+ * section where the bird eats in Day Jamam 1, the Night table from the one where it eats in Night Jamam 1.
+ */
+export function BirdEatingScheduleTable({
+  pakshaId,
+  bird,
+  selectedDateTime,
+}: {
+  pakshaId: "valarpirai" | "theipirai";
+  bird: PatchiName;
+  selectedDateTime: Date;
+}) {
+  const { coords } = useLocation();
+  const jamamColumns = useMemo(
+    () => buildDaySchedulerJamamColumns(selectedDateTime, coords),
+    [selectedDateTime, coords],
+  );
+  const { daily } = useDailyThithi(selectedDateTime);
+  const dailySelection = daily?.status === "ready" ? daily.selection : null;
+  const nightThithi = useMemo(
+    () =>
+      dailySelection
+        ? getThithiPatchiEntryForThithiNumber(dailySelection.pakshaId, dailySelection.thithiNumber)
+        : undefined,
+    [dailySelection],
+  );
+
+  const sections = useMemo((): ThithiScheduleSection[] => {
+    const rows = thithiScheduleEatingRowWeekdays(pakshaId, bird);
+    return (["day", "night"] as const).flatMap((period) => {
+      const weekday = rows[period];
+      const groupKey = weekday === null ? null : getAlternateGroupKey(pakshaId, weekday);
+      if (weekday === null || !groupKey) return [];
+      return [
+        {
+          key: `${pakshaId}-${groupKey}-${period}`,
+          headings: [...(getThithiHeadingsForScheduleWeekday(pakshaId, weekday) ?? [EMPTY_SCHEDULE_LABEL])],
+          activityWeekday: thithiScheduleActivityWeekday(pakshaId, weekday),
+          weekday,
+          groupKey,
+          periods: [period],
+        },
+      ];
+    });
+  }, [pakshaId, bird]);
+
+  return (
+    <div className="schedule-table-card--alternate patchi-pivot-tables">
+      <AlternatePakshaScheduleView
+        jamamColumns={jamamColumns}
+        pakshaId={pakshaId}
+        selectedPatchi={bird}
+        selectedDateTime={selectedDateTime}
+        rowHeading="thithi"
+        nightThithi={nightThithi}
+        sections={sections}
+      />
+    </div>
+  );
+}
+
 function AlternatePakshaScheduleView({
   jamamColumns,
   pakshaId,
@@ -239,6 +307,7 @@ function AlternatePakshaScheduleView({
   selectedDateTime,
   rowHeading,
   nightThithi,
+  sections,
 }: {
   jamamColumns: DaySchedulerJamamColumn[];
   pakshaId: "valarpirai" | "theipirai";
@@ -246,6 +315,8 @@ function AlternatePakshaScheduleView({
   selectedDateTime?: Date;
   rowHeading: "day" | "thithi";
   nightThithi?: ThithiPatchiEntry;
+  /** Preset sections in the all-birds layout, one table each so every table heads its own jamam times. */
+  sections?: ThithiScheduleSection[];
 }) {
   const { coords } = useLocation();
   const [antharaSelection, setAntharaSelection] = useState<AlternateAntharaSelection | null>(
@@ -312,7 +383,19 @@ function AlternatePakshaScheduleView({
 
   return (
     <>
-      {selectedPatchi === "all" ? (
+      {sections ? (
+        sections.map((section) => (
+          <AlternatePakshaDayNightTables
+            key={section.key}
+            jamamColumns={jamamColumns}
+            pakshaId={pakshaId}
+            antharaSelection={antharaSelection}
+            onOpenAnthara={setAntharaSelection}
+            rowHeading={rowHeading}
+            sections={[section]}
+          />
+        ))
+      ) : selectedPatchi === "all" ? (
         <AlternatePakshaDayNightTables
           jamamColumns={jamamColumns}
           pakshaId={pakshaId}
@@ -354,12 +437,14 @@ function AlternatePakshaDayNightTables({
   antharaSelection,
   onOpenAnthara,
   rowHeading,
+  sections,
 }: {
   jamamColumns: DaySchedulerJamamColumn[];
   pakshaId: "valarpirai" | "theipirai";
   antharaSelection: AlternateAntharaSelection | null;
   onOpenAnthara: (selection: AlternateAntharaSelection) => void;
   rowHeading: "day" | "thithi";
+  sections?: ThithiScheduleSection[];
 }) {
   const showNight = alternatePakshaSupportsNight(pakshaId);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -451,6 +536,7 @@ function AlternatePakshaDayNightTables({
   }, [showNight, pakshaId, rowHeading]);
 
   const scheduleSections = useMemo((): ThithiScheduleSection[] => {
+    if (sections) return sections;
     if (rowHeading !== "thithi") {
       return ALTERNATE_WEEKDAY_ORDER.flatMap((weekday) => {
         const groupKey = getAlternateGroupKey(pakshaId, weekday);
@@ -498,7 +584,7 @@ function AlternatePakshaDayNightTables({
     }
 
     return groups;
-  }, [jamamColumns, pakshaId, rowHeading]);
+  }, [jamamColumns, pakshaId, rowHeading, sections]);
 
   return (
     <div
@@ -546,63 +632,54 @@ function AlternatePakshaDayNightTables({
               ]
                 .filter(Boolean)
                 .join(" ");
+              const showDay = !section.periods || section.periods.includes("day");
+              const showNightBlock =
+                showNight && (!section.periods || section.periods.includes("night"));
+              const nightHeadings = showDay ? [] : section.headings;
 
               return (
                 <Fragment key={section.key}>
-                  <tr
-                    className={weekdayStartClass}
-                    data-alternate-section
-                    data-weekday={weekday}
-                    data-period="day"
-                  >
-                    {section.headings.length > 0 ? (
-                      <th
-                        scope="rowgroup"
-                        colSpan={1 + jamamColumns.length}
-                        className="alternate-all-chip-table__period-label alternate-all-chip-table__thithi-row alternate-valarpirai-day-table__activity"
-                      >
-                        <span className="alternate-all-chip-table__thithi-line">
-                          <span className="alternate-all-chip-table__active-day">
-                            {section.headings.map((heading, headingIndex) => (
-                              <Fragment key={`${heading.ta}-${heading.en}`}>
-                                {headingIndex > 0 ? ", " : null}
-                                <BilingualText text={heading} />
-                              </Fragment>
-                            ))}
-                          </span>
-                          <span className="alternate-all-chip-table__header-sep" aria-hidden="true">
-                            ·
-                          </span>
-                          <BilingualText text={periodAthikaraPatchiHeader("day").period} />
-                        </span>
-                      </th>
-                    ) : (
-                      <>
-                        <th
-                          scope="row"
-                          className="alternate-all-chip-table__period-label alternate-valarpirai-day-table__activity"
-                        >
-                          <span className="alternate-all-chip-table__active-day">
-                            <BilingualText
-                              text={scheduleRowHeading(pakshaId, weekday, groupKey, rowHeading)}
+                  {showDay ? (
+                    <tr
+                      className={weekdayStartClass}
+                      data-alternate-section
+                      data-weekday={weekday}
+                      data-period="day"
+                    >
+                      {section.headings.length > 0 ? (
+                        <ThithiLineHeader
+                          headings={section.headings}
+                          period="day"
+                          colSpan={1 + jamamColumns.length}
+                        />
+                      ) : (
+                        <>
+                          <th
+                            scope="row"
+                            className="alternate-all-chip-table__period-label alternate-valarpirai-day-table__activity"
+                          >
+                            <span className="alternate-all-chip-table__active-day">
+                              <BilingualText
+                                text={scheduleRowHeading(pakshaId, weekday, groupKey, rowHeading)}
+                              />
+                            </span>
+                            <span className="alternate-all-chip-table__header-sep" aria-hidden="true">
+                              ·
+                            </span>
+                            <BilingualText text={periodAthikaraPatchiHeader("day").period} />
+                          </th>
+                          {jamamColumns.map((column) => (
+                            <td
+                              key={`day-spacer-${section.key}-${column.yama}`}
+                              className="alternate-all-chip-table__period-spacer"
+                              aria-hidden="true"
                             />
-                          </span>
-                          <span className="alternate-all-chip-table__header-sep" aria-hidden="true">
-                            ·
-                          </span>
-                          <BilingualText text={periodAthikaraPatchiHeader("day").period} />
-                        </th>
-                        {jamamColumns.map((column) => (
-                          <td
-                            key={`day-spacer-${section.key}-${column.yama}`}
-                            className="alternate-all-chip-table__period-spacer"
-                            aria-hidden="true"
-                          />
-                        ))}
-                      </>
-                    )}
-                  </tr>
-                  {PANCHA_ACTIVITY_TA.map((activityTa, activityIndex) => (
+                          ))}
+                        </>
+                      )}
+                    </tr>
+                  ) : null}
+                  {(showDay ? PANCHA_ACTIVITY_TA : []).map((activityTa, activityIndex) => (
                     <tr key={`day-${section.key}-${activityTa}`}>
                       <th
                         scope="row"
@@ -666,27 +743,41 @@ function AlternatePakshaDayNightTables({
                       })}
                     </tr>
                   ))}
-                  {showNight ? (
+                  {showNightBlock ? (
                     <>
                       <tr
-                        className="alternate-all-chip-table__period-marker alternate-all-chip-table__night-start"
+                        className={
+                          showDay
+                            ? "alternate-all-chip-table__period-marker alternate-all-chip-table__night-start"
+                            : weekdayStartClass
+                        }
                         data-alternate-section
                         data-weekday={weekday}
                         data-period="night"
                       >
-                        <th
-                          scope="row"
-                          className="alternate-all-chip-table__period-label alternate-valarpirai-day-table__activity"
-                        >
-                          <BilingualText text={periodAthikaraPatchiHeader("night").period} />
-                        </th>
-                        {jamamColumns.map((column) => (
-                          <td
-                            key={`night-spacer-${section.key}-${column.yama}`}
-                            className="alternate-all-chip-table__period-spacer"
-                            aria-hidden="true"
+                        {nightHeadings.length > 0 ? (
+                          <ThithiLineHeader
+                            headings={nightHeadings}
+                            period="night"
+                            colSpan={1 + jamamColumns.length}
                           />
-                        ))}
+                        ) : (
+                          <>
+                            <th
+                              scope="row"
+                              className="alternate-all-chip-table__period-label alternate-valarpirai-day-table__activity"
+                            >
+                              <BilingualText text={periodAthikaraPatchiHeader("night").period} />
+                            </th>
+                            {jamamColumns.map((column) => (
+                              <td
+                                key={`night-spacer-${section.key}-${column.yama}`}
+                                className="alternate-all-chip-table__period-spacer"
+                                aria-hidden="true"
+                              />
+                            ))}
+                          </>
+                        )}
                       </tr>
                       {ALTERNATE_NIGHT_ACTIVITY_TA.map((activityTa, activityIndex) => (
                         <tr key={`night-${section.key}-${activityTa}`}>
@@ -761,6 +852,39 @@ function AlternatePakshaDayNightTables({
         </table>
       </div>
     </div>
+  );
+}
+
+function ThithiLineHeader({
+  headings,
+  period,
+  colSpan,
+}: {
+  headings: Bilingual[];
+  period: PeriodId;
+  colSpan: number;
+}) {
+  return (
+    <th
+      scope="rowgroup"
+      colSpan={colSpan}
+      className="alternate-all-chip-table__period-label alternate-all-chip-table__thithi-row alternate-valarpirai-day-table__activity"
+    >
+      <span className="alternate-all-chip-table__thithi-line">
+        <span className="alternate-all-chip-table__active-day">
+          {headings.map((heading, headingIndex) => (
+            <Fragment key={`${heading.ta}-${heading.en}`}>
+              {headingIndex > 0 ? ", " : null}
+              <BilingualText text={heading} />
+            </Fragment>
+          ))}
+        </span>
+        <span className="alternate-all-chip-table__header-sep" aria-hidden="true">
+          ·
+        </span>
+        <BilingualText text={periodAthikaraPatchiHeader(period).period} />
+      </span>
+    </th>
   );
 }
 

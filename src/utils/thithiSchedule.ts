@@ -1,5 +1,6 @@
 import {
   ALTERNATE_ANTHARA_SEGMENT_COUNT,
+  ALTERNATE_WEEKDAY_ORDER,
   getAlternateDayActivity,
   getAlternateNightActivity,
 } from "./alternateCalculation";
@@ -87,6 +88,25 @@ export function thithiScheduleJamam1Bird(
   activity: string,
 ): ThithiScheduleBird | null {
   return thithiScheduleBirdDoing(pakshaId, thithiNumber, 1, "day", activity);
+}
+
+/** Schedule rows (planet weekdays) where `bird` eats (ஊண்) in Jamam 1 of the Day and in Jamam 1 of the Night. */
+export function thithiScheduleEatingRowWeekdays(
+  pakshaId: PakshaId,
+  bird: ThithiScheduleBird,
+): Record<PeriodId, number | null> {
+  const rowFor = (period: PeriodId) =>
+    ALTERNATE_WEEKDAY_ORDER.find(
+      (weekday) =>
+        thithiScheduleBirdActivity(
+          pakshaId,
+          thithiScheduleActivityWeekday(pakshaId, weekday),
+          1,
+          period,
+          bird,
+        ) === "ஊண்",
+    ) ?? null;
+  return { day: rowFor("day"), night: rowFor("night") };
 }
 
 /** Jamams of the sunrise-to-sunrise cycle containing `moment`, and the active one (start-inclusive, end-exclusive). */

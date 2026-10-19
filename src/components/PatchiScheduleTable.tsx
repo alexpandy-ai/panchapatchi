@@ -1,4 +1,5 @@
 import { BilingualText } from "./BilingualText";
+import { BirdEatingScheduleTable } from "./DaySchedulerTable";
 import { PatchiFilterChips, type PatchiSelection } from "./PatchiPickerBlock";
 import { useNavigation } from "../context/NavigationContext";
 
@@ -35,11 +36,17 @@ const SHEET_TABS: { id: PakshaId; label: (typeof PAKSHA_BI)[PakshaId] }[] = [
 
 type PatchiName = (typeof PATCHI_ORDER)[number];
 
+/** Single-bird picks shown in the Thithi Schedule table format instead of the Patchi Schedule grids. */
+const THITHI_SCHEDULE_FORMAT: Partial<Record<PakshaId, readonly PatchiName[]>> = {
+  valarpirai: ["காகம்"],
+};
+
 interface PatchiScheduleTableProps {
   bundle: PatchiSchedulesBundle | null;
   allBundles?: { patchiName: PatchiName; bundle: PatchiSchedulesBundle }[];
   selectedPatchi: PatchiSelection;
   onSelectPatchi: (patchi: PatchiSelection) => void;
+  selectedDateTime: Date;
   subtitle?: Bilingual;
 }
 
@@ -48,6 +55,7 @@ export function PatchiScheduleTable({
   allBundles,
   selectedPatchi,
   onSelectPatchi,
+  selectedDateTime,
   subtitle,
 }: PatchiScheduleTableProps) {
   const activeBundle = bundle ?? allBundles?.[0]?.bundle ?? null;
@@ -108,6 +116,12 @@ export function PatchiScheduleTable({
           patchiBundle.schedules[0];
 
         if (!schedule) return null;
+        const thithiFormatPaksha =
+          selectedPatchi !== "all" &&
+          (activePaksha === "valarpirai" || activePaksha === "theipirai") &&
+          THITHI_SCHEDULE_FORMAT[activePaksha]?.includes(patchiName)
+            ? activePaksha
+            : null;
 
         return (
           <div key={patchiName} className="patchi-schedule-patchi-section">
@@ -121,8 +135,18 @@ export function PatchiScheduleTable({
               <BilingualText text={patchiBilingual(patchiName)} />
             </h4>
             <div className="patchi-pivot-tables">
-              <PeriodPivotTable schedule={schedule} period="day" />
-              <PeriodPivotTable schedule={schedule} period="night" />
+              {thithiFormatPaksha ? (
+                <BirdEatingScheduleTable
+                  pakshaId={thithiFormatPaksha}
+                  bird={patchiName}
+                  selectedDateTime={selectedDateTime}
+                />
+              ) : (
+                <>
+                  <PeriodPivotTable schedule={schedule} period="day" />
+                  <PeriodPivotTable schedule={schedule} period="night" />
+                </>
+              )}
             </div>
           </div>
         );

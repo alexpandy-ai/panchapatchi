@@ -56,6 +56,7 @@ export function TimeTableView({
           allBundles={selectedPatchi === "all" ? allBundles : undefined}
           selectedPatchi={selectedPatchi}
           onSelectPatchi={setSelectedPatchi}
+          selectedDateTime={selectedDateTime}
           subtitle={subtitle}
         />
       ) : (

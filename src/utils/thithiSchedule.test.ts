@@ -20,6 +20,7 @@ import {
 import {
   thithiScheduleBirdNow,
   thithiScheduleDayFacts,
+  thithiScheduleEatingRowWeekdays,
   thithiScheduleRowWeekday,
   type ThithiScheduleBird,
 } from "./thithiSchedule.ts";
@@ -158,6 +159,21 @@ test("Home matches the Schedule page for all birds, both Pirai, every thithi, da
           }
         }
       }
+    }
+  }
+});
+
+test("Patchi Schedule Crow, Valarpirai: Day rows from the Trithiyai row, Night rows from the Panchami row", () => {
+  const rows = thithiScheduleEatingRowWeekdays("valarpirai", "காகம்");
+  assert.equal(rows.day, thithiScheduleRowWeekday("valarpirai", 3));
+  assert.equal(rows.night, thithiScheduleRowWeekday("valarpirai", 5));
+  assert.equal(thithiScheduleDayFacts("valarpirai", 3)?.athikara, "காகம்");
+
+  for (const pakshaId of PIRAIS) {
+    for (const period of ["day", "night"] as const) {
+      const byBird = PATCHI_ORDER.map((bird) => thithiScheduleEatingRowWeekdays(pakshaId, bird)[period]);
+      assert.ok(byBird.every((weekday) => weekday !== null), `${pakshaId} ${period}`);
+      assert.equal(new Set(byBird).size, PATCHI_ORDER.length, `${pakshaId} ${period}: one row per bird`);
     }
   }
 });
