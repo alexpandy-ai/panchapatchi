@@ -401,14 +401,18 @@ async function main() {
   return 0;
 }
 
+// exitCode, not process.exit(): exiting while fetch sockets close aborts Node on Windows.
 main().then(
-  (code) => process.exit(code),
+  (code) => {
+    process.exitCode = code;
+  },
   (error) => {
     if (error instanceof StageError) {
       console.error(`[ship] [${error.stage}] FAILED: ${error.message}`);
-      process.exit(error.code);
+      process.exitCode = error.code;
+      return;
     }
     console.error(`[ship] FAILED: ${redact(error?.stack ?? error)}`);
-    process.exit(1);
+    process.exitCode = 1;
   },
 );
