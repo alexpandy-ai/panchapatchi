@@ -34,6 +34,11 @@ export function thithiIndexLabel(index: number | null, language: AppLanguage): s
   return pickBilingual(thithiIndexLabelBi(index), language);
 }
 
+/** Thithi name without the Pirai; unnamed sectors keep their label. */
+export function thithiNameLabel(index: number | null, language: AppLanguage): string {
+  return pickBilingual(index === null ? UNNAMED_SECTOR : thithiNameBi(thithiIndexToSelection(index)), language);
+}
+
 const MONTH_NAMES: readonly Bilingual[] = [
   bi("ஜனவரி", "January"),
   bi("பிப்ரவரி", "February"),

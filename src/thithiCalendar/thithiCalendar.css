@@ -222,6 +222,7 @@
 
 .thithi-calendar__monthly {
   max-height: 70vh;
+  margin-top: 1rem;
 }
 
 .thithi-calendar__monthly table {
@@ -237,6 +238,22 @@
 
 .thithi-calendar__monthly td {
   text-align: left;
+}
+
+.thithi-calendar__actions--inline {
+  flex-wrap: nowrap;
+}
+
+.thithi-calendar__actions--inline select {
+  min-width: 0;
+}
+
+.thithi-calendar__monthly .thithi-calendar__inline-cell {
+  white-space: nowrap;
+}
+
+.thithi-calendar__monthly .thithi-calendar__inline-cell small {
+  display: inline;
 }
 
 .thithi-calendar__sequence {

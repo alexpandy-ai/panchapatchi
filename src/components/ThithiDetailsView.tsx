@@ -28,6 +28,7 @@ import {
   reviewReasonText,
   TD,
   thithiNameBi,
+  thithiNameLabel,
 } from "../thithiCalendar/labels";
 import { thithiIndexToSelection } from "../thithiCalendar/thithiIds";
 import { useDailyThithi } from "../thithiCalendar/useDailyThithi";
@@ -235,10 +236,11 @@ export function ThithiDetailsView({ selectedDateTime, onDateTimeChange }: Thithi
             <h3>{pick(mode === "annual" ? TD.tabAnnual : mode === "chart" ? TD.tabChart : TD.headingDaily)}</h3>
             {mode !== "chart" ? <p>{pick(TD.legend)}</p> : null}
           </div>
-          <div className="thithi-calendar__actions">
-            <label htmlFor="thithi-year">{pick(TD.year)}</label>
+          <div className={mode === "daily" ? "thithi-calendar__actions thithi-calendar__actions--inline" : "thithi-calendar__actions"}>
+            {mode !== "daily" ? <label htmlFor="thithi-year">{pick(TD.year)}</label> : null}
             <select
               id="thithi-year"
+              aria-label={mode === "daily" ? pick(TD.year) : undefined}
               value={year}
               onChange={(event) => setYear(Number(event.target.value))}
             >
@@ -248,9 +250,10 @@ export function ThithiDetailsView({ selectedDateTime, onDateTimeChange }: Thithi
                 </option>
               ))}
             </select>
-            <label htmlFor="thithi-month">{pick(TD.month)}</label>
+            {mode !== "daily" ? <label htmlFor="thithi-month">{pick(TD.month)}</label> : null}
             <select
               id="thithi-month"
+              aria-label={mode === "daily" ? pick(TD.month) : undefined}
               value={month}
               onChange={(event) => setMonth(Number(event.target.value))}
             >
@@ -274,9 +277,6 @@ export function ThithiDetailsView({ selectedDateTime, onDateTimeChange }: Thithi
 
         {rows && mode === "daily" ? (
           <>
-            <h3 className="thithi-calendar__section">
-              {monthLabel} {year}
-            </h3>
             <div className="thithi-calendar__scroll thithi-calendar__monthly">
               <table>
                 <thead>
@@ -304,13 +304,13 @@ export function ThithiDetailsView({ selectedDateTime, onDateTimeChange }: Thithi
                         <DateButton row={row} label={row.date} language={language} onChoose={chooseDate} />
                         {row.date === effectiveDate ? <small>◆ {pick(TD.calculationDate)}</small> : null}
                       </td>
-                      <td>
-                        {thithiLabel(row.assumed, language)}
+                      <td className="thithi-calendar__inline-cell">
+                        {thithiNameLabel(row.assumed, language)}{" "}
                         <small>
                           {row.angle}°–{row.endAngle}°
                         </small>
                       </td>
-                      <td>{thithiLabel(row.actual, language)}</td>
+                      <td>{thithiNameLabel(row.actual, language)}</td>
                     </tr>
                   ))}
                 </tbody>
