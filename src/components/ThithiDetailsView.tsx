@@ -6,16 +6,13 @@ import { pickBilingual, type Bilingual } from "../utils/bilingual";
 import { LOCATION_DISPLAY, type GeoCoords } from "../utils/location";
 import {
   calendarYear,
-  downloadCsv,
   firstCalendarYear,
   formatPlaceTime,
   lastCalendarYear,
   monthCells,
   peekCalendarYear,
   placeKey,
-  placeToday,
   placeWallClock,
-  rowsThroughToday,
   thithiLabel,
   degreeRange,
   type CalendarDay,
@@ -31,7 +28,6 @@ import {
   reviewReasonText,
   TD,
   thithiNameBi,
-  weekdayName,
 } from "../thithiCalendar/labels";
 import { thithiIndexToSelection } from "../thithiCalendar/thithiIds";
 import { useDailyThithi } from "../thithiCalendar/useDailyThithi";
@@ -111,7 +107,6 @@ export function ThithiDetailsView({ selectedDateTime, onDateTimeChange }: Thithi
   const [calendar, setCalendar] = useState<{ key: string; rows: CalendarDay[] } | null>(null);
   const [computing, setComputing] = useState(true);
   const [error, setError] = useState("");
-  const [exporting, setExporting] = useState(false);
   const [showAnchors, setShowAnchors] = useState(false);
   const yearKey = `${placeKey(place)}#${year}`;
 
@@ -183,24 +178,10 @@ export function ThithiDetailsView({ selectedDateTime, onDateTimeChange }: Thithi
     lookupRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
-  async function exportAll() {
-    setExporting(true);
-    try {
-      const allRows = await rowsThroughToday(place);
-      downloadCsv(allRows, `Thithi_1950_${placeToday(place)}.csv`, placeSummary, language);
-    } finally {
-      setExporting(false);
-    }
-  }
-
   const years = Array.from({ length: lastYear - firstYear + 1 }, (_, index) => firstYear + index);
 
   return (
     <section className="thithi-calendar">
-      <div className="thithi-calendar__intro">
-        <p className="thithi-calendar__eyebrow">{pick(TD.eyebrow)}</p>
-      </div>
-
       <section className="thithi-calendar__lookup" ref={lookupRef} aria-live="polite">
         <div className="thithi-calendar__result">
           {daily?.status === "locating" ? (
@@ -216,10 +197,6 @@ export function ThithiDetailsView({ selectedDateTime, onDateTimeChange }: Thithi
               <div className="thithi-calendar__value">
                 <strong>{thithiLabel(selected.assumed, language)}</strong>
               </div>
-              <p className="thithi-calendar__hint">
-                {pick(TD.calculationDate)}: {effective.effectiveDateKey} · {weekdayName(effective.effectiveDateKey, language)}
-                {effective.beforeSunrise ? ` · ${pick(TD.beforeSunrise)}` : null}
-              </p>
               {selected.critical ? (
                 <div className="thithi-calendar__review">
                   <strong>{pick(TD.reviewDate)}</strong>
@@ -283,9 +260,6 @@ export function ThithiDetailsView({ selectedDateTime, onDateTimeChange }: Thithi
                 </option>
               ))}
             </select>
-            <button type="button" onClick={() => void exportAll()} disabled={exporting || locating}>
-              {pick(exporting ? TD.exporting : TD.exportAll)}
-            </button>
           </div>
         </div>
         {error ? (

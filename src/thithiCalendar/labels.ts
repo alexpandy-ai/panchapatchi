@@ -1,6 +1,5 @@
 import type { AppLanguage } from "../context/LanguageContext";
-import { bi, pickBilingual, WEEKDAY_EN, type Bilingual } from "../utils/bilingual";
-import { TAMIL_WEEKDAYS } from "../utils/dayGroup";
+import { bi, pickBilingual, type Bilingual } from "../utils/bilingual";
 import type { PakshaId } from "../utils/paksha";
 import { getThithiCellPosition, THITHI_PATCHI_BY_PAKSHA } from "../utils/thithiPatchi";
 import type { ReviewReason } from "./calendar";
@@ -57,18 +56,11 @@ export function monthName(month: number, language: AppLanguage): string {
   return name ? pickBilingual(name, language) : "";
 }
 
-/** Weekday of a `YYYY-MM-DD` civil date. */
-export function weekdayName(dateKey: string, language: AppLanguage): string {
-  const weekday = new Date(`${dateKey}T00:00:00Z`).getUTCDay();
-  return language === "ta" ? (TAMIL_WEEKDAYS[weekday] ?? "") : (WEEKDAY_EN[weekday] ?? "");
-}
-
 export function placeLocale(language: AppLanguage): string {
   return language === "ta" ? "ta-IN" : "en-IN";
 }
 
 export const TD = {
-  eyebrow: bi("1950 முதல் நடப்பு ஆண்டு வரை", "From 1950 to the current year"),
   tabAnnual: bi("ஆண்டு அட்டவணை", "Annual Table"),
   tabChart: bi("ஆண்டு வரைபடம்", "Year Chart"),
   tabDaily: bi("மாத அட்டவணை", "Monthly Table"),
@@ -80,8 +72,6 @@ export const TD = {
   legend: bi("● உதய பௌர்ணமி \u00a0 ★ உதய அமாவாசை", "● Sunrise Pournami \u00a0 ★ Sunrise Amavasya"),
   year: bi("ஆண்டு", "Year"),
   month: bi("மாதம்", "Month"),
-  exporting: bi("தயாராகிறது…", "Preparing…"),
-  exportAll: bi("1950 முதல் இன்று வரை ↓", "1950 to today ↓"),
   computing: bi("கணக்கிடுகிறது…", "Calculating…"),
   calculationFailed: bi("கணக்கீடு தோல்வி", "Calculation failed"),
   outOfRangeShort: bi("தேதி வரம்புக்கு வெளியே", "Date out of range"),
@@ -94,10 +84,6 @@ export const TD = {
   angleSunsetThithi: bi("கோண–அஸ்தமன விதிப்படி திதி", "Thithi by angle–sunset rule"),
   sunriseThithi: bi("நாட்காட்டித் திதி — இடத்தின் சூரிய உதயம்", "Calendar thithi — sunrise at the place"),
   calculationDate: bi("கணக்கீட்டுத் தேதி", "Calculation date"),
-  beforeSunrise: bi(
-    "சூரிய உதயத்திற்கு முன் — முந்தைய தேதியின் திதி",
-    "Before sunrise — previous date's thithi",
-  ),
   annualHeading: bi("கோண–அஸ்தமன அடிப்படையிலான திதிகள்", "Thithis by the angle–sunset rule"),
   annualHint: bi(
     "உங்கள் வட்டப்படி 32 × 11.25° பகுதிகள்: 0° அமாவாசை · 90° வளர்பிறை அஷ்டமி · 180° பௌர்ணமி · 270° தேய்பிறை அஷ்டமி. 168.75°–180° மற்றும் 348.75°–360° பெயரிடப்படாத பகுதிகள். ⚠ நிறமிட்ட தேதியை அழுத்தினால் காரணம் தெரியும். அனைத்திற்கும் தேர்ந்தெடுத்த இடத்தின் அஸ்தமன விதி. அடுத்தடுத்த நாட்களில் அதே திதி மீண்டால் மட்டும் கூடுதல் தேதி மறைக்கப்படும்; கோண அடிப்படைத் தேதி இருந்தால் அதற்கு முன்னுரிமை. அதே மாதத்தில் இடைவெளிக்குப் பின் வரும் அதே திதியின் தேதியும் காட்டப்படும்.",

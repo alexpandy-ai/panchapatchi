@@ -1,6 +1,6 @@
 import * as Astronomy from "astronomy-engine";
 import type { AppLanguage } from "../context/LanguageContext";
-import { placeLocale, TD, thithiIndexLabel } from "./labels";
+import { placeLocale, thithiIndexLabel } from "./labels";
 
 /**
  * Thithi calendar for a selected place.
@@ -505,49 +505,6 @@ export function annualRows(rows: CalendarDay[]): CalendarDay[] {
 export function monthCells(rows: CalendarDay[], index: number, month: number): CalendarDay[] {
   const collapsed = visibleDates(annualRows(rows).filter((row) => row.assumed === index));
   return visibleDates(collapsed.filter((row) => row.month === month));
-}
-
-export function calendarCsv(rows: CalendarDay[], placeSummary: string, language: AppLanguage = "ta"): string {
-  const header = [
-    TD.date[language],
-    TD.angleSunsetThithi[language],
-    `${TD.sunriseThithi[language]} (${placeSummary})`,
-  ];
-  const lines = [
-    header,
-    ...rows.map((row) => [row.date, thithiLabel(row.assumed, language), thithiLabel(row.actual, language)]),
-  ];
-  return lines
-    .map((line) => line.map((cell) => `"${cell.replaceAll('"', '""')}"`).join(","))
-    .join("\r\n");
-}
-
-export function downloadCsv(
-  rows: CalendarDay[],
-  filename: string,
-  placeSummary: string,
-  language: AppLanguage = "ta",
-): void {
-  const blob = new Blob([`\uFEFF${calendarCsv(rows, placeSummary, language)}`], {
-    type: "text/csv;charset=utf-8",
-  });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = filename;
-  link.click();
-  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
-
-export async function rowsThroughToday(place: ThithiPlace): Promise<CalendarDay[]> {
-  const today = placeToday(place);
-  const endYear = Number(today.slice(0, 4));
-  const rows: CalendarDay[] = [];
-  for (let year = FIRST_YEAR; year <= endYear; year += 1) {
-    rows.push(...calendarYear(year, place).filter((row) => row.date <= today));
-    await new Promise((resolve) => setTimeout(resolve, 0));
-  }
-  return rows;
 }
 
 export function moonSamples(year: number, month: number, place: ThithiPlace): MoonSample[] {
