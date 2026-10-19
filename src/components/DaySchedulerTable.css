@@ -1,4 +1,4 @@
-/* Thithi Schedule › Schedule table: left-aligned cells, columns sized to their content. Layout only. */
+/* Thithi Schedule › Schedule table: left-aligned cells, columns sized to their content. */
 
 .schedule-table-card--alternate .alternate-valarpirai-all-chip--thithi table.alternate-all-chip-table {
   width: auto;
@@ -16,4 +16,12 @@
 .schedule-table-card--alternate .alternate-valarpirai-all-chip--thithi table.alternate-all-chip-table thead th.alternate-all-chip-table__jamam-header,
 .schedule-table-card--alternate .alternate-valarpirai-all-chip--thithi table.alternate-all-chip-table td.alternate-valarpirai-day-table__bird {
   white-space: nowrap;
+}
+
+/* Patchi Activity column; the background must stay opaque because the body cells are pinned over scrolled bird cells. */
+.schedule-table-card--alternate .alternate-valarpirai-all-chip--thithi table.alternate-all-chip-table thead th.alternate-all-chip-table__activity-col,
+.schedule-table-card--alternate .alternate-valarpirai-all-chip--thithi table.alternate-all-chip-table tbody th.patchi-pivot-table__day {
+  background: var(--color-selected);
+  color: var(--color-green-2);
+  font-weight: 700;
 }
