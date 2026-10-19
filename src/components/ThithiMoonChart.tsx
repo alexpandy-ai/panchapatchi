@@ -46,8 +46,8 @@ const SECTORS = Array.from({ length: 32 }, (_, sector) => sector);
 /** 32 × 11.25° thithi circle; names follow the active language. */
 function SectorCircle({ label }: { label: (sector: number) => string }) {
   return (
-    <g fill="#352724" fontSize="13" fontFamily="Arial, sans-serif">
-      <circle cx="368" cy="320" r="255" fill="none" stroke="#352724" strokeWidth="2" />
+    <g style={{ fill: "var(--chart-ink)" }} fontSize="13" fontFamily="Arial, sans-serif">
+      <circle cx="368" cy="320" r="255" fill="none" style={{ stroke: "var(--chart-ink)" }} strokeWidth="2" />
       {SECTORS.map((sector) => {
         const start = sector * 11.25;
         const mid = start + 5.625;
@@ -58,7 +58,7 @@ function SectorCircle({ label }: { label: (sector: number) => string }) {
         const name = label(sector);
         return (
           <g key={sector}>
-            <line x1="368" y1="320" x2={x2} y2={y2} stroke="#352724" strokeWidth="1" />
+            <line x1="368" y1="320" x2={x2} y2={y2} style={{ stroke: "var(--chart-ink)" }} strokeWidth="1" />
             <text x={degreeX} y={degreeY} textAnchor="middle" dominantBaseline="middle" fontSize="14">
               {start}°
             </text>
@@ -174,7 +174,7 @@ export function ThithiMoonChart({ year, month, place }: ThithiMoonChartProps) {
               markerHeight="6"
               orient="auto-start-reverse"
             >
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="#812e39" />
+              <path d="M 0 0 L 10 5 L 0 10 z" style={{ fill: "var(--chart-accent)" }} />
             </marker>
           </defs>
           {basis === "phase" ? (
@@ -183,11 +183,11 @@ export function ThithiMoonChart({ year, month, place }: ThithiMoonChartProps) {
             </g>
           ) : (
             <>
-              <circle cx="368" cy="320" r="255" fill="none" stroke="#cbb8a8" />
+              <circle cx="368" cy="320" r="255" fill="none" style={{ stroke: "var(--chart-ring)" }} />
               {[0, 90, 180, 270].map((tick) => {
                 const label = point(tick, 280);
                 return (
-                  <text key={tick} x={label[0]} y={label[1]} textAnchor="middle" fill="#352724">
+                  <text key={tick} x={label[0]} y={label[1]} textAnchor="middle" style={{ fill: "var(--chart-ink)" }}>
                     {tick}°
                   </text>
                 );
@@ -201,47 +201,47 @@ export function ThithiMoonChart({ year, month, place }: ThithiMoonChartProps) {
                 cy="320"
                 r={km / 3000}
                 fill="none"
-                stroke="#b8aca1"
+                style={{ stroke: "var(--chart-guide)" }}
                 strokeWidth="0.7"
                 strokeDasharray="3 4"
               />
-              <text x="373" y={320 - km / 3000 + 10} fill="#68584e" fontSize="10">
+              <text x="373" y={320 - km / 3000 + 10} style={{ fill: "var(--chart-muted)" }} fontSize="10">
                 {km / 1000},000 km
               </text>
             </g>
           ))}
-          <path d={trail} fill="none" stroke="#b58b73" strokeWidth="2" markerEnd="url(#thithiMoonArrow)" />
+          <path d={trail} fill="none" style={{ stroke: "var(--chart-trail)" }} strokeWidth="2" markerEnd="url(#thithiMoonArrow)" />
           {samples.map((item, itemIndex) => {
             const position = point(item[basis], item.distance / 3000);
             const label = point(item[basis], item.distance / 3000 + 15);
             const selected = itemIndex === Math.min(index, samples.length - 1);
             return (
               <g key={item.date}>
-                <circle cx={position[0]} cy={position[1]} r={selected ? 6 : 3} fill={selected ? "#812e39" : "#b58b73"} />
+                <circle cx={position[0]} cy={position[1]} r={selected ? 6 : 3} style={{ fill: selected ? "var(--chart-accent)" : "var(--chart-trail)" }} />
                 {itemIndex % 3 === 0 || itemIndex === samples.length - 1 ? (
-                  <text x={label[0]} y={label[1]} textAnchor="middle" dominantBaseline="middle" fill="#53392f" fontSize="12">
+                  <text x={label[0]} y={label[1]} textAnchor="middle" dominantBaseline="middle" style={{ fill: "var(--chart-ink)" }} fontSize="12">
                     {Number(item.date.slice(8))}
                   </text>
                 ) : null}
               </g>
             );
           })}
-          <line x1="368" y1="320" x2="218" y2="320" stroke="#96776a" strokeDasharray="4 4" />
-          <line x1="368" y1="320" x2={moon[0]} y2={moon[1]} stroke="#812e39" strokeWidth="2.5" markerEnd="url(#thithiMoonArrow)" />
-          <circle cx={moon[0]} cy={moon[1]} r="10" fill="#812e39" />
+          <line x1="368" y1="320" x2="218" y2="320" style={{ stroke: "var(--chart-muted)" }} strokeDasharray="4 4" />
+          <line x1="368" y1="320" x2={moon[0]} y2={moon[1]} style={{ stroke: "var(--chart-accent)" }} strokeWidth="2.5" markerEnd="url(#thithiMoonArrow)" />
+          <circle cx={moon[0]} cy={moon[1]} r="10" style={{ fill: "var(--chart-accent)" }} />
           <svg x={moon[0] - 11} y={moon[1] - 11} width="22" height="22" viewBox="887 0 887 887" overflow="hidden">
             <image href={earthMoonUrl} width="1774" height="887" />
           </svg>
           <svg x="352" y="304" width="32" height="32" viewBox="0 0 887 887" overflow="hidden">
             <image href={earthMoonUrl} width="1774" height="887" />
           </svg>
-          <text x="368" y="348" textAnchor="middle" fill="#352724" fontSize="12">
+          <text x="368" y="348" textAnchor="middle" style={{ fill: "var(--chart-ink)" }} fontSize="12">
             {pick(TD.chartEarth)}
           </text>
-          <line x1="218" y1="625" x2="251.333" y2="625" stroke="#812e39" strokeWidth="3" />
-          <line x1="218" y1="620" x2="218" y2="630" stroke="#812e39" />
-          <line x1="251.333" y1="620" x2="251.333" y2="630" stroke="#812e39" />
-          <text x="262" y="629" fill="#352724" fontSize="12">
+          <line x1="218" y1="625" x2="251.333" y2="625" style={{ stroke: "var(--chart-accent)" }} strokeWidth="3" />
+          <line x1="218" y1="620" x2="218" y2="630" style={{ stroke: "var(--chart-accent)" }} />
+          <line x1="251.333" y1="620" x2="251.333" y2="630" style={{ stroke: "var(--chart-accent)" }} />
+          <text x="262" y="629" style={{ fill: "var(--chart-ink)" }} fontSize="12">
             {pick(TD.chartScale)}
           </text>
         </svg>
