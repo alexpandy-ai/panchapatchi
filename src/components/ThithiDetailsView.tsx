@@ -233,10 +233,12 @@ export function ThithiDetailsView({ selectedDateTime, onDateTimeChange }: Thithi
 
       <section className="thithi-calendar__panel">
         <div className="thithi-calendar__toolbar">
-          <div>
-            <h3>{pick(mode === "annual" ? TD.tabAnnual : mode === "chart" ? TD.tabChart : TD.headingDaily)}</h3>
-            {mode !== "chart" ? <p>{pick(TD.legend)}</p> : null}
-          </div>
+          {mode !== "chart" ? (
+            <div>
+              <h3>{pick(mode === "annual" ? TD.tabAnnual : TD.headingDaily)}</h3>
+              <p>{pick(TD.legend)}</p>
+            </div>
+          ) : null}
           <div className="thithi-calendar__actions">
             <select
               id="thithi-year"

@@ -67,7 +67,6 @@ export function placeLocale(language: AppLanguage): string {
 
 export const TD = {
   tabAnnual: bi("ஆண்டு அட்டவணை", "Annual Table"),
-  tabChart: bi("ஆண்டு வரைபடம்", "Year Chart"),
   tabDaily: bi("மாத அட்டவணை", "Monthly Table"),
   chipAnnual: bi("ஆண்டு", "Annual"),
   chipChart: bi("வரைபடம்", "Chart"),
@@ -128,6 +127,8 @@ export const TD = {
   sources: bi("ஆதாரம்", "Sources"),
   usnoLink: bi("USNO நிலவு phase விளக்கம்", "USNO Moon phase explanation"),
   footer: bi("பிரதமை முதல் பௌர்ணமி வரை · உங்கள் தினசரி திதி வரிசை", "Prathamai to Pournami · your daily thithi sequence"),
+  chartDetails: bi("தேர்ந்தெடுத்த நாளின் விவரம்", "Selected day details"),
+  chartAbout: bi("வரைபட விளக்கம்", "About this chart"),
   chartEmpty: bi("இந்த மாதத்துக்கு சந்திர வரைபடம் இல்லை.", "No Moon chart for this month."),
   chartBasis: bi("கோண வகை", "Angle basis"),
   chartBasisPhase: bi("சந்திரன் − சூரியன் · திதி வட்டம்", "Moon − Sun · thithi circle"),

@@ -113,8 +113,7 @@
   flex-wrap: wrap;
 }
 
-.thithi-calendar__toolbar h3,
-.thithi-calendar__chart h3 {
+.thithi-calendar__toolbar h3 {
   margin: 0;
   color: var(--red-deep);
   font-size: 1.05rem;
@@ -339,6 +338,18 @@
   margin-top: 0.7rem;
   color: var(--muted);
   font-size: 0.85rem;
+}
+
+.thithi-calendar__chart .thithi-calendar__anchors {
+  text-align: left;
+}
+
+.thithi-calendar__anchors .thithi-calendar__chart-status {
+  color: var(--red-deep);
+}
+
+.thithi-calendar__anchors .thithi-calendar__hint {
+  font-size: 0.92rem;
 }
 
 .thithi-calendar__anchors .thithi-calendar__angle-rule {

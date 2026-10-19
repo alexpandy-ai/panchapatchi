@@ -9,7 +9,7 @@ import {
   type MoonSample,
   type ThithiPlace,
 } from "../thithiCalendar/calendar";
-import { monthName, TD, thithiNameBi } from "../thithiCalendar/labels";
+import { TD, thithiNameBi } from "../thithiCalendar/labels";
 import { thithiIndexToSelection } from "../thithiCalendar/thithiIds";
 
 interface ThithiMoonChartProps {
@@ -85,7 +85,8 @@ export function ThithiMoonChart({ year, month, place }: ThithiMoonChartProps) {
   const [basis, setBasis] = useState<"phase" | "longitude">("phase");
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
-  const monthLabel = monthName(month, language);
+  const [showDetails, setShowDetails] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
   const sectorLabel = (sector: number) => {
     const thithiIndex = sectorIndex(sector);
     return thithiIndex === null ? "" : pick(thithiNameBi(thithiIndexToSelection(thithiIndex)));
@@ -125,9 +126,6 @@ export function ThithiMoonChart({ year, month, place }: ThithiMoonChartProps) {
 
   return (
     <section className="thithi-calendar__chart">
-      <h3>
-        {pick(TD.tabChart)} · {monthLabel} {year}
-      </h3>
       <div className="thithi-calendar__chart-controls">
         <label>
           {pick(TD.chartBasis)}
@@ -164,11 +162,6 @@ export function ThithiMoonChart({ year, month, place }: ThithiMoonChartProps) {
           {pick(playing ? TD.chartPause : TD.chartPlay)}
         </button>
       </div>
-      <p className="thithi-calendar__chart-status" aria-live="polite">
-        {sample.date} · {pick(TD.chartSunset)}: {formatPlaceTime(sample.time.toISOString(), place, language)} ·{" "}
-        {pick(basis === "phase" ? TD.chartPhase : TD.chartLongitude)}: {angle.toFixed(2)}° · {pick(TD.chartDistance)}:{" "}
-        {Math.round(sample.distance).toLocaleString("en-IN")} km · {pick(TD.chartTravelled)}: {travelled.toFixed(2)}°
-      </p>
       <div className="thithi-calendar__drawing">
         <svg viewBox="0 -45 736 730" role="img" aria-label={pick(TD.chartAria)}>
           <defs>
@@ -253,7 +246,40 @@ export function ThithiMoonChart({ year, month, place }: ThithiMoonChartProps) {
           </text>
         </svg>
       </div>
-      <p className="thithi-calendar__hint">{pick(TD.chartHint)}</p>
+      <div className="thithi-calendar__anchors">
+        <button
+          type="button"
+          className="thithi-calendar__anchors-toggle"
+          aria-expanded={showDetails}
+          aria-controls="thithi-chart-details"
+          onClick={() => setShowDetails((open) => !open)}
+        >
+          {showDetails ? "▾" : "▸"} {pick(TD.chartDetails)} · {sample.date}
+        </button>
+        {showDetails ? (
+          <p id="thithi-chart-details" className="thithi-calendar__chart-status" aria-live="polite">
+            {sample.date} · {pick(TD.chartSunset)}: {formatPlaceTime(sample.time.toISOString(), place, language)} ·{" "}
+            {pick(basis === "phase" ? TD.chartPhase : TD.chartLongitude)}: {angle.toFixed(2)}° · {pick(TD.chartDistance)}:{" "}
+            {Math.round(sample.distance).toLocaleString("en-IN")} km · {pick(TD.chartTravelled)}: {travelled.toFixed(2)}°
+          </p>
+        ) : null}
+      </div>
+      <div className="thithi-calendar__anchors">
+        <button
+          type="button"
+          className="thithi-calendar__anchors-toggle"
+          aria-expanded={showAbout}
+          aria-controls="thithi-chart-about"
+          onClick={() => setShowAbout((open) => !open)}
+        >
+          {showAbout ? "▾" : "▸"} {pick(TD.chartAbout)}
+        </button>
+        {showAbout ? (
+          <p id="thithi-chart-about" className="thithi-calendar__hint">
+            {pick(TD.chartHint)}
+          </p>
+        ) : null}
+      </div>
     </section>
   );
 }
