@@ -83,6 +83,7 @@ export function PatchiScheduleTable({
               pakshaId={activePaksha}
               bird={patchiName}
               selectedDateTime={selectedDateTime}
+              hideThithiRows={selectedPatchi === "all"}
             />
           </div>
         </div>

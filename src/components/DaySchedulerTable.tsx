@@ -249,10 +249,12 @@ export function BirdEatingScheduleTable({
   pakshaId,
   bird,
   selectedDateTime,
+  hideThithiRows,
 }: {
   pakshaId: "valarpirai" | "theipirai";
   bird: PatchiName;
   selectedDateTime: Date;
+  hideThithiRows?: boolean;
 }) {
   const { coords } = useLocation();
   const jamamColumns = useMemo(
@@ -310,6 +312,7 @@ export function BirdEatingScheduleTable({
         nightThithi={nightThithi}
         sections={sections}
         highlightBird={bird}
+        hideThithiRows={hideThithiRows}
       />
     </div>
   );
@@ -324,6 +327,7 @@ function AlternatePakshaScheduleView({
   nightThithi,
   sections,
   highlightBird,
+  hideThithiRows,
 }: {
   jamamColumns: DaySchedulerJamamColumn[];
   pakshaId: "valarpirai" | "theipirai";
@@ -334,6 +338,7 @@ function AlternatePakshaScheduleView({
   /** Preset sections in the all-birds layout, one table each so every table heads its own jamam times. */
   sections?: ThithiScheduleSection[];
   highlightBird?: PatchiName;
+  hideThithiRows?: boolean;
 }) {
   const { coords } = useLocation();
   const [antharaSelection, setAntharaSelection] = useState<AlternateAntharaSelection | null>(
@@ -411,6 +416,7 @@ function AlternatePakshaScheduleView({
             rowHeading={rowHeading}
             sections={[section]}
             highlightBird={highlightBird}
+            hideThithiRows={hideThithiRows}
           />
         ))
       ) : selectedPatchi === "all" ? (
@@ -457,6 +463,7 @@ function AlternatePakshaDayNightTables({
   rowHeading,
   sections,
   highlightBird,
+  hideThithiRows = false,
 }: {
   jamamColumns: DaySchedulerJamamColumn[];
   pakshaId: "valarpirai" | "theipirai";
@@ -466,6 +473,8 @@ function AlternatePakshaDayNightTables({
   sections?: ThithiScheduleSection[];
   /** Outlines this bird's cells and puts the Now badge on its cell in a section's running jamam. */
   highlightBird?: PatchiName;
+  /** Drops the thithi-names rows; the Day/Night label moves under the activity column header. */
+  hideThithiRows?: boolean;
 }) {
   const showNight = alternatePakshaSupportsNight(pakshaId);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -625,6 +634,11 @@ function AlternatePakshaDayNightTables({
             <tr className="alternate-all-chip-table__jamam-row">
               <th className="patchi-pivot-table__day-col alternate-all-chip-table__activity-col">
                 <BilingualText text={UI.patchiActivity} />
+                {hideThithiRows ? (
+                  <span className="patchi-pivot-table__time">
+                    <BilingualText text={periodAthikaraPatchiHeader(activeSection.period).period} />
+                  </span>
+                ) : null}
               </th>
               {jamamColumns.map((column) => (
                 <th
@@ -665,9 +679,15 @@ function AlternatePakshaDayNightTables({
                 showNight && (!section.periods || section.periods.includes("night"));
               const nightHeadings = showDay ? [] : section.headings;
 
+              const sectionMarker = (period: PeriodId) => ({
+                "data-alternate-section": "",
+                "data-weekday": weekday,
+                "data-period": period,
+              });
+
               return (
                 <Fragment key={section.key}>
-                  {showDay ? (
+                  {showDay && !hideThithiRows ? (
                     <tr
                       className={weekdayStartClass}
                       data-alternate-section
@@ -708,7 +728,10 @@ function AlternatePakshaDayNightTables({
                     </tr>
                   ) : null}
                   {(showDay ? PANCHA_ACTIVITY_TA : []).map((activityTa, activityIndex) => (
-                    <tr key={`day-${section.key}-${activityTa}`}>
+                    <tr
+                      key={`day-${section.key}-${activityTa}`}
+                      {...(hideThithiRows && activityIndex === 0 ? sectionMarker("day") : {})}
+                    >
                       <th
                         scope="row"
                         className="patchi-pivot-table__day alternate-valarpirai-day-table__activity"
@@ -772,42 +795,47 @@ function AlternatePakshaDayNightTables({
                   ))}
                   {showNightBlock ? (
                     <>
-                      <tr
-                        className={
-                          showDay
-                            ? "alternate-all-chip-table__period-marker alternate-all-chip-table__night-start"
-                            : weekdayStartClass
-                        }
-                        data-alternate-section
-                        data-weekday={weekday}
-                        data-period="night"
-                      >
-                        {nightHeadings.length > 0 ? (
-                          <ThithiLineHeader
-                            headings={nightHeadings}
-                            period="night"
-                            colSpan={1 + jamamColumns.length}
-                          />
-                        ) : (
-                          <>
-                            <th
-                              scope="row"
-                              className="alternate-all-chip-table__period-label alternate-valarpirai-day-table__activity"
-                            >
-                              <BilingualText text={periodAthikaraPatchiHeader("night").period} />
-                            </th>
-                            {jamamColumns.map((column) => (
-                              <td
-                                key={`night-spacer-${section.key}-${column.yama}`}
-                                className="alternate-all-chip-table__period-spacer"
-                                aria-hidden="true"
-                              />
-                            ))}
-                          </>
-                        )}
-                      </tr>
+                      {hideThithiRows ? null : (
+                        <tr
+                          className={
+                            showDay
+                              ? "alternate-all-chip-table__period-marker alternate-all-chip-table__night-start"
+                              : weekdayStartClass
+                          }
+                          data-alternate-section
+                          data-weekday={weekday}
+                          data-period="night"
+                        >
+                          {nightHeadings.length > 0 ? (
+                            <ThithiLineHeader
+                              headings={nightHeadings}
+                              period="night"
+                              colSpan={1 + jamamColumns.length}
+                            />
+                          ) : (
+                            <>
+                              <th
+                                scope="row"
+                                className="alternate-all-chip-table__period-label alternate-valarpirai-day-table__activity"
+                              >
+                                <BilingualText text={periodAthikaraPatchiHeader("night").period} />
+                              </th>
+                              {jamamColumns.map((column) => (
+                                <td
+                                  key={`night-spacer-${section.key}-${column.yama}`}
+                                  className="alternate-all-chip-table__period-spacer"
+                                  aria-hidden="true"
+                                />
+                              ))}
+                            </>
+                          )}
+                        </tr>
+                      )}
                       {ALTERNATE_NIGHT_ACTIVITY_TA.map((activityTa, activityIndex) => (
-                        <tr key={`night-${section.key}-${activityTa}`}>
+                        <tr
+                          key={`night-${section.key}-${activityTa}`}
+                          {...(hideThithiRows && activityIndex === 0 ? sectionMarker("night") : {})}
+                        >
                           <th
                             scope="row"
                             className="patchi-pivot-table__day alternate-valarpirai-day-table__activity"
