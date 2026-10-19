@@ -5075,10 +5075,24 @@ body:has(.app--find-patchi) {
 }
 
 .app--find-patchi .datetime-card__row {
-  background: var(--bg-panel);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-control);
-  padding: 0.75rem 0.7rem;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+/* Submit wraps below Lat/Lng under these widths; the Tamil label is wider than its 5.5rem minimum, so it wraps sooner. */
+@media (max-width: 334.5px) {
+  .app--find-patchi .datetime-card .datetime-card__coords-submit .datetime-card__submit {
+    flex-basis: 100%;
+  }
+}
+
+@media (max-width: 347.5px) {
+  html[lang="ta"] .app--find-patchi .datetime-card .datetime-card__coords-submit .datetime-card__submit {
+    flex-basis: 100%;
+  }
 }
 
 .app--find-patchi .datetime-field__label,
