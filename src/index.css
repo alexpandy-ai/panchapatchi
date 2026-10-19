@@ -1751,63 +1751,17 @@ body {
   color: var(--muted);
 }
 
-.alternate-all-chip-table--thithi {
-  --thithi-col-width: 7.25rem;
+.alternate-all-chip-table tbody th.alternate-all-chip-table__thithi-row {
+  text-align: left;
 }
 
-.alternate-all-chip-table--thithi .alternate-all-chip-table__thithi-col {
+/* The row spans every jamam column, so the label pins itself while the table scrolls sideways. */
+.alternate-all-chip-table__thithi-line {
   position: sticky;
-  left: 0;
-  z-index: 2;
-  width: var(--thithi-col-width);
-  min-width: var(--thithi-col-width);
-  background: var(--rose);
-  color: var(--burgundy);
-  font-weight: 700;
-  text-align: center;
-  vertical-align: middle;
+  left: 0.5rem;
+  display: inline-block;
+  max-width: calc(100vw - 5rem);
   white-space: normal;
-  line-height: 1.35;
-  padding: 0.55rem 0.4rem;
-}
-
-.alternate-all-chip-table__thithi-names {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-}
-
-.alternate-all-chip-table__thithi-name {
-  display: block;
-  white-space: nowrap;
-  line-height: 1.35;
-}
-
-.alternate-all-chip-table--thithi thead .alternate-all-chip-table__thithi-col--head {
-  z-index: 7;
-  background: var(--surface);
-  color: var(--burgundy);
-}
-
-.alternate-all-chip-table--thithi tbody .patchi-pivot-table__day,
-.alternate-all-chip-table--thithi tbody .alternate-all-chip-table__period-label {
-  left: var(--thithi-col-width);
-}
-
-.alternate-all-chip-table--thithi .alternate-all-chip-table__thithi-col .bi-ta {
-  display: block;
-  font-weight: 700;
-}
-
-.alternate-all-chip-table--thithi .alternate-all-chip-table__thithi-col .bi-en {
-  display: block;
-  margin-top: 0.12rem;
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--muted);
-  line-height: 1.25;
 }
 
 .schedule-table-card--alternate .alternate-valarpirai-all-chip--thithi .patchi-pivot-table thead th {
@@ -1895,23 +1849,6 @@ body {
 
   .alternate-all-chip-table tbody .patchi-pivot-table__day .bi-en,
   .alternate-all-chip-table thead .alternate-all-chip-table__activity-col .bi-en {
-    display: none;
-  }
-
-  .alternate-all-chip-table--thithi {
-    --thithi-col-width: 6.6rem;
-  }
-
-  .alternate-all-chip-table--thithi .alternate-all-chip-table__thithi-col {
-    padding: 0.4rem 0.3rem;
-    font-size: 0.82rem;
-  }
-
-  .alternate-all-chip-table__thithi-names {
-    gap: 0.35rem;
-  }
-
-  .alternate-all-chip-table--thithi .alternate-all-chip-table__thithi-col .bi-en {
     display: none;
   }
 
