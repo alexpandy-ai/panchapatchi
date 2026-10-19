@@ -5,6 +5,7 @@ import { JamamAntharaDialog } from "./JamamAntharaDialog";
 import { PatchiFilterChips, type PatchiSelection } from "./PatchiPickerBlock";
 import { useLocation } from "../context/LocationContext";
 import { useNavigation } from "../context/NavigationContext";
+import "./DaySchedulerTable.css";
 
 import type { PeriodId } from "../utils/jamam";
 import { jamamIndexForYama } from "../utils/jamam";
