@@ -4896,6 +4896,76 @@ body:has(.app--home) {
   border-color: var(--accent-saffron-hover);
 }
 
+/* Home phones: Date | Time | Sunrise boxes, then Place · Day · Sunrise labels on one line under them. */
+@media (max-width: 767px) {
+  .app--home .datetime-card--form-grid .datetime-card__row {
+    grid-template-columns: minmax(8rem, 1.3fr) minmax(5.7rem, 1fr) minmax(3rem, 1fr);
+    grid-template-areas:
+      "date time sunrise"
+      "place day sunrise-label"
+      "location location location"
+      "coords coords coords";
+    column-gap: 0.35rem;
+    row-gap: 0.3rem;
+  }
+
+  .app--home .datetime-card--form-grid .datetime-card__datetime-row,
+  .app--home .datetime-card--form-grid .datetime-field--date,
+  .app--home .datetime-card--form-grid .datetime-field__coord--sunrise,
+  .app--home .datetime-card--form-grid .datetime-field--location {
+    display: contents;
+  }
+
+  .app--home .datetime-field--date .datetime-field__input {
+    grid-area: date;
+  }
+
+  .app--home .datetime-field__sunrise-value {
+    grid-area: sunrise;
+  }
+
+  .app--home .datetime-field--location > .datetime-field__label {
+    grid-area: place;
+  }
+
+  .app--home .datetime-field__day-label {
+    grid-area: day;
+  }
+
+  .app--home .datetime-field__coord--sunrise .datetime-field__coord-label {
+    grid-area: sunrise-label;
+  }
+
+  .app--home .datetime-field__location-autocomplete {
+    grid-area: location;
+  }
+
+  .app--home .datetime-field--location > .datetime-field__label,
+  .app--home .datetime-field__day-label,
+  .app--home .datetime-field__coord--sunrise .datetime-field__coord-label {
+    align-self: baseline;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .app--home .datetime-card--form-grid .datetime-card__coords-submit {
+    margin-top: 0.25rem;
+  }
+}
+
+@media (max-width: 359px) {
+  .app--home .datetime-card--form-grid .datetime-card__row {
+    grid-template-columns: minmax(7.25rem, 1.3fr) minmax(5.2rem, 1fr) minmax(2.6rem, 1fr);
+    column-gap: 0.28rem;
+  }
+
+  .app--home .datetime-field--location > .datetime-field__label {
+    font-size: 0.66rem;
+  }
+}
+
 .app--home .content {
   background: var(--bg-card);
 }
