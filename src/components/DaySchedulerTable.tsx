@@ -906,7 +906,7 @@ function ThithiLineHeader({
   period,
   colSpan,
 }: {
-  headings: Bilingual[];
+  headings: readonly Bilingual[];
   period: PeriodId;
   colSpan: number;
 }) {
@@ -1003,25 +1003,48 @@ function AlternatePakshaSingleBirdPeriodTable({
   const tableClass = isDay
     ? "alternate-valarpirai-day-table"
     : "alternate-valarpirai-night-table";
+  /** Thithi Schedule: thithi names sit in a full-width row above each activity row, as in the All chip. */
+  const thithiRows = rowHeading === "thithi";
+  const rows = ALTERNATE_WEEKDAY_ORDER.flatMap((weekday) => {
+    const groupKey = getAlternateGroupKey(pakshaId, weekday);
+    return groupKey ? [{ weekday, groupKey }] : [];
+  });
 
   return (
-    <div className={`patchi-pivot-section ${tableClass} alternate-valarpirai-single-bird__period`}>
+    <div
+      className={[
+        "patchi-pivot-section",
+        tableClass,
+        "alternate-valarpirai-single-bird__period",
+        thithiRows ? "alternate-valarpirai-all-chip--thithi" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
       <div className="sheet-table-wrap patchi-pivot-wrap">
-        <table className={`sheet-table patchi-pivot-table ${tableClass}__grid`}>
-          <thead>
-            <tr>
-              <th className="patchi-pivot-table__day-col">
-                {rowHeading === "thithi" ? (
-                  <span className="patchi-pivot-table__jamam">
-                    <BilingualText text={UI.thithi} />
+        <table
+          className={[
+            "sheet-table patchi-pivot-table",
+            `${tableClass}__grid`,
+            thithiRows ? "alternate-all-chip-table" : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        >
+          <thead className={thithiRows ? "alternate-all-chip-table__sticky-head" : undefined}>
+            <tr className={thithiRows ? "alternate-all-chip-table__jamam-row" : undefined}>
+              {thithiRows ? null : (
+                <th className="patchi-pivot-table__day-col">
+                  <span className="patchi-pivot-table__time">
+                    <BilingualText text={periodHeader.period} />
                   </span>
-                ) : null}
-                <span className="patchi-pivot-table__time">
-                  <BilingualText text={periodHeader.period} />
-                </span>
-              </th>
+                </th>
+              )}
               {jamamColumns.map((column) => (
-                <th key={column.yama}>
+                <th
+                  key={column.yama}
+                  className={thithiRows ? "alternate-all-chip-table__jamam-header" : undefined}
+                >
                   <span className="patchi-pivot-table__jamam">
                     <BilingualText text={jamamBilingual(jamamIndexForYama(column.yama, period))} />
                   </span>
@@ -1031,19 +1054,20 @@ function AlternatePakshaSingleBirdPeriodTable({
             </tr>
           </thead>
           <tbody>
-            {ALTERNATE_WEEKDAY_ORDER.map((weekday) => {
-              const groupKey = getAlternateGroupKey(pakshaId, weekday);
-              if (!groupKey) return null;
-              const activityWeekday =
-                rowHeading === "thithi" ? thithiScheduleActivityWeekday(pakshaId, weekday) : weekday;
+            {rows.map(({ weekday, groupKey }, rowIndex) => {
+              const activityWeekday = thithiRows
+                ? thithiScheduleActivityWeekday(pakshaId, weekday)
+                : weekday;
 
-              return (
+              const activityRow = (
                 <tr key={groupKey}>
-                  <th scope="row" className="patchi-pivot-table__day">
-                    <BilingualText
-                      text={scheduleRowHeading(pakshaId, weekday, groupKey, rowHeading)}
-                    />
-                  </th>
+                  {thithiRows ? null : (
+                    <th scope="row" className="patchi-pivot-table__day">
+                      <BilingualText
+                        text={scheduleRowHeading(pakshaId, weekday, groupKey, rowHeading)}
+                      />
+                    </th>
+                  )}
                   {jamamColumns.map((column) => {
                     const activity = thithiScheduleBirdActivity(
                       pakshaId,
@@ -1098,6 +1122,32 @@ function AlternatePakshaSingleBirdPeriodTable({
                     );
                   })}
                 </tr>
+              );
+
+              if (!thithiRows) return activityRow;
+
+              return (
+                <Fragment key={groupKey}>
+                  <tr
+                    className={[
+                      "alternate-all-chip-table__period-marker",
+                      rowIndex > 0 ? "alternate-all-chip-table__weekday-start--spaced" : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                  >
+                    <ThithiLineHeader
+                      headings={
+                        getThithiHeadingsForScheduleWeekday(pakshaId, weekday) ?? [
+                          EMPTY_SCHEDULE_LABEL,
+                        ]
+                      }
+                      period={period}
+                      colSpan={jamamColumns.length}
+                    />
+                  </tr>
+                  {activityRow}
+                </Fragment>
               );
             })}
           </tbody>
