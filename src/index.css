@@ -596,7 +596,6 @@ body {
 }
 
 .schedule-table-card--alternate .patchi-pivot-table__jamam,
-.schedule-table-card--alternate .patchi-pivot-table__status,
 .schedule-table-card--alternate .alternate-valarpirai-day-table__activity,
 .schedule-table-card--alternate .alternate-all-chip-table__period-label,
 .schedule-table-card--alternate .alternate-all-chip-table__active-day,
@@ -860,11 +859,6 @@ body {
   white-space: nowrap;
 }
 
-.patchi-pivot-table__col--active {
-  background: var(--rose);
-  color: var(--accent);
-}
-
 .patchi-pivot-table__row--today .patchi-pivot-table__day {
   background: var(--rose);
   color: var(--accent);
@@ -895,22 +889,6 @@ body {
 .patchi-pivot-table td {
   padding: 0.7rem 0.55rem;
   min-width: 4.25rem;
-}
-
-.patchi-pivot-table__status {
-  display: block;
-  font-weight: 700;
-  line-height: 1.3;
-}
-
-.patchi-pivot-table__cell--current {
-  background: var(--accent-soft);
-  border: 2px solid var(--accent);
-  position: relative;
-}
-
-.patchi-pivot-table__cell--current .patchi-pivot-table__status {
-  color: var(--accent);
 }
 
 .patchi-pivot-table__cell--selected {

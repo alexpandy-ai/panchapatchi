@@ -55,6 +55,7 @@ import {
   thithiScheduleActivityWeekday,
   thithiScheduleBirdActivity,
   thithiScheduleEatingRowWeekdays,
+  thithiScheduleNowYama,
 } from "../utils/thithiSchedule";
 import { useDailyThithi } from "../thithiCalendar/useDailyThithi";
 
@@ -84,6 +85,8 @@ interface ThithiScheduleSection {
   groupKey: string;
   /** Blocks to render; omitted = Day and Night. */
   periods?: readonly PeriodId[];
+  /** Running jamam inside this section, when the current moment falls in it. */
+  now?: { period: PeriodId; yama: number };
 }
 
 /** Morning bird grid for one activity weekday. Matching grids share one tithi cell. */
@@ -266,12 +269,22 @@ export function BirdEatingScheduleTable({
     [dailySelection],
   );
 
+  const activeJamam = useMemo(() => {
+    const moment = selectedDateTime.getTime();
+    return (
+      daySchedulerJamamSlots(jamamColumns).find(
+        (slot) => slot.start.getTime() <= moment && moment < slot.end.getTime(),
+      ) ?? null
+    );
+  }, [jamamColumns, selectedDateTime]);
+
   const sections = useMemo((): ThithiScheduleSection[] => {
     const rows = thithiScheduleEatingRowWeekdays(pakshaId, bird);
     return (["day", "night"] as const).flatMap((period) => {
       const weekday = rows[period];
       const groupKey = weekday === null ? null : getAlternateGroupKey(pakshaId, weekday);
       if (weekday === null || !groupKey) return [];
+      const nowYama = thithiScheduleNowYama(pakshaId, weekday, period, dailySelection, activeJamam);
       return [
         {
           key: `${pakshaId}-${groupKey}-${period}`,
@@ -280,10 +293,11 @@ export function BirdEatingScheduleTable({
           weekday,
           groupKey,
           periods: [period],
+          now: nowYama === null ? undefined : { period, yama: nowYama },
         },
       ];
     });
-  }, [pakshaId, bird]);
+  }, [pakshaId, bird, dailySelection, activeJamam]);
 
   return (
     <div className="schedule-table-card--alternate patchi-pivot-tables">
@@ -295,6 +309,7 @@ export function BirdEatingScheduleTable({
         rowHeading="thithi"
         nightThithi={nightThithi}
         sections={sections}
+        highlightBird={bird}
       />
     </div>
   );
@@ -308,6 +323,7 @@ function AlternatePakshaScheduleView({
   rowHeading,
   nightThithi,
   sections,
+  highlightBird,
 }: {
   jamamColumns: DaySchedulerJamamColumn[];
   pakshaId: "valarpirai" | "theipirai";
@@ -317,6 +333,7 @@ function AlternatePakshaScheduleView({
   nightThithi?: ThithiPatchiEntry;
   /** Preset sections in the all-birds layout, one table each so every table heads its own jamam times. */
   sections?: ThithiScheduleSection[];
+  highlightBird?: PatchiName;
 }) {
   const { coords } = useLocation();
   const [antharaSelection, setAntharaSelection] = useState<AlternateAntharaSelection | null>(
@@ -393,6 +410,7 @@ function AlternatePakshaScheduleView({
             onOpenAnthara={setAntharaSelection}
             rowHeading={rowHeading}
             sections={[section]}
+            highlightBird={highlightBird}
           />
         ))
       ) : selectedPatchi === "all" ? (
@@ -438,6 +456,7 @@ function AlternatePakshaDayNightTables({
   onOpenAnthara,
   rowHeading,
   sections,
+  highlightBird,
 }: {
   jamamColumns: DaySchedulerJamamColumn[];
   pakshaId: "valarpirai" | "theipirai";
@@ -445,6 +464,8 @@ function AlternatePakshaDayNightTables({
   onOpenAnthara: (selection: AlternateAntharaSelection) => void;
   rowHeading: "day" | "thithi";
   sections?: ThithiScheduleSection[];
+  /** Outlines this bird's cells and puts the Now badge on its cell in a section's running jamam. */
+  highlightBird?: PatchiName;
 }) {
   const showNight = alternatePakshaSupportsNight(pakshaId);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -586,6 +607,9 @@ function AlternatePakshaDayNightTables({
     return groups;
   }, [jamamColumns, pakshaId, rowHeading, sections]);
 
+  const headerNowYama = scheduleSections.find((section) => section.now?.period === activeSection.period)
+    ?.now?.yama;
+
   return (
     <div
       ref={containerRef}
@@ -605,7 +629,11 @@ function AlternatePakshaDayNightTables({
               {jamamColumns.map((column) => (
                 <th
                   key={`active-hdr-${column.yama}-${activeSection.period}`}
-                  className="alternate-all-chip-table__jamam-header"
+                  className={
+                    headerNowYama === column.yama
+                      ? "alternate-all-chip-table__jamam-header alternate-all-chip-table__jamam-header--now"
+                      : "alternate-all-chip-table__jamam-header"
+                  }
                 >
                   <span className="patchi-pivot-table__jamam">
                     <BilingualText
@@ -706,16 +734,14 @@ function AlternatePakshaDayNightTables({
                               section.key,
                             )
                           : false;
+                        const isNow = section.now?.period === "day" && section.now.yama === column.yama;
+                        const isHighlighted = bird !== null && bird === highlightBird;
 
                         return (
                           <td
                             key={column.yama}
-                            className={[
-                              "alternate-valarpirai-day-table__bird",
-                              isSelected ? "patchi-pivot-table__cell--selected" : "",
-                            ]
-                              .filter(Boolean)
-                              .join(" ")}
+                            className={birdCellClass(isSelected, isNow, isHighlighted)}
+                            aria-current={isNow && isHighlighted ? "time" : undefined}
                           >
                             {bird ? (
                               <button
@@ -738,6 +764,7 @@ function AlternatePakshaDayNightTables({
                             ) : (
                               "—"
                             )}
+                            {isNow && isHighlighted ? <NowBadge /> : null}
                           </td>
                         );
                       })}
@@ -806,16 +833,15 @@ function AlternatePakshaDayNightTables({
                                   section.key,
                                 )
                               : false;
+                            const isNow =
+                              section.now?.period === "night" && section.now.yama === column.yama;
+                            const isHighlighted = bird !== null && bird === highlightBird;
 
                             return (
                               <td
                                 key={column.yama}
-                                className={[
-                                  "alternate-valarpirai-day-table__bird",
-                                  isSelected ? "patchi-pivot-table__cell--selected" : "",
-                                ]
-                                  .filter(Boolean)
-                                  .join(" ")}
+                                className={birdCellClass(isSelected, isNow, isHighlighted)}
+                                aria-current={isNow && isHighlighted ? "time" : undefined}
                               >
                                 {bird ? (
                                   <button
@@ -838,6 +864,7 @@ function AlternatePakshaDayNightTables({
                                 ) : (
                                   "—"
                                 )}
+                                {isNow && isHighlighted ? <NowBadge /> : null}
                               </td>
                             );
                           })}
@@ -852,6 +879,25 @@ function AlternatePakshaDayNightTables({
         </table>
       </div>
     </div>
+  );
+}
+
+function birdCellClass(isSelected: boolean, isNow: boolean, isHighlighted: boolean): string {
+  return [
+    "alternate-valarpirai-day-table__bird",
+    isNow ? "alternate-all-chip-table__cell--now" : "",
+    isHighlighted ? "alternate-all-chip-table__cell--bird" : "",
+    isSelected ? "patchi-pivot-table__cell--selected" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
+
+function NowBadge() {
+  return (
+    <span className="schedule-table__badge schedule-table__badge--cell">
+      <BilingualText text={UI.now} />
+    </span>
   );
 }
 

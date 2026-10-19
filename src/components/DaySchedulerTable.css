@@ -25,3 +25,31 @@
   color: var(--color-green-2);
   font-weight: 700;
 }
+
+/* Patchi Schedule only: running jamam column, chosen bird's cells. */
+.schedule-table-card--alternate .alternate-valarpirai-all-chip--thithi table.alternate-all-chip-table thead th.alternate-all-chip-table__jamam-header--now {
+  background: var(--color-green-2);
+  color: var(--color-on-dark);
+}
+
+.schedule-table-card--alternate .alternate-valarpirai-all-chip--thithi table.alternate-all-chip-table thead th.alternate-all-chip-table__jamam-header--now * {
+  color: var(--color-on-dark);
+}
+
+.schedule-table-card--alternate .alternate-valarpirai-all-chip--thithi table.alternate-all-chip-table tbody td.alternate-all-chip-table__cell--now {
+  background: var(--color-paper-2);
+}
+
+.schedule-table-card--alternate .alternate-valarpirai-all-chip--thithi table.alternate-all-chip-table tbody td.patchi-pivot-table__cell--selected {
+  background: var(--rose);
+}
+
+/* Ring and text colour stay visible over the running-jamam and selected-cell backgrounds. */
+.schedule-table-card--alternate .alternate-valarpirai-all-chip--thithi table.alternate-all-chip-table tbody td.alternate-all-chip-table__cell--bird {
+  box-shadow: inset 0 0 0 2px var(--color-brass);
+}
+
+.schedule-table-card--alternate .alternate-valarpirai-all-chip--thithi table.alternate-all-chip-table tbody td.alternate-all-chip-table__cell--bird .patchi-pivot-table__cell-btn {
+  color: var(--color-rust);
+  font-weight: 700;
+}

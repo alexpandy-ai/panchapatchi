@@ -62,49 +62,6 @@ export interface JamamColumn {
   nightJamamActive: boolean;
 }
 
-export interface PatchiScheduleDayRow {
-  groupKey: string;
-  groupLabel: string;
-  dayCells: string[];
-  nightCells: string[];
-  isCurrentDay: boolean;
-}
-
-export interface JamamActivitySlots {
-  day: ActivitySlot[];
-  night: ActivitySlot[];
-}
-
-export function jamamActivitySlotsKey(groupKey: string, yama: number): string {
-  return `${groupKey}:${yama}`;
-}
-
-export interface PatchiSchedule {
-  patchiName: string;
-  pakshaId: PakshaId;
-  pakshaLabel: string;
-  isActivePaksha: boolean;
-  currentGroupKey: string;
-  weekday: number;
-  weekdayLabel: string;
-  daySectionLabel: string;
-  nightSectionLabel: string;
-  jamamColumns: JamamColumn[];
-  dayRows: PatchiScheduleDayRow[];
-  jamamActivitySlots: Record<string, JamamActivitySlots>;
-  activeCell: ActiveScheduleCell | null;
-}
-
-export interface PatchiSchedulesBundle {
-  patchiName: string;
-  weekday: number;
-  weekdayLabel: string;
-  currentGroupKey: string;
-  activePakshaId: PakshaId;
-  activePakshaLabel: string;
-  schedules: PatchiSchedule[];
-}
-
 function normalizeBird(bird: string): string {
   return formatPatchiName(bird);
 }
@@ -251,16 +208,6 @@ function buildGridRow(yama: YamaRow, daySlot: JamamSlot, nightSlot: JamamSlot): 
   };
 }
 
-function activityForPatchi(
-  yama: YamaRow,
-  period: "day" | "night",
-  patchiName: string,
-): string {
-  const slots = period === "day" ? yama.day : yama.night;
-  const match = slots.find((slot) => normalizeBird(slot.bird) === normalizeBird(patchiName));
-  return match ? displayActivity(match.activity) : "—";
-}
-
 function resolveActiveCell(
   selectedDateTime: Date,
   currentGroupKey: string,
@@ -320,144 +267,7 @@ export function getScheduleGridForDate(
   };
 }
 
-function buildPatchiScheduleForPaksha(
-  pakshaId: PakshaId,
-  paksha: PakshaData,
-  patchiName: string,
-  selectedDateTime: Date,
-  currentGroupKey: string,
-  weekday: number,
-  activeCell: ActiveScheduleCell | null,
-  isActivePaksha: boolean,
-  coords: GeoCoords | null,
-): PatchiSchedule {
-  const { day, night } = getFullDayJamamSchedule(selectedDateTime, coords);
-  const refGroup = paksha.groups[0];
-  const jamamColumns: JamamColumn[] = (refGroup?.yamas ?? []).flatMap((yama) => {
-    const slots = jamamSlotsForYama(yama.yama, day, night);
-    if (!slots) return [];
-
-    return [
-      {
-        yama: yama.yama,
-        yamaLabel: jamamLabel(jamamIndexForYama(yama.yama, "day")),
-        dayTimeRange: formatTimeRange(slots.day.start, slots.day.end),
-        nightTimeRange: formatTimeRange(slots.night.start, slots.night.end),
-        dayStart: slots.day.start,
-        dayEnd: slots.day.end,
-        nightStart: slots.night.start,
-        nightEnd: slots.night.end,
-        dayJamamActive: isActivePaksha && slots.day.isActive,
-        nightJamamActive: isActivePaksha && slots.night.isActive,
-      },
-    ];
-  });
-
-  const dayRows: PatchiScheduleDayRow[] = paksha.groups.map((group) => ({
-    groupKey: group.key,
-    groupLabel: getDayGroupLabel(group.key),
-    dayCells: group.yamas.map((yama) => activityForPatchi(yama, "day", patchiName)),
-    nightCells: group.yamas.map((yama) => activityForPatchi(yama, "night", patchiName)),
-    isCurrentDay: group.key === currentGroupKey,
-  }));
-
-  const jamamActivitySlots: Record<string, JamamActivitySlots> = {};
-  for (const group of paksha.groups) {
-    for (const yama of group.yamas) {
-      jamamActivitySlots[jamamActivitySlotsKey(group.key, yama.yama)] = {
-        day: yama.day,
-        night: yama.night,
-      };
-    }
-  }
-
-  return {
-    patchiName,
-    pakshaId,
-    pakshaLabel: PAKSHA_LABELS[pakshaId],
-    isActivePaksha,
-    currentGroupKey,
-    weekday,
-    weekdayLabel: getDisplayWeekdayLabel(weekday),
-    daySectionLabel: paksha.daySectionLabel,
-    nightSectionLabel: paksha.nightSectionLabel,
-    jamamColumns,
-    dayRows,
-    jamamActivitySlots,
-    activeCell: isActivePaksha ? activeCell : null,
-  };
-}
-
-export function getPatchiSchedulesForDate(
-  selectedDateTime: Date,
-  data: Record<PakshaId, PakshaData | null>,
-  patchiName: string,
-  coords: GeoCoords | null = null,
-): PatchiSchedulesBundle | null {
-  const weekday = selectedDateTime.getDay();
-  const currentGroupKey = getDayGroupKey(weekday);
-  const activePakshaId = getPakshaFromDate(selectedDateTime);
-  const jamam = getJamamState(selectedDateTime, coords);
-  const activeSlot = jamam.slots.find((slot) => slot.isActive);
-
-  const activeCell: ActiveScheduleCell | null = activeSlot
-    ? {
-        groupKey: currentGroupKey,
-        yama: jamam.yamaIndex,
-        period: jamam.period,
-      }
-    : null;
-
-  const schedules: PatchiSchedule[] = [];
-  for (const pakshaId of ["valarpirai", "theipirai"] as PakshaId[]) {
-    const paksha = data[pakshaId];
-    if (!paksha) continue;
-
-    schedules.push(
-      buildPatchiScheduleForPaksha(
-        pakshaId,
-        paksha,
-        patchiName,
-        selectedDateTime,
-        currentGroupKey,
-        weekday,
-        activeCell,
-        pakshaId === activePakshaId,
-        coords,
-      ),
-    );
-  }
-
-  if (schedules.length === 0) return null;
-
-  return {
-    patchiName,
-    weekday,
-    weekdayLabel: getDisplayWeekdayLabel(weekday),
-    currentGroupKey,
-    activePakshaId,
-    activePakshaLabel: PAKSHA_LABELS[activePakshaId],
-    schedules,
-  };
-}
-
-export function getPatchiScheduleForDate(
-  selectedDateTime: Date,
-  data: Record<PakshaId, PakshaData | null>,
-  patchiName: string,
-  coords: GeoCoords | null = null,
-): PatchiSchedule | null {
-  const bundle = getPatchiSchedulesForDate(selectedDateTime, data, patchiName, coords);
-  if (!bundle) return null;
-
-  return (
-    bundle.schedules.find((schedule) => schedule.pakshaId === bundle.activePakshaId) ??
-    bundle.schedules[0] ??
-    null
-  );
-}
-
-/** @deprecated Use getPatchiScheduleForDate for compact per-patchi table */
+/** @deprecated */
 export function getPatchiGridForDate(
   selectedDateTime: Date,
   data: Record<PakshaId, PakshaData | null>,
@@ -473,15 +283,6 @@ export function getJamamSummary(selectedDateTime: Date, coords: GeoCoords | null
   const jamam = getJamamState(selectedDateTime, coords);
   const activeSlot = jamam.slots.find((slot) => slot.isActive);
   return { jamam, activeSlot };
-}
-
-export function isActiveJamamColumn(
-  activeCell: ActiveScheduleCell | null,
-  yama: number,
-  period: PeriodId,
-): boolean {
-  if (!activeCell) return false;
-  return activeCell.yama === yama && activeCell.period === period;
 }
 
 export function isActivePeriodCell(

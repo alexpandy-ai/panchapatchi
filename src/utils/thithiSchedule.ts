@@ -109,6 +109,23 @@ export function thithiScheduleEatingRowWeekdays(
   return { day: rowFor("day"), night: rowFor("night") };
 }
 
+/**
+ * Jamam (yama 1–5) of a Schedule row's Day or Night block that is running now, or null when the
+ * current Pirai / thithi belongs to another row or the active jamam is in the other half of the cycle.
+ */
+export function thithiScheduleNowYama(
+  pakshaId: PakshaId,
+  rowWeekday: number,
+  period: PeriodId,
+  current: { pakshaId: PakshaId; thithiNumber: number } | null,
+  activeJamam: Pick<JamamSlot, "index"> | null,
+): number | null {
+  if (!current || !activeJamam || current.pakshaId !== pakshaId) return null;
+  if (thithiScheduleRowWeekday(pakshaId, current.thithiNumber) !== rowWeekday) return null;
+  const active = yamaFromJamamIndex(activeJamam.index);
+  return active.period === period ? active.yama : null;
+}
+
 /** Jamams of the sunrise-to-sunrise cycle containing `moment`, and the active one (start-inclusive, end-exclusive). */
 export function thithiScheduleActiveJamam(
   moment: Date,

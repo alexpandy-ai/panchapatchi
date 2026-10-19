@@ -21,6 +21,7 @@ import {
   thithiScheduleBirdNow,
   thithiScheduleDayFacts,
   thithiScheduleEatingRowWeekdays,
+  thithiScheduleNowYama,
   thithiScheduleRowWeekday,
   type ThithiScheduleBird,
 } from "./thithiSchedule.ts";
@@ -163,11 +164,22 @@ test("Home matches the Schedule page for all birds, both Pirai, every thithi, da
   }
 });
 
-test("Patchi Schedule Crow, Valarpirai: Day rows from the Trithiyai row, Night rows from the Panchami row", () => {
-  const rows = thithiScheduleEatingRowWeekdays("valarpirai", "காகம்");
-  assert.equal(rows.day, thithiScheduleRowWeekday("valarpirai", 3));
-  assert.equal(rows.night, thithiScheduleRowWeekday("valarpirai", 5));
-  assert.equal(thithiScheduleDayFacts("valarpirai", 3)?.athikara, "காகம்");
+test("Patchi Schedule: Day table from the row where the bird eats in Day Jamam 1, Night table from Night Jamam 1", () => {
+  /** First thithi (1–5) of the Day row and of the Night row, per Pirai and bird. */
+  const expected: Record<PakshaId, Record<ThithiScheduleBird, [number, number]>> = {
+    valarpirai: { காகம்: [3, 5], வல்லூறு: [1, 3], கோழி: [4, 1], ஆந்தை: [2, 4], மயில்: [5, 2] },
+    theipirai: { காகம்: [1, 3], வல்லூறு: [3, 5], கோழி: [5, 2], ஆந்தை: [2, 4], மயில்: [4, 1] },
+  };
+  for (const pakshaId of PIRAIS) {
+    for (const bird of PATCHI_ORDER) {
+      const [dayThithi, nightThithi] = expected[pakshaId][bird];
+      const rows = thithiScheduleEatingRowWeekdays(pakshaId, bird);
+      const label = `${pakshaId} ${bird}`;
+      assert.equal(rows.day, thithiScheduleRowWeekday(pakshaId, dayThithi), `${label} day`);
+      assert.equal(rows.night, thithiScheduleRowWeekday(pakshaId, nightThithi), `${label} night`);
+      assert.equal(thithiScheduleDayFacts(pakshaId, dayThithi)?.athikara, bird, label);
+    }
+  }
 
   for (const pakshaId of PIRAIS) {
     for (const period of ["day", "night"] as const) {
@@ -176,6 +188,27 @@ test("Patchi Schedule Crow, Valarpirai: Day rows from the Trithiyai row, Night r
       assert.equal(new Set(byBird).size, PATCHI_ORDER.length, `${pakshaId} ${period}: one row per bird`);
     }
   }
+});
+
+test("Patchi Schedule Now: only the table for the current Pirai / thithi row and Day or Night half", () => {
+  const trithiyaiRow = thithiScheduleRowWeekday("valarpirai", 3)!;
+  const ashtami = { pakshaId: "valarpirai" as const, thithiNumber: 8 };
+  assert.equal(thithiScheduleRowWeekday("valarpirai", 8), trithiyaiRow, "Ashtami shares the Trithiyai row");
+
+  assert.equal(thithiScheduleNowYama("valarpirai", trithiyaiRow, "day", ashtami, { index: 3 }), 3);
+  assert.equal(thithiScheduleNowYama("valarpirai", trithiyaiRow, "night", ashtami, { index: 3 }), null);
+  assert.equal(thithiScheduleNowYama("valarpirai", trithiyaiRow, "night", ashtami, { index: 8 }), 3);
+  assert.equal(thithiScheduleNowYama("valarpirai", trithiyaiRow, "day", ashtami, { index: 8 }), null);
+
+  const panchamiRow = thithiScheduleRowWeekday("valarpirai", 5)!;
+  assert.equal(thithiScheduleNowYama("valarpirai", panchamiRow, "night", ashtami, { index: 8 }), null);
+  assert.equal(
+    thithiScheduleNowYama("theipirai", thithiScheduleRowWeekday("theipirai", 8)!, "day", ashtami, { index: 3 }),
+    null,
+    "other Pirai",
+  );
+  assert.equal(thithiScheduleNowYama("valarpirai", trithiyaiRow, "day", null, { index: 3 }), null);
+  assert.equal(thithiScheduleNowYama("valarpirai", trithiyaiRow, "day", ashtami, null), null);
 });
 
 test("jamam and antharam intervals are start-inclusive and end-exclusive around sunset", () => {

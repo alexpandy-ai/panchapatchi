@@ -93,7 +93,6 @@ export const UI = {
   nextSunrise: bi("அடுத்த நாள் சூரியோதயம்", "Next sunrise"),
   loading: bi("தரவு ஏற்றுகிறது…", "Loading data…"),
   loadError: bi("தரவை ஏற்ற முடியவில்லை. பக்கத்தை புதுப்பிக்கவும்.", "Could not load data. Please refresh."),
-  noPatchiData: bi("பட்சி தரவு கிடைக்கவில்லை.", "Bird data unavailable."),
   noDayData: bi("இந்த நாளுக்கான தரவு கிடைக்கவில்லை.", "No data for this day."),
   groups: bi("குழுக்கள்", "Groups"),
   jamams: bi("ஜாமங்கள்", "Jamams"),
