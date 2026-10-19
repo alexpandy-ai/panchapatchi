@@ -109,6 +109,7 @@ export function ThithiDetailsView({ selectedDateTime, onDateTimeChange }: Thithi
   const [computing, setComputing] = useState(true);
   const [error, setError] = useState("");
   const [showAnchors, setShowAnchors] = useState(false);
+  const [showAngleRule, setShowAngleRule] = useState(false);
   const yearKey = `${placeKey(place)}#${year}`;
 
   useEffect(() => {
@@ -236,11 +237,10 @@ export function ThithiDetailsView({ selectedDateTime, onDateTimeChange }: Thithi
             <h3>{pick(mode === "annual" ? TD.tabAnnual : mode === "chart" ? TD.tabChart : TD.headingDaily)}</h3>
             {mode !== "chart" ? <p>{pick(TD.legend)}</p> : null}
           </div>
-          <div className={mode === "daily" ? "thithi-calendar__actions thithi-calendar__actions--inline" : "thithi-calendar__actions"}>
-            {mode !== "daily" ? <label htmlFor="thithi-year">{pick(TD.year)}</label> : null}
+          <div className="thithi-calendar__actions">
             <select
               id="thithi-year"
-              aria-label={mode === "daily" ? pick(TD.year) : undefined}
+              aria-label={pick(TD.year)}
               value={year}
               onChange={(event) => setYear(Number(event.target.value))}
             >
@@ -250,10 +250,9 @@ export function ThithiDetailsView({ selectedDateTime, onDateTimeChange }: Thithi
                 </option>
               ))}
             </select>
-            {mode !== "daily" ? <label htmlFor="thithi-month">{pick(TD.month)}</label> : null}
             <select
               id="thithi-month"
-              aria-label={mode === "daily" ? pick(TD.month) : undefined}
+              aria-label={pick(TD.month)}
               value={month}
               onChange={(event) => setMonth(Number(event.target.value))}
             >
@@ -321,8 +320,6 @@ export function ThithiDetailsView({ selectedDateTime, onDateTimeChange }: Thithi
 
         {rows && mode === "annual" ? (
           <div>
-            <h3 className="thithi-calendar__sequence">{pick(TD.annualHeading)}</h3>
-            <p className="thithi-calendar__hint">{pick(TD.annualHint)}</p>
             {[0, 1].map((side) => (
               <section key={side} className="thithi-calendar__section">
                 <h3>
@@ -434,6 +431,25 @@ export function ThithiDetailsView({ selectedDateTime, onDateTimeChange }: Thithi
                     </p>
                   ))}
               </div>
+            ) : null}
+          </div>
+        ) : null}
+
+        {rows && mode === "annual" ? (
+          <div className="thithi-calendar__anchors">
+            <button
+              type="button"
+              className="thithi-calendar__anchors-toggle"
+              aria-expanded={showAngleRule}
+              aria-controls="thithi-angle-rule"
+              onClick={() => setShowAngleRule((open) => !open)}
+            >
+              {showAngleRule ? "▾" : "▸"} {pick(TD.annualHeading)}
+            </button>
+            {showAngleRule ? (
+              <p id="thithi-angle-rule" className="thithi-calendar__angle-rule">
+                {pick(TD.annualHint)}
+              </p>
             ) : null}
           </div>
         ) : null}

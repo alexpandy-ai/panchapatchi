@@ -36,6 +36,14 @@
   align-items: center;
 }
 
+.thithi-calendar__actions {
+  flex-wrap: nowrap;
+}
+
+.thithi-calendar__actions select {
+  min-width: 0;
+}
+
 .thithi-calendar label {
   display: inline-flex;
   gap: 0.4rem;
@@ -106,8 +114,7 @@
 }
 
 .thithi-calendar__toolbar h3,
-.thithi-calendar__chart h3,
-.thithi-calendar__sequence h3 {
+.thithi-calendar__chart h3 {
   margin: 0;
   color: var(--red-deep);
   font-size: 1.05rem;
@@ -240,26 +247,12 @@
   text-align: left;
 }
 
-.thithi-calendar__actions--inline {
-  flex-wrap: nowrap;
-}
-
-.thithi-calendar__actions--inline select {
-  min-width: 0;
-}
-
 .thithi-calendar__monthly .thithi-calendar__inline-cell {
   white-space: nowrap;
 }
 
 .thithi-calendar__monthly .thithi-calendar__inline-cell small {
   display: inline;
-}
-
-.thithi-calendar__sequence {
-  margin-top: 1.4rem;
-  padding-top: 1rem;
-  border-top: 2px solid var(--border);
 }
 
 .thithi-calendar__section {
@@ -346,6 +339,12 @@
   margin-top: 0.7rem;
   color: var(--muted);
   font-size: 0.85rem;
+}
+
+.thithi-calendar__anchors .thithi-calendar__angle-rule {
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.7;
 }
 
 @media (max-width: 650px) {
