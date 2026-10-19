@@ -40,9 +40,9 @@ import "../thithiCalendar/thithiCalendar.css";
 type CalendarMode = "annual" | "chart" | "daily";
 
 const TABS: { id: CalendarMode; label: Bilingual }[] = [
-  { id: "annual", label: TD.tabAnnual },
-  { id: "chart", label: TD.tabChart },
-  { id: "daily", label: TD.tabDaily },
+  { id: "annual", label: TD.chipAnnual },
+  { id: "chart", label: TD.chipChart },
+  { id: "daily", label: TD.chipDaily },
 ];
 
 function DateButton({
