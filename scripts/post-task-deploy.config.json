@@ -1,0 +1,9 @@
+{
+  "remote": "origin",
+  "remoteUrl": "https://github.com/alexpandy-ai/panchapatchi.git",
+  "allowedBranches": ["cursor/anthara-click-slots-33236", "main"],
+  "checks": ["test", "lint", "build"],
+  "outDir": "dist",
+  "harvisSite": "pakshi",
+  "siteUrl": "https://pakshi.harvis.page"
+}

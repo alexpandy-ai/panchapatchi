@@ -1,0 +1,18 @@
+---
+description: Ship each completed coding task - verify, commit, push to GitHub, deploy to Harvis
+alwaysApply: true
+---
+
+# Post-task ship
+
+When a coding task in this repo is finished and you have verified it, the last step is:
+
+```
+npm run ship -- -m "<what changed and why>" --files <files changed for this task>
+```
+
+- Use `--all` instead of `--files` only when every changed file belongs to the task. With nothing left to commit (only push/deploy pending), run `npm run ship`.
+- Don't run it for questions, plans, unfinished work, or when the user says not to commit or deploy.
+- The script runs test, lint and build, then commits, pushes and deploys, and stops at the first failure. Report the failing stage and its message; never work around it with force-push, `git reset --hard`, `git clean`, a new Harvis site, or deploying with a pasted token.
+- Report the commit, push result and live URL it prints.
+- Settings live in `scripts/post-task-deploy.config.json`; README "Post-task ship pipeline" documents setup and troubleshooting.

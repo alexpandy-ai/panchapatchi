@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "hooks": {
+    "stop": [
+      {
+        "command": "node .cursor/hooks/post-task-ship-reminder.mjs",
+        "timeout": 20,
+        "loop_limit": 1
+      }
+    ]
+  }
+}
