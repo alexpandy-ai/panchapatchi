@@ -1,0 +1,91 @@
+.sunrise-page {
+  display: grid;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.sunrise-page__meta,
+.sunrise-page__note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.sunrise-times {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+}
+
+.sunrise-times__card {
+  display: grid;
+  gap: 0.3rem;
+  align-content: start;
+  min-width: 0;
+  padding: 0.9rem 1rem;
+  background: var(--color-card);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--color-brass);
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 12px rgb(var(--color-shadow-rgb) / 0.06);
+}
+
+.sunrise-times__card:last-child {
+  border-top-color: var(--color-green-2);
+}
+
+.sunrise-times__name {
+  font-weight: 700;
+  color: var(--color-green-2);
+}
+
+.sunrise-times__angle {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.sunrise-times__time {
+  margin-top: 0.2rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.sunrise-times__time--missing {
+  font-size: 0.95rem;
+  color: var(--color-rust);
+}
+
+/* Phones and tablets: one row per event, time on the right. */
+@media (max-width: 899px) {
+  .sunrise-times__card {
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 0.75rem;
+    align-items: center;
+    padding: 0.75rem 0.9rem;
+  }
+
+  .sunrise-times__name,
+  .sunrise-times__angle {
+    grid-column: 1;
+  }
+
+  .sunrise-times__time {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    margin-top: 0;
+    font-size: 1.4rem;
+    text-align: right;
+  }
+
+  .sunrise-times__time--missing {
+    max-width: 8rem;
+    font-size: 0.85rem;
+  }
+}

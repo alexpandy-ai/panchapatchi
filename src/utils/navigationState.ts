@@ -30,6 +30,7 @@ const APP_VIEWS: AppView[] = [
   "thithiSchedule",
   "thithiDetails",
   "days",
+  "sunrise",
 ];
 
 const INFORMATION_SECTIONS: InformationSection[] = [

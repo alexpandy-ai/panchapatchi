@@ -13,7 +13,8 @@ export type AppView =
   | "alternateSchedule"
   | "thithiSchedule"
   | "thithiDetails"
-  | "days";
+  | "days"
+  | "sunrise";
 
 interface AppMenuProps {
   activeView: AppView;

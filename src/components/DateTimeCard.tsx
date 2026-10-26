@@ -7,7 +7,7 @@ import { BilingualText } from "./BilingualText";
 
 import { bi, pickBilingual, UI, WEEKDAY_EN } from "../utils/bilingual";
 import { TAMIL_WEEKDAYS } from "../utils/dayGroup";
-import { formatTime, getDayCycleBounds } from "../utils/jamam";
+import { dateCardSunrise } from "../utils/morningSun";
 
 import { COUNTRIES } from "../data/countries";
 
@@ -396,7 +396,7 @@ export function DateTimeCard({
     onSubmit?.({ date: nextDateTime, coords: submittedCoords });
   };
 
-  const { sunrise } = getDayCycleBounds(value, coords);
+  const sunriseText = useMemo(() => dateCardSunrise(value, coords), [value, coords]);
 
   return (
 
@@ -502,7 +502,7 @@ export function DateTimeCard({
 
             className="datetime-field__input datetime-field__sunrise-value"
 
-            value={formatTime(sunrise)}
+            value={sunriseText}
 
             aria-label={pickBilingual(UI.sunrise, language)}
 

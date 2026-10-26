@@ -9,7 +9,7 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "ship": "node scripts/post-task-deploy.mjs",
-    "test": "npx --yes tsx --test src/utils/nextMorningThithi.test.ts src/utils/kolkataCivil.test.ts src/thithiCalendar/calendar.test.ts src/thithiCalendar/dailyThithi.test.ts src/utils/thithiSchedule.test.ts"
+    "test": "npx --yes tsx --test src/utils/nextMorningThithi.test.ts src/utils/kolkataCivil.test.ts src/thithiCalendar/calendar.test.ts src/thithiCalendar/dailyThithi.test.ts src/utils/thithiSchedule.test.ts src/utils/morningSun.test.ts"
   },
   "dependencies": {
     "astronomy-engine": "^2.1.19",
