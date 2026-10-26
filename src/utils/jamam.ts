@@ -1,7 +1,7 @@
 import { bi, pakshaLabelBilingual, type Bilingual } from "./bilingual";
 import type { GeoCoords } from "./location";
 import type { PakshaId } from "./paksha";
-import { getNextSunrise, getSunrise } from "./sunrise";
+import { getNextSunrise, getPreviousSunrise, getSunrise } from "./sunrise";
 
 export const JAMAM_COUNT = 5;
 
@@ -60,9 +60,7 @@ export function getPreviousJamamSlot(
   if (targetIndex < currentIndex) {
     return slots.find((slot) => slot.index === targetIndex) ?? null;
   }
-  const prevDay = new Date(cycleStart);
-  prevDay.setDate(prevDay.getDate() - 1);
-  const prevCycleStart = getSunrise(prevDay, coords);
+  const prevCycleStart = getPreviousSunrise(cycleStart, coords);
   const prevCycleSlots = buildFullDaySlots(prevCycleStart, prevCycleStart, coords);
   return prevCycleSlots.find((slot) => slot.index === targetIndex) ?? null;
 }
@@ -126,9 +124,7 @@ export interface JamamState {
 export function cycleStartFor(moment: Date, coords: GeoCoords | null): Date {
   const todaySunrise = getSunrise(moment, coords);
   if (moment < todaySunrise) {
-    const prev = new Date(todaySunrise);
-    prev.setDate(prev.getDate() - 1);
-    return getSunrise(prev, coords);
+    return getPreviousSunrise(todaySunrise, coords);
   }
   return todaySunrise;
 }
@@ -204,6 +200,15 @@ export function formatTime(date: Date): string {
     minute: "2-digit",
     hour12: false,
   });
+}
+
+/** Date-card sunrise: the start of the date's first jamam; "—" when the Sun does not rise that day. */
+export function dateCardSunrise(date: Date, coords: GeoCoords | null): string {
+  try {
+    return formatTime(getSunrise(date, coords));
+  } catch {
+    return "—";
+  }
 }
 
 export function formatTimeWithSeconds(date: Date): string {

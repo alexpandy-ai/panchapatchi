@@ -1,14 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { placeWallClock } from "../thithiCalendar/calendar.ts";
+import { placeSunrise, placeSunset, placeWallClock } from "../thithiCalendar/calendar.ts";
 import { placeForCoords } from "../thithiCalendar/dailyThithi.ts";
-import {
-  dateCardSunrise,
-  formatPlaceClock,
-  morningSunAltitudeTime,
-  morningSunTimes,
-  type SunPlace,
-} from "./morningSun.ts";
+import { dateCardSunrise, formatTime, getFullDayJamamSchedule } from "./jamam.ts";
+import { formatPlaceClock, morningSunAltitudeTime, morningSunTimes, type SunPlace } from "./morningSun.ts";
+import { getSunrise, getSunset } from "./sunrise.ts";
 
 const CHENNAI: SunPlace = { coords: { lat: 13.0827, lng: 80.2707 }, timeZone: "Asia/Kolkata" };
 const LONDON: SunPlace = { coords: { lat: 51.5074, lng: -0.1278 }, timeZone: "Europe/London" };
@@ -42,11 +38,11 @@ test("Chennai 2026-10-26 twilight starts match timeanddate.com (4:49, 5:14, 5:39
     [astronomical, nautical, civil, sunrise].map((entry) => entry.altitude),
     [-18, -12, -6, 0],
   );
-  // Sun's centre on the geometric horizon is a few minutes after the conventional sunrise (−0.833°, 6:01).
-  const conventional = morningSunAltitudeTime(CHENNAI, "2026-10-26", -0.833);
-  assertNear(CHENNAI, conventional, "06:01");
-  const gap = localMinutes(CHENNAI, sunrise.time) - localMinutes(CHENNAI, conventional);
+  // timeanddate's 6:01 is the upper limb with refraction (−0.833°); the Sun's centre reaches 0° ~3.5 min later.
+  assertNear(CHENNAI, morningSunAltitudeTime(CHENNAI, "2026-10-26", -0.833), "06:01");
+  const gap = localMinutes(CHENNAI, sunrise.time) - localMinutes(CHENNAI, morningSunAltitudeTime(CHENNAI, "2026-10-26", -0.833));
   assert.ok(gap > 3 && gap < 4, `0° is ${gap.toFixed(2)} min after −0.833°`);
+  assert.equal(formatPlaceClock(CHENNAI, sunrise.time!), "06:04");
 });
 
 test("London 2026-06-21: astronomical dawn is not reached; nautical 2:40 and civil 3:55 (BST)", () => {
@@ -87,13 +83,39 @@ test("astronomical < nautical < civil < sunrise, all on the selected local date 
   }
 });
 
-test("date card sunrise is the Sunrise page's 0° row; no location keeps the fixed 06:00", () => {
+test("one sunrise everywhere: Sunrise page 0° row = app sunrise = thithi calendar sunrise", () => {
   const coords = { lat: 13.0827, lng: 80.2707 };
   const place = placeForCoords(coords) as SunPlace;
   const zero = morningSunTimes(place, "2026-10-26").find((entry) => entry.id === "sunrise")!.time!;
   // The card holds device-local date parts, read as the place's civil date.
-  const card = dateCardSunrise(new Date(2026, 9, 26, 16, 30), coords);
-  assert.equal(card, formatPlaceClock(place, zero));
-  assert.equal(card, "06:04");
+  const selected = new Date(2026, 9, 26, 16, 30);
+  assert.equal(getSunrise(selected, coords).getTime(), zero.getTime());
+  assert.equal(placeSunrise(place, "2026-10-26").getTime(), zero.getTime());
+  assert.equal(formatPlaceClock(place, zero), "06:04");
+});
+
+test("date card sunrise equals the first jamam start (Chennai, London, no location)", () => {
+  const cases: [{ lat: number; lng: number } | null, Date][] = [
+    [{ lat: 13.0827, lng: 80.2707 }, new Date(2026, 9, 26, 16, 30)],
+    [{ lat: 51.5074, lng: -0.1278 }, new Date(2026, 5, 21, 12, 0)],
+    [null, new Date(2026, 9, 26, 16, 30)],
+  ];
+  for (const [coords, selected] of cases) {
+    const firstJamam = getFullDayJamamSchedule(selected, coords).all[0];
+    assert.equal(firstJamam.index, 1);
+    assert.equal(firstJamam.start.getTime(), getSunrise(selected, coords).getTime());
+    assert.equal(dateCardSunrise(selected, coords), formatTime(firstJamam.start));
+  }
   assert.equal(dateCardSunrise(new Date(2026, 9, 26, 16, 30), null), "06:00");
+});
+
+test("sunset is the Sun's centre setting through 0°; no location keeps the fixed 18:00", () => {
+  const coords = { lat: 13.0827, lng: 80.2707 };
+  const place = placeForCoords(coords);
+  const selected = new Date(2026, 9, 26, 16, 30);
+  const sunset = getSunset(selected, coords);
+  assert.equal(sunset.getTime(), placeSunset(place, "2026-10-26").getTime());
+  // timeanddate: 17:44 (−0.833°); setting, the centre crosses 0° a few minutes earlier.
+  assertNear(CHENNAI, sunset, "17:41");
+  assert.equal(formatTime(getSunset(selected, null)), "18:00");
 });

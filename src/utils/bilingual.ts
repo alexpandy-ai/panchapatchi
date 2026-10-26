@@ -96,6 +96,10 @@ export const UI = {
     "இந்த நேரங்களுக்கு இடம் தேவை: தலைப்பிலுள்ள இட பொத்தானை அழுத்தவும் அல்லது முகப்பில் இடத்தைத் தேர்ந்து சமர்ப்பிக்கவும்.",
     "These times need a location: use the location button in the header, or choose a place on Home and Submit.",
   ),
+  sunriseUsedThroughout: bi(
+    "தேதி அட்டைகள், ஜாமங்கள், திதிகள் என பயன்பாடு முழுவதும் இந்த 0° சூரியோதயமே பயன்படுகிறது; சூரிய அஸ்தமனமும் சூரிய மையம் 0°-இல் உள்ள நேரமே.",
+    "The app uses this 0° sunrise throughout — date cards, jamams and thithis; sunset is likewise the Sun's centre at 0°.",
+  ),
   loading: bi("தரவு ஏற்றுகிறது…", "Loading data…"),
   loadError: bi("தரவை ஏற்ற முடியவில்லை. பக்கத்தை புதுப்பிக்கவும்.", "Could not load data. Please refresh."),
   noDayData: bi("இந்த நாளுக்கான தரவு கிடைக்கவில்லை.", "No data for this day."),
@@ -350,15 +354,6 @@ export const MORNING_SUN_BI: Record<
     angle: bi("சூரிய மையம் அடிவானத்தில் (0°)", "Sun's centre on the horizon (0°)"),
   },
 };
-
-/** Date cards show the 0° time; jamam and thithi calculations still start at the conventional sunrise. */
-export function sunriseConventionNote(time: string, minutes: string): Bilingual {
-  return bi(
-    `மற்ற பக்கங்களின் தேதி அட்டைகள் இந்த 0° நேரத்தைக் காட்டுகின்றன. ஜாமம், திதி கணக்கீடுகள் வழக்கமான சூரியோதயம் ${time} (சூரியனின் மேல் விளிம்பு, ஒளிவிலகலுடன், −0.833°) — 0°-க்கு ${minutes} நிமிடம் முன்பு.`,
-    `Date cards on the other pages show this 0° time. Jamam and thithi calculations use the conventional sunrise, ${time} (upper edge of the Sun, with refraction, −0.833°) — ${minutes} min before 0°.`,
-  );
-}
-
 export const PAKSHA_BI: Record<"valarpirai" | "theipirai", Bilingual> = {
   valarpirai: bi("வளர்பிறை", "Waxing moon"),
   theipirai: bi("தேய்பிறை", "Waning moon"),

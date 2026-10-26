@@ -117,10 +117,12 @@ test("no-location default uses fixed 06:00 sunrise and 18:00 sunset", () => {
   assert.equal(samples[0].time.toISOString(), "2024-05-01T12:30:00.000Z");
 });
 
+/** Sun's centre rising through 0° geometric altitude (the app-wide sunrise). */
 function independentSunrise(place: ThithiPlace, dateKey: string): Date {
   assert.ok(place.coords);
   const observer = new Astronomy.Observer(place.coords.lat, place.coords.lng, 0);
-  const found = Astronomy.SearchRiseSet(Astronomy.Body.Sun, observer, 1, localMidnight(place, dateKey), 1);
+  const start = localMidnight(place, dateKey);
+  const found = Astronomy.SearchAltitude(Astronomy.Body.Sun, observer, 1, start, 1, 0);
   assert.ok(found);
   return found.date;
 }
@@ -175,7 +177,7 @@ test("effective date switches exactly at sunrise in a DST zone (New York)", () =
   assert.equal(placeWallClock(NEW_YORK, springForward.cycleStart).hour, 6);
   assert.equal(placeWallClock(NEW_YORK, springForward.cycleEnd).hour, 7);
 
-  const fallBack = effectiveCalculationDate(NEW_YORK, at(NEW_YORK, "2026-11-01", 6, 30));
+  const fallBack = effectiveCalculationDate(NEW_YORK, at(NEW_YORK, "2026-11-01", 6, 40));
   assert.equal(fallBack.effectiveDateKey, "2026-11-01");
   assert.equal(placeWallClock(NEW_YORK, fallBack.cycleStart).hour, 6);
   const beforeFallBackRise = effectiveCalculationDate(NEW_YORK, at(NEW_YORK, "2026-11-01", 6, 0));

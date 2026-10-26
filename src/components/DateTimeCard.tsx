@@ -7,7 +7,7 @@ import { BilingualText } from "./BilingualText";
 
 import { bi, pickBilingual, UI, WEEKDAY_EN } from "../utils/bilingual";
 import { TAMIL_WEEKDAYS } from "../utils/dayGroup";
-import { dateCardSunrise } from "../utils/morningSun";
+import { dateCardSunrise } from "../utils/jamam";
 
 import { COUNTRIES } from "../data/countries";
 

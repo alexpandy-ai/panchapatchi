@@ -1,21 +1,17 @@
-import * as SunCalc from "suncalc";
+import { addDays, localDateKey, placeSunrise, placeSunset, type ThithiPlace } from "../thithiCalendar/calendar";
+import { cardDateKey, placeForCoords } from "../thithiCalendar/dailyThithi";
 import type { GeoCoords } from "./location";
 
 export const FIXED_SUNRISE_HOUR = 6;
 export const FIXED_SUNSET_HOUR = 18;
 
-/** Use local noon so SunCalc picks the correct calendar day across time zones. */
-function atLocalNoon(date: Date): Date {
-  const d = new Date(date);
-  d.setHours(12, 0, 0, 0);
-  return d;
-}
+let cachedPlace: { coords: GeoCoords; place: ThithiPlace } | null = null;
 
-function requireTime(value: Date | null, label: string): Date {
-  if (!value) {
-    throw new Error(`Could not calculate ${label} for the given date and location.`);
+function placeFor(coords: GeoCoords): ThithiPlace {
+  if (cachedPlace?.coords.lat !== coords.lat || cachedPlace.coords.lng !== coords.lng) {
+    cachedPlace = { coords: { lat: coords.lat, lng: coords.lng }, place: placeForCoords(coords) };
   }
-  return value;
+  return cachedPlace.place;
 }
 
 function fixedSunriseOnDate(date: Date): Date {
@@ -30,30 +26,41 @@ function fixedSunsetOnDate(date: Date): Date {
   return sunset;
 }
 
-/** `coords === null` uses a fixed 6:00 AM local sunrise (no SunCalc). */
+/**
+ * Sunrise on the date card's date (`date`'s local date parts) at the place: the Sun's centre at 0°,
+ * the single sunrise for the date card, jamams and thithis. `coords === null` uses a fixed 6:00 AM.
+ */
 export function getSunrise(date: Date, coords: GeoCoords | null): Date {
   if (coords === null) {
     return fixedSunriseOnDate(date);
   }
-  return requireTime(
-    SunCalc.getTimes(atLocalNoon(date), coords.lat, coords.lng).sunrise,
-    "sunrise",
-  );
+  return placeSunrise(placeFor(coords), cardDateKey(date));
 }
 
-/** `coords === null` uses a fixed 6:00 PM local sunset (no SunCalc). */
+/** Sunset (Sun's centre at 0°) on the date card's date; `coords === null` uses a fixed 6:00 PM. */
 export function getSunset(date: Date, coords: GeoCoords | null): Date {
   if (coords === null) {
     return fixedSunsetOnDate(date);
   }
-  return requireTime(
-    SunCalc.getTimes(atLocalNoon(date), coords.lat, coords.lng).sunset,
-    "sunset",
-  );
+  return placeSunset(placeFor(coords), cardDateKey(date));
 }
 
+function sunriseDaysFrom(sunrise: Date, days: number, coords: GeoCoords | null): Date {
+  if (coords === null) {
+    const shifted = new Date(sunrise);
+    shifted.setDate(shifted.getDate() + days);
+    return fixedSunriseOnDate(shifted);
+  }
+  const place = placeFor(coords);
+  return placeSunrise(place, addDays(localDateKey(place, sunrise), days));
+}
+
+/** Sunrise on the place's next civil date after the one `sunrise` falls on. */
 export function getNextSunrise(sunrise: Date, coords: GeoCoords | null): Date {
-  const nextDay = new Date(sunrise);
-  nextDay.setDate(nextDay.getDate() + 1);
-  return getSunrise(nextDay, coords);
+  return sunriseDaysFrom(sunrise, 1, coords);
+}
+
+/** Sunrise on the place's civil date before the one `sunrise` falls on. */
+export function getPreviousSunrise(sunrise: Date, coords: GeoCoords | null): Date {
+  return sunriseDaysFrom(sunrise, -1, coords);
 }

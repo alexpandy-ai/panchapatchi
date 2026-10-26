@@ -3,10 +3,9 @@ import { BilingualText } from "./BilingualText";
 import { useLanguage } from "../context/LanguageContext";
 import { useLocation } from "../context/LocationContext";
 import { cardDateKey, placeForCoords } from "../thithiCalendar/dailyThithi";
-import { MORNING_SUN_BI, pickBilingual, sunriseConventionNote, UI } from "../utils/bilingual";
+import { MORNING_SUN_BI, pickBilingual, UI } from "../utils/bilingual";
 import { formatPlaceClock, morningSunTimes, type SunPlace } from "../utils/morningSun";
 import { timeZoneOffsetMs } from "../utils/placeTimeZone";
-import { getSunrise } from "../utils/sunrise";
 import "./SunriseView.css";
 
 interface SunriseViewProps {
@@ -27,18 +26,6 @@ export function SunriseView({ selectedDateTime }: SunriseViewProps) {
     [lat, lng],
   );
   const rows = useMemo(() => (place ? morningSunTimes(place, dateKey) : null), [place, dateKey]);
-
-  const note = useMemo(() => {
-    const zero = rows?.find((row) => row.id === "sunrise")?.time;
-    if (!place || !zero) return null;
-    try {
-      const appSunrise = getSunrise(selectedDateTime, place.coords);
-      const minutes = ((zero.getTime() - appSunrise.getTime()) / 60_000).toFixed(1);
-      return sunriseConventionNote(formatPlaceClock(place, appSunrise), minutes);
-    } catch {
-      return null;
-    }
-  }, [place, rows, selectedDateTime]);
 
   const placeLabel = pickBilingual(locationDisplay, language);
 
@@ -82,11 +69,9 @@ export function SunriseView({ selectedDateTime }: SunriseViewProps) {
           </li>
         ))}
       </ol>
-      {note ? (
-        <p className="sunrise-page__note">
-          <BilingualText text={note} />
-        </p>
-      ) : null}
+      <p className="sunrise-page__note">
+        <BilingualText text={UI.sunriseUsedThroughout} />
+      </p>
     </section>
   );
 }

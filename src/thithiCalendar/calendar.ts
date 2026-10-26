@@ -4,8 +4,8 @@ import { placeLocale, thithiIndexLabel } from "./labels";
 
 /**
  * Thithi calendar for a selected place.
- * Isolated from Home and Day Schedule calculations.
  * 32 sectors of 11.25°, assigned by the place's local sunset.
+ * Sunrise/sunset here are the app-wide ones (Sun's centre at 0°), also used for jamams.
  */
 
 const DAY_MS = 86_400_000;
@@ -157,7 +157,8 @@ function offsetMs(place: ThithiPlace, time: number): number {
   return wall - Math.floor(time / 1000) * 1000;
 }
 
-function addDays(dateKey: string, days: number): string {
+/** `YYYY-MM-DD` shifted by whole civil days. */
+export function addDays(dateKey: string, days: number): string {
   return new Date(Date.parse(`${dateKey}T00:00:00Z`) + days * DAY_MS).toISOString().slice(0, 10);
 }
 
@@ -190,12 +191,49 @@ function midnightMs(state: PlaceState, dateKey: string): number {
   return value;
 }
 
+/** Sunrise and sunset: the Sun's centre at this geometric altitude (no refraction). */
+export const SUN_HORIZON_ALTITUDE = 0;
+
+function searchSunAltitudeIn(
+  state: PlaceState,
+  observer: Astronomy.Observer,
+  dateKey: string,
+  direction: 1 | -1,
+  altitude: number,
+): Date | null {
+  const start = midnightMs(state, dateKey);
+  const end = midnightMs(state, addDays(dateKey, 1));
+  const found = Astronomy.SearchAltitude(
+    Astronomy.Body.Sun,
+    observer,
+    direction,
+    new Date(start),
+    (end - start) / DAY_MS,
+    altitude,
+  );
+  return found && found.date.getTime() < end ? found.date : null;
+}
+
+/**
+ * When the Sun's centre crosses `altitude` on the place's civil date
+ * (`direction` 1 = rising, −1 = setting); `null` if not on that date.
+ */
+export function searchSunAltitude(
+  place: ThithiPlace & { coords: NonNullable<ThithiPlace["coords"]> },
+  dateKey: string,
+  direction: 1 | -1,
+  altitude: number,
+): Date | null {
+  const state = stateFor(place);
+  return state.observer ? searchSunAltitudeIn(state, state.observer, dateKey, direction, altitude) : null;
+}
+
 function sunsetOn(state: PlaceState, dateKey: string): Date {
   const cached = state.sunsets.get(dateKey);
   if (cached !== undefined) return new Date(cached);
   const sunset = state.observer
     ? astroDate(
-        Astronomy.SearchRiseSet(Astronomy.Body.Sun, state.observer, -1, new Date(midnightMs(state, dateKey)), 1),
+        searchSunAltitudeIn(state, state.observer, dateKey, -1, SUN_HORIZON_ALTITUDE),
         "அஸ்தமனம்",
       )
     : new Date(localInstant(state.place, dateKey, FIXED_SUNSET_HOUR * HOUR_MS));
@@ -208,7 +246,7 @@ function sunriseOn(state: PlaceState, dateKey: string): Date {
   if (cached !== undefined) return new Date(cached);
   const sunrise = state.observer
     ? astroDate(
-        Astronomy.SearchRiseSet(Astronomy.Body.Sun, state.observer, 1, new Date(midnightMs(state, dateKey)), 1),
+        searchSunAltitudeIn(state, state.observer, dateKey, 1, SUN_HORIZON_ALTITUDE),
         "உதயம்",
       )
     : new Date(localInstant(state.place, dateKey, FIXED_SUNRISE_HOUR * HOUR_MS));
@@ -216,11 +254,15 @@ function sunriseOn(state: PlaceState, dateKey: string): Date {
   return sunrise;
 }
 
-/** Sunrise on a civil date at the place (Astronomy Engine; fixed 06:00 without coords). */
+/** Sunrise (Sun's centre at 0°) on a civil date at the place; fixed 06:00 without coords. */
 export function placeSunrise(place: ThithiPlace, dateKey: string): Date {
   return sunriseOn(stateFor(place), dateKey);
 }
 
+/** Sunset (Sun's centre at 0°) on a civil date at the place; fixed 18:00 without coords. */
+export function placeSunset(place: ThithiPlace, dateKey: string): Date {
+  return sunsetOn(stateFor(place), dateKey);
+}
 /** Instant of a wall-clock time (`msOfDay` after local midnight) on `dateKey` in the place's zone. */
 export function placeWallClockInstant(place: ThithiPlace, dateKey: string, msOfDay: number): Date {
   return new Date(localInstant(place, dateKey, msOfDay));
@@ -325,9 +367,9 @@ export function formatPlaceTime(iso: string, place: ThithiPlace, language: AppLa
   return new Date(shifted).toLocaleString(locale, { ...options, timeZone: "UTC" });
 }
 
-function astroDate(result: Astronomy.AstroTime | null, label: string): Date {
+function astroDate(result: Astronomy.AstroTime | Date | null, label: string): Date {
   if (!result) throw new Error(`${label} கிடைக்கவில்லை`);
-  return result.date;
+  return result instanceof Date ? result : result.date;
 }
 
 function anchorForFull(
