@@ -85,7 +85,7 @@ import "../thithiCalendar/thithiCalendar.css";
 
 interface PatchiStatusViewProps {
   selectedDateTime: Date;
-  /** Excel sheet data — required for Status; unused on Home (Alternate Day Scheduler). */
+  /** Excel sheet data — required for Status; unused on Home. */
   data?: Record<PakshaId, PakshaData | null>;
   /** Home: compact thithi/athikara line and date-based paksha only. Status: full layout. */
   variant?: "home" | "status";

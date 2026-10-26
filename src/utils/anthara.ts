@@ -39,7 +39,7 @@ export const NIGHT_JAMAM_SCHEDULE_END = 10;
 /** Birds cycle in Pancha display order (same as Others / Know Patchi). */
 const ANTHARA_BIRD_ORDER = PATCHI_ORDER;
 
-/** Day uses Pancha order; night uses Day Scheduler night cycle (Die→Sleep→Rule→Walk→Eat). */
+/** Day uses Pancha order; night uses the schedule night cycle (Die→Sleep→Rule→Walk→Eat). */
 function antharaThozhilCycleOrder(period: PeriodId): readonly string[] {
   return period === "day" ? PANCHA_ACTIVITY_TA : ALTERNATE_NIGHT_ACTIVITY_TA;
 }
@@ -242,9 +242,9 @@ export interface PatchiAntharaMatrixOptions {
 }
 
 /**
- * One jamam click on Home or Day Schedule.
+ * One jamam click on Home or a schedule table.
  * `weekday` is the clicked BracketDay (Home: night thithi athikara weekday;
- * Day Schedule: the row that was clicked). Both pages must pass that into
+ * schedule tables: the row that was clicked). Every caller must pass that into
  * this function — they must not build matrix options separately.
  */
 export interface JamamAntharaClickInput {
@@ -256,8 +256,8 @@ export interface JamamAntharaClickInput {
   coords: GeoCoords | null;
   allJamamSlots: JamamSlot[];
   /**
-   * Home only: selected Pirai/Thithi. Omit on Day Schedule so rows 6–10
-   * still step from the calculated night thithi.
+   * Selected (Home) or calculated (schedule tables) Pirai/Thithi. When omitted,
+   * rows 6–10 step from the calculated night thithi.
    */
   nightThithi?: ThithiPatchiEntry;
 }
@@ -268,7 +268,7 @@ export interface JamamAntharaClickModel {
 }
 
 /**
- * Anthara / Naal slots for a jamam click. Home and Day Schedule both call this.
+ * Anthara / Naal slots for a jamam click. Home and the schedule tables all call this.
  * Day: rows 1–5 are the clicked day jamam; rows 6–10 are that day’s night.
  * Naal opened from those night rows uses the next thithi’s morning BracketDay.
  * Night: rows 1–5 stay on the clicked night; rows 6–10 are the next thithi’s morning.

@@ -94,5 +94,5 @@ A stray `HARVIS_DEPLOY_TOKEN` or `HARVIS_SUBDOMAIN` environment variable is igno
 
 ## Notes
 
-- Patchi Schedule, Status, and Day Scheduler all read `PATCHI_SCHEDULE_DATA` from source — no API calls.
+- Patchi Schedule and Status read `PATCHI_SCHEDULE_DATA` from source — no API calls.
 - `scripts/build-data.mjs` can regenerate table data from Excel if you ever need to refresh the TypeScript dump (`xlsx` is a devDependency for that only).

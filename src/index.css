@@ -538,7 +538,7 @@ body {
   min-width: 0;
 }
 
-/* Day Scheduler — same layout/overflow/readable Tamil patterns as Patchi Schedule */
+/* Thithi Schedule — same layout/overflow/readable Tamil patterns as Patchi Schedule */
 .schedule-table-card--alternate .patchi-schedule-sheet-picker {
   flex-wrap: wrap;
   align-items: stretch;
@@ -1733,11 +1733,6 @@ body {
   background: color-mix(in srgb, var(--border) 35%, transparent);
 }
 
-.alternate-all-chip-table__jamam-group-header {
-  text-align: center;
-  font-weight: 600;
-}
-
 .alternate-all-chip-table__active-day {
   font-weight: 700;
   font-size: calc(1em + 1pt);
@@ -1747,11 +1742,6 @@ body {
 .alternate-all-chip-table__active-day .bi-ta,
 .alternate-all-chip-table__active-day .bi-en {
   font-weight: 700;
-}
-
-.alternate-all-chip-table__active-period {
-  font-weight: 600;
-  color: var(--muted);
 }
 
 .alternate-all-chip-table__header-sep {
@@ -1896,28 +1886,6 @@ body {
     flex: 1 1 auto;
     min-width: 4.5rem;
   }
-}
-
-.alternate-valarpirai-day-group+.alternate-valarpirai-day-group {
-  margin-top: 1.25rem;
-  padding-top: 0.85rem;
-  border-top: 1px solid var(--border);
-}
-
-.alternate-valarpirai-day-group .alternate-valarpirai-day-table__day-title {
-  margin-bottom: 0.65rem;
-}
-
-.alternate-valarpirai-day-group .alternate-valarpirai-night-table {
-  margin-top: 0.65rem;
-}
-
-.alternate-valarpirai-day-table__day-title {
-  margin: 0 0 0.5rem;
-  padding: 0 0.85rem;
-  font-size: 0.92rem;
-  font-weight: 700;
-  color: var(--accent);
 }
 
 .alternate-valarpirai-day-table__activity {

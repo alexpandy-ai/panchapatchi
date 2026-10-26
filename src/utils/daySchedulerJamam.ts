@@ -20,7 +20,7 @@ export interface DaySchedulerJamamColumn {
   nightJamamActive: boolean;
 }
 
-/** Sunrise-based jamam columns for Day Scheduler (independent of PATCHI_SCHEDULE_DATA). */
+/** Sunrise-based jamam columns for the Thithi and Patchi Schedule tables (independent of PATCHI_SCHEDULE_DATA). */
 export function buildDaySchedulerJamamColumns(
   date: Date,
   coords: GeoCoords | null,
@@ -49,7 +49,7 @@ export function buildDaySchedulerJamamColumns(
   });
 }
 
-/** Build continuous jamam slots (1–10) from Day Scheduler columns. */
+/** Build continuous jamam slots (1–10) from the schedule tables' jamam columns. */
 export function daySchedulerJamamSlots(columns: DaySchedulerJamamColumn[]): JamamSlot[] {
   return columns
     .flatMap((column) => [

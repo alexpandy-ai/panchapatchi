@@ -9,9 +9,8 @@ interface ThithiScheduleViewProps {
 }
 
 /**
- * Thithi Schedule — own route and page component, initially the same layout
- * as Day Scheduler. Shared calculation engines stay in utils; this wrapper
- * can change without editing DaySchedulerView.
+ * Thithi Schedule — own route and page component around the shared schedule table.
+ * Shared calculation engines stay in utils.
  */
 export function ThithiScheduleView({ selectedDateTime, subtitle }: ThithiScheduleViewProps) {
   const { patchi: selectedPatchi, setPatchi: setSelectedPatchi } = useNavigation();
@@ -23,7 +22,6 @@ export function ThithiScheduleView({ selectedDateTime, subtitle }: ThithiSchedul
         onSelectPatchi={setSelectedPatchi}
         selectedDateTime={selectedDateTime}
         subtitle={subtitle}
-        rowHeading="thithi"
       />
     </div>
   );

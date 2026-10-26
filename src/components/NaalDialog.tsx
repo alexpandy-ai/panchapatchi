@@ -59,7 +59,7 @@ function naalCycleActivities(startActivity: string, period: PeriodId, count: num
   if (startActivity === "—" || startActivity === "") {
     return Array.from({ length: count }, () => "—");
   }
-  // Day Scheduler night uses Die→Sleep→Rule→Walk→Eat; day uses Pancha day order.
+  // Night uses Die→Sleep→Rule→Walk→Eat; day uses Pancha day order.
   const order =
     period === "day" ? PANCHA_ACTIVITY_TA : ALTERNATE_NIGHT_ACTIVITY_TA;
   return antharaActivitiesFrom(startActivity, count, order);

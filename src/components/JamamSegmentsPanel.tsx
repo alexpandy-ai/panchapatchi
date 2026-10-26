@@ -53,7 +53,7 @@ export interface NaalActivitySelection {
   period: PeriodId;
   /**
    * When true, keep the start activity on every Naal slot instead of cycling.
-   * Day Scheduler night jamam rows must leave this false so each bird cycles.
+   * Schedule-table night jamam rows must leave this false so each bird cycles.
    */
   repeatActivity: boolean;
   /**

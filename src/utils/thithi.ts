@@ -23,7 +23,7 @@ export type ThithiPatchiEntry = {
   patchi: (typeof PATCHI_ORDER)[number];
   day: Bilingual;
   weekday: number;
-  /** Day Scheduler day in brackets under Athikara Patchi (Die-morning / Eat-night). */
+  /** Schedule weekday in brackets under Athikara Patchi (Die-morning / Eat-night). */
   athikaraDay: Bilingual;
   athikaraWeekday: number;
   groupIndex: number;
@@ -373,7 +373,7 @@ export function getThithiScheduleActivityWeekday(
 }
 
 /**
- * Joined thithi names for one Day Scheduler weekday, taken from the Thithi
+ * Joined thithi names for one schedule weekday, taken from the Thithi
  * Patchi group whose planet weekday is that schedule weekday.
  * Returns null when the source row cannot be matched uniquely.
  */

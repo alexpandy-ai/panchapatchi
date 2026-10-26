@@ -727,7 +727,7 @@ test("Home Naal from day Anthara 6–10 steps to the next thithi morning; rows 1
   assert.deepEqual(antharaSix.appendedJamamSerials, [4, 5, 1, 2, 3]);
 });
 
-test("day Anthara 6–10 without next-morning slots keeps the Day Scheduler night cycle", () => {
+test("day Anthara 6–10 without next-morning slots keeps the schedule night cycle", () => {
   const column = { segmentIndex: 5, jamamIndex: 9 };
   const naal = resolveNaalAppendForAntharaClick({
     parentJamamIndex: 4,
@@ -832,10 +832,10 @@ function homePageClick(
 }
 
 /**
- * Mirrors DaySchedulerTable antharaClick for the same BracketDay as Home:
+ * Mirrors the schedule tables' antharaClick for the same BracketDay as Home:
  * daySchedulerJamamSlots + sheet paksha + clicked weekday row.
  */
-function daySchedulePageClick(
+function scheduleTableClick(
   anchor: Date,
   period: "day" | "night",
   yama: number,
@@ -848,7 +848,7 @@ function daySchedulePageClick(
   const columns = buildDaySchedulerJamamColumns(anchor, null);
   const allJamamSlots = daySchedulerJamamSlots(columns);
   const slot = allJamamSlots.find((entry) => entry.index === jamamIndex);
-  assert.ok(slot, `Day Schedule missing jamam ${jamamIndex}`);
+  assert.ok(slot, `Schedule table missing jamam ${jamamIndex}`);
   const input: JamamAntharaClickInput = {
     period,
     pakshaId: nightThithi.pakshaId,
@@ -889,30 +889,30 @@ function naalFlags(model: JamamAntharaClickModel) {
   };
 }
 
-function assertHomeMatchesDaySchedule(anchor: Date, period: "day" | "night", yama: number) {
+function assertHomeMatchesScheduleTable(anchor: Date, period: "day" | "night", yama: number) {
   const homePath = homePageClick(anchor, period, yama);
-  const dayPath = daySchedulePageClick(anchor, period, yama);
-  assert.equal(homePath.input.pakshaId, dayPath.input.pakshaId);
-  assert.equal(homePath.input.weekday, dayPath.input.weekday);
-  assert.equal(homePath.input.period, dayPath.input.period);
-  assert.equal(homePath.slot.index, dayPath.slot.index);
-  assert.equal(homePath.slot.start.getTime(), dayPath.slot.start.getTime());
+  const tablePath = scheduleTableClick(anchor, period, yama);
+  assert.equal(homePath.input.pakshaId, tablePath.input.pakshaId);
+  assert.equal(homePath.input.weekday, tablePath.input.weekday);
+  assert.equal(homePath.input.period, tablePath.input.period);
+  assert.equal(homePath.slot.index, tablePath.slot.index);
+  assert.equal(homePath.slot.start.getTime(), tablePath.slot.start.getTime());
 
   const home = activityRows(homePath.model, homePath.slot);
-  const daySchedule = activityRows(dayPath.model, dayPath.slot);
-  assert.deepEqual(daySchedule.rows, home.rows);
-  assert.equal(daySchedule.rows.length, 5);
+  const scheduleTable = activityRows(tablePath.model, tablePath.slot);
+  assert.deepEqual(scheduleTable.rows, home.rows);
+  assert.equal(scheduleTable.rows.length, 5);
   const clickedBird = "மயில்";
   assert.deepEqual(
     home.rows.filter((row) => row.patchi === clickedBird),
-    daySchedule.rows.filter((row) => row.patchi === clickedBird),
+    scheduleTable.rows.filter((row) => row.patchi === clickedBird),
   );
-  return { input: homePath.input, slot: homePath.slot, home, daySchedule };
+  return { input: homePath.input, slot: homePath.slot, home, scheduleTable };
 }
 
-test("Home and Day Schedule slot arrays match for an ordinary night jamam", () => {
+test("Home and schedule-table slot arrays match for an ordinary night jamam", () => {
   const anchor = localDate(2026, 1, 4, 20);
-  const { home } = assertHomeMatchesDaySchedule(anchor, "night", 1);
+  const { home } = assertHomeMatchesScheduleTable(anchor, "night", 1);
   const context = resolveNextMorningThithiContext(anchor, null);
   assert.equal(context.originalThithi.pakshaId, "theipirai");
   assert.equal(context.originalThithi.thithiNumber, 2);
@@ -966,9 +966,9 @@ test("Home and Day Schedule slot arrays match for an ordinary night jamam", () =
   );
 });
 
-test("Home and Day Schedule slot arrays match for Pournami → Theipirai Prathamai", () => {
+test("Home and schedule-table slot arrays match for Pournami → Theipirai Prathamai", () => {
   const anchor = localDate(2026, 1, 2, 20);
-  const { home } = assertHomeMatchesDaySchedule(anchor, "night", 2);
+  const { home } = assertHomeMatchesScheduleTable(anchor, "night", 2);
   const context = resolveNextMorningThithiContext(anchor, null);
   assert.equal(context.originalThithi.pakshaId, "valarpirai");
   assert.equal(context.originalThithi.thithiNumber, 15);
@@ -991,9 +991,9 @@ test("Home and Day Schedule slot arrays match for Pournami → Theipirai Pratham
   assert.equal(peacock.activities[0], birdActivity(context.originalThithi, 2, "night", "மயில்"));
 });
 
-test("Home and Day Schedule slot arrays match for Amavasai → Valarpirai Prathamai", () => {
+test("Home and schedule-table slot arrays match for Amavasai → Valarpirai Prathamai", () => {
   const anchor = localDate(2026, 1, 17, 20);
-  const { home } = assertHomeMatchesDaySchedule(anchor, "night", 3);
+  const { home } = assertHomeMatchesScheduleTable(anchor, "night", 3);
   const context = resolveNextMorningThithiContext(anchor, null);
   assert.equal(context.originalThithi.pakshaId, "theipirai");
   assert.equal(context.originalThithi.thithiNumber, 15);
@@ -1015,9 +1015,9 @@ test("Home and Day Schedule slot arrays match for Amavasai → Valarpirai Pratha
   );
 });
 
-test("Home and Day Schedule day jamam rows 1–5 and 6–10 stay on the clicked day", () => {
+test("Home and schedule-table day jamam rows 1–5 and 6–10 stay on the clicked day", () => {
   const anchor = localDate(2026, 1, 4, 14);
-  const { home } = assertHomeMatchesDaySchedule(anchor, "day", 4);
+  const { home } = assertHomeMatchesScheduleTable(anchor, "day", 4);
   const context = resolveNextMorningThithiContext(anchor, null);
   assert.notEqual(
     context.nextMorningThithi.thithiNumber,

@@ -26,7 +26,6 @@ const APP_VIEWS: AppView[] = [
   "home",
   "status",
   "schedule",
-  "alternateSchedule",
   "thithiSchedule",
   "thithiDetails",
   "days",
@@ -79,8 +78,9 @@ function parseParams(source: string): Partial<NavigationState> {
   const params = new URLSearchParams(source);
   const parsed: Partial<NavigationState> = {};
 
+  // A link to a view that no longer exists (e.g. the removed Day Scheduler) opens Home.
   const view = params.get("view");
-  if (view && isAppView(view)) parsed.view = view as AppView;
+  if (view) parsed.view = isAppView(view) ? view : DEFAULT_NAVIGATION.view;
 
   const daysSection = params.get("daysSection");
   if (daysSection && isInformationSection(daysSection)) parsed.daysSection = daysSection;
@@ -105,7 +105,18 @@ function readHashParams(): Partial<NavigationState> {
     return parseParams(hash.startsWith("?") ? hash.slice(1) : hash);
   }
 
-  return isAppView(hash) ? { view: hash as AppView } : {};
+  return { view: isAppView(hash) ? hash : DEFAULT_NAVIGATION.view };
+}
+
+/** The URL hash names a view the app no longer has, so it should be rewritten. */
+export function hashHasUnknownView(): boolean {
+  const hash = window.location.hash.replace(/^#/, "").trim();
+  if (!hash) return false;
+  const view =
+    hash.startsWith("?") || hash.includes("=")
+      ? new URLSearchParams(hash.startsWith("?") ? hash.slice(1) : hash).get("view")
+      : hash;
+  return view !== null && !isAppView(view);
 }
 
 function readStorageObject(): Partial<NavigationState> {
@@ -165,11 +176,7 @@ export function saveNavigationState(state: NavigationState): void {
     params.set("daysSection", state.daysSection);
   }
 
-  if (
-    state.view === "schedule" ||
-    state.view === "alternateSchedule" ||
-    state.view === "thithiSchedule"
-  ) {
+  if (state.view === "schedule" || state.view === "thithiSchedule") {
     params.set("paksha", state.paksha);
     params.set("patchi", state.patchi);
   }

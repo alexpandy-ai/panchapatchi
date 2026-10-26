@@ -345,7 +345,7 @@ export function getPatchiDaysDayForAthikaraPatchi(
 }
 
 /**
- * Day Scheduler / All Chips weekday column for a bird under that pirai
+ * Schedule weekday column for a bird under that pirai
  * (reverse of Patchi Days Athikara mapping).
  */
 export function getPatchiDaysWeekdayForAthikaraPatchi(
@@ -392,8 +392,8 @@ export function getMorningDieNightEatWeekdayForPatchi(
 }
 
 /**
- * Day Scheduler column where this bird Dies in jamam-1 morning and Eats at night.
- * Labels match the Valarpirai / Theipirai Day Scheduler weekday headers.
+ * Schedule weekday where this bird Dies in jamam-1 morning and Eats at night,
+ * labelled with the Valarpirai / Theipirai weekday names.
  */
 export function getMorningDieNightEatDayForPatchi(
   pakshaId: AlternatePakshaId,

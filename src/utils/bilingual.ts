@@ -105,8 +105,6 @@ export const UI = {
   groups: bi("குழுக்கள்", "Groups"),
   jamams: bi("ஜாமங்கள்", "Jamams"),
   schedule: bi("பட்சி அட்டவணை", "Patchi Schedule"),
-  alternateSchedule: bi("நாள் அட்டவணை", "Day Scheduler"),
-  alternateCalculation: bi("நாள் அட்டவணை", "Day Scheduler"),
   thithiSchedule: bi("திதி அட்டவணை", "Thithi Schedule"),
   thithiScheduleItem: bi("அட்டவணை", "Schedule"),
   thithiDetails: bi("திதி விவரம்", "Thithi Details"),
@@ -325,10 +323,6 @@ export const MENU_ITEMS: AppMenuItem[] = [
   {
     id: "schedule",
     label: bi("பட்சி அட்டவணை", "Patchi Schedule"),
-  },
-  {
-    id: "alternateSchedule",
-    label: bi("நாள் அட்டவணை", "Day Scheduler"),
   },
   {
     id: "sunrise",

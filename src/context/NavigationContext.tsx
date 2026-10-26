@@ -9,6 +9,7 @@ import {
 } from "react";
 import type { AppView } from "../components/AppMenu";
 import {
+  hashHasUnknownView,
   loadNavigationState,
   saveNavigationState,
   type InformationSection,
@@ -30,7 +31,7 @@ const NavigationContext = createContext<NavigationContextValue | null>(null);
 export function NavigationProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<NavigationState>(() => {
     const loaded = loadNavigationState();
-    if (!window.location.hash.replace(/^#/, "").trim()) {
+    if (!window.location.hash.replace(/^#/, "").trim() || hashHasUnknownView()) {
       saveNavigationState(loaded);
     }
     return loaded;
@@ -46,7 +47,9 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const handleHashChange = () => {
-      setState(loadNavigationState());
+      const loaded = loadNavigationState();
+      if (hashHasUnknownView()) saveNavigationState(loaded);
+      setState(loaded);
     };
 
     window.addEventListener("hashchange", handleHashChange);

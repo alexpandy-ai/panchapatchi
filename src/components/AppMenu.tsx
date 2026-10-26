@@ -10,7 +10,6 @@ export type AppView =
   | "home"
   | "status"
   | "schedule"
-  | "alternateSchedule"
   | "thithiSchedule"
   | "thithiDetails"
   | "days"
