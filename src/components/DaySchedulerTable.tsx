@@ -311,7 +311,7 @@ export function BirdEatingScheduleTable({
         rowHeading="thithi"
         nightThithi={nightThithi}
         sections={sections}
-        highlightBird={bird}
+        plainCells
         hideThithiRows={hideThithiRows}
       />
     </div>
@@ -326,7 +326,7 @@ function AlternatePakshaScheduleView({
   rowHeading,
   nightThithi,
   sections,
-  highlightBird,
+  plainCells,
   hideThithiRows,
 }: {
   jamamColumns: DaySchedulerJamamColumn[];
@@ -337,7 +337,7 @@ function AlternatePakshaScheduleView({
   nightThithi?: ThithiPatchiEntry;
   /** Preset sections in the all-birds layout, one table each so every table heads its own jamam times. */
   sections?: ThithiScheduleSection[];
-  highlightBird?: PatchiName;
+  plainCells?: boolean;
   hideThithiRows?: boolean;
 }) {
   const { coords } = useLocation();
@@ -415,7 +415,7 @@ function AlternatePakshaScheduleView({
             onOpenAnthara={setAntharaSelection}
             rowHeading={rowHeading}
             sections={[section]}
-            highlightBird={highlightBird}
+            plainCells={plainCells}
             hideThithiRows={hideThithiRows}
           />
         ))
@@ -462,7 +462,7 @@ function AlternatePakshaDayNightTables({
   onOpenAnthara,
   rowHeading,
   sections,
-  highlightBird,
+  plainCells = false,
   hideThithiRows = false,
 }: {
   jamamColumns: DaySchedulerJamamColumn[];
@@ -471,8 +471,8 @@ function AlternatePakshaDayNightTables({
   onOpenAnthara: (selection: AlternateAntharaSelection) => void;
   rowHeading: "day" | "thithi";
   sections?: ThithiScheduleSection[];
-  /** Outlines this bird's cells and puts the Now badge on its cell in a section's running jamam. */
-  highlightBird?: PatchiName;
+  /** No cell is highlighted, not even the one whose antharam dialog is open. */
+  plainCells?: boolean;
   /** Drops the thithi-names rows; the Day/Night label moves under the activity column header. */
   hideThithiRows?: boolean;
 }) {
@@ -757,14 +757,11 @@ function AlternatePakshaDayNightTables({
                               section.key,
                             )
                           : false;
-                        const isNow = section.now?.period === "day" && section.now.yama === column.yama;
-                        const isHighlighted = bird !== null && bird === highlightBird;
 
                         return (
                           <td
                             key={column.yama}
-                            className={birdCellClass(isSelected, isNow, isHighlighted)}
-                            aria-current={isNow && isHighlighted ? "time" : undefined}
+                            className={birdCellClass(isSelected && !plainCells)}
                           >
                             {bird ? (
                               <button
@@ -787,7 +784,6 @@ function AlternatePakshaDayNightTables({
                             ) : (
                               "—"
                             )}
-                            {isNow && isHighlighted ? <NowBadge /> : null}
                           </td>
                         );
                       })}
@@ -861,15 +857,11 @@ function AlternatePakshaDayNightTables({
                                   section.key,
                                 )
                               : false;
-                            const isNow =
-                              section.now?.period === "night" && section.now.yama === column.yama;
-                            const isHighlighted = bird !== null && bird === highlightBird;
 
                             return (
                               <td
                                 key={column.yama}
-                                className={birdCellClass(isSelected, isNow, isHighlighted)}
-                                aria-current={isNow && isHighlighted ? "time" : undefined}
+                                className={birdCellClass(isSelected && !plainCells)}
                               >
                                 {bird ? (
                                   <button
@@ -892,7 +884,6 @@ function AlternatePakshaDayNightTables({
                                 ) : (
                                   "—"
                                 )}
-                                {isNow && isHighlighted ? <NowBadge /> : null}
                               </td>
                             );
                           })}
@@ -910,23 +901,10 @@ function AlternatePakshaDayNightTables({
   );
 }
 
-function birdCellClass(isSelected: boolean, isNow: boolean, isHighlighted: boolean): string {
-  return [
-    "alternate-valarpirai-day-table__bird",
-    isNow ? "alternate-all-chip-table__cell--now" : "",
-    isHighlighted ? "alternate-all-chip-table__cell--bird" : "",
-    isSelected ? "patchi-pivot-table__cell--selected" : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
-}
-
-function NowBadge() {
-  return (
-    <span className="schedule-table__badge schedule-table__badge--cell">
-      <BilingualText text={UI.now} />
-    </span>
-  );
+function birdCellClass(isSelected: boolean): string {
+  return isSelected
+    ? "alternate-valarpirai-day-table__bird patchi-pivot-table__cell--selected"
+    : "alternate-valarpirai-day-table__bird";
 }
 
 function ThithiLineHeader({
