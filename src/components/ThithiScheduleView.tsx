@@ -1,6 +1,7 @@
 import { DaySchedulerTable } from "./DaySchedulerTable";
 import { useNavigation } from "../context/NavigationContext";
 import type { Bilingual } from "../utils/bilingual";
+import "./ThithiScheduleView.css";
 
 interface ThithiScheduleViewProps {
   selectedDateTime: Date;
@@ -16,7 +17,7 @@ export function ThithiScheduleView({ selectedDateTime, subtitle }: ThithiSchedul
   const { patchi: selectedPatchi, setPatchi: setSelectedPatchi } = useNavigation();
 
   return (
-    <div className="time-table-view">
+    <div className="time-table-view time-table-view--thithi-schedule">
       <DaySchedulerTable
         selectedPatchi={selectedPatchi}
         onSelectPatchi={setSelectedPatchi}

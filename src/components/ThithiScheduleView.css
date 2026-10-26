@@ -1,0 +1,7 @@
+/* Thithi Schedule: the content panel is the only frame around the schedule card. The transparent 1px border keeps the card's content where it was. */
+.time-table-view--thithi-schedule > .schedule-table-card {
+  background: transparent;
+  border-color: transparent;
+  border-radius: 0;
+  box-shadow: none;
+}
