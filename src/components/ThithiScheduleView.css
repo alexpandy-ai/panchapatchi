@@ -1,7 +1,39 @@
-/* Thithi Schedule: the content panel is the only frame around the schedule card. The transparent 1px border keeps the card's content where it was. */
-.time-table-view--thithi-schedule > .schedule-table-card {
+/* Thithi Schedule: no panel or card frame; the pirai buttons, chips and tables start at the header's gutter. */
+.app--thithi-schedule .content {
   background: transparent;
-  border-color: transparent;
+  border: none;
   border-radius: 0;
   box-shadow: none;
+  padding: 0;
+}
+
+.app--thithi-schedule .time-table-view--thithi-schedule > .schedule-table-card {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.app--thithi-schedule .schedule-table-card > .patchi-schedule-sheet-picker {
+  padding: 0;
+}
+
+.app--thithi-schedule .schedule-table-card > .patchi-schedule-patchi-picker {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.app--thithi-schedule .schedule-table-card > .patchi-pivot-tables {
+  padding: 0;
+}
+
+/* Body cells are transparent; this keeps them on the light panel colour they had inside the old frame. */
+.app--thithi-schedule .patchi-pivot-wrap > table {
+  background: var(--panel-yellow);
+}
+
+@media (max-width: 767px) {
+  .app--thithi-schedule {
+    --page-pad-x: 0.5rem;
+  }
 }
