@@ -83,7 +83,6 @@ export const UI = {
   dayTime: bi("பகல் நேரம்", "Day time"),
   nightTime: bi("இரவு நேரம்", "Night time"),
   today: bi("இன்று", "Today"),
-  now: bi("நடப்பில்", "Now"),
   nextJamam: bi("அடுத்த ஜாமம்", "Next jamam"),
   previousJamamTime: bi("முந்தைய ஜாமம் நேரம்", "Previous jamam time"),
   currentJamam: bi("தற்போதைய ஜாமம்", "Current jamam"),
