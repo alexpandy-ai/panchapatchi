@@ -37,8 +37,8 @@ export function buildDaySchedulerJamamColumns(
 
     return {
       yama,
-      dayTimeRange: formatTimeRange(daySlot.start, daySlot.end),
-      nightTimeRange: formatTimeRange(nightSlot.start, nightSlot.end),
+      dayTimeRange: formatTimeRange(daySlot.start, daySlot.end, coords),
+      nightTimeRange: formatTimeRange(nightSlot.start, nightSlot.end, coords),
       dayStart: daySlot.start,
       dayEnd: daySlot.end,
       nightStart: nightSlot.start,

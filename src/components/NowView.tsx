@@ -20,6 +20,7 @@ import {
   PAKSHA_LABELS,
   type PakshaId,
 } from "../utils/paksha";
+import { placeOf, placeWeekday } from "../utils/placeClock";
 
 const data = PATCHI_SCHEDULE_DATA;
 
@@ -35,7 +36,7 @@ export function NowView() {
     return () => window.clearInterval(id);
   }, []);
 
-  const weekday = now.getDay();
+  const weekday = placeWeekday(now, coords);
   const autoPaksha = getPakshaFromDate(now);
   const pakshaId: PakshaId = pakshaMode === "auto" ? autoPaksha : pakshaMode;
   const paksha = data[pakshaId];
@@ -55,11 +56,12 @@ export function NowView() {
         year: "numeric",
         month: "long",
         day: "numeric",
+        timeZone: placeOf(coords).timeZone ?? undefined,
       }),
-    [now],
+    [now, coords],
   );
 
-  const timeLabel = useMemo(() => formatTimeWithSeconds(now), [now]);
+  const timeLabel = useMemo(() => formatTimeWithSeconds(now, coords), [now, coords]);
 
   return (
     <div className="now-view">
@@ -107,7 +109,7 @@ export function NowView() {
           </span>
         </div>
         <p className="context-hint">
-          சூரியோதயம் {formatTime(sunrise)} · சூரியாஸ்தமனம் {formatTime(sunset)}
+          சூரியோதயம் {formatTime(sunrise, coords)} · சூரியாஸ்தமனம் {formatTime(sunset, coords)}
         </p>
       </section>
 
@@ -117,7 +119,7 @@ export function NowView() {
           <span className="jamam-period">{jamam.periodLabel}</span>
         </div>
         <p className="jamam-time-range">
-          {formatTime(activeSlot.start)} – {formatTime(activeSlot.end)}
+          {formatTime(activeSlot.start, coords)} – {formatTime(activeSlot.end, coords)}
           <span className="jamam-duration">
             ({formatJamamDuration(activeSlot.start, activeSlot.end)})
           </span>
@@ -167,7 +169,7 @@ export function NowView() {
             >
               <span className="timeline__label">{slot.label}</span>
               <span className="timeline__time">
-                {formatTime(slot.start)} – {formatTime(slot.end)}
+                {formatTime(slot.start, coords)} – {formatTime(slot.end, coords)}
               </span>
             </li>
           ))}

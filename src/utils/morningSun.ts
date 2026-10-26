@@ -1,4 +1,4 @@
-import { placeWallClock, searchSunAltitude, SUN_HORIZON_ALTITUDE, type ThithiPlace } from "../thithiCalendar/calendar";
+import { searchSunAltitude, SUN_HORIZON_ALTITUDE, type ThithiPlace } from "../thithiCalendar/calendar";
 
 export type MorningSunId = "astronomical" | "nautical" | "civil" | "sunrise";
 
@@ -31,8 +31,4 @@ export function morningSunTimes(
   }));
 }
 
-/** `HH:MM` (24 h) on the place's wall clock, seconds dropped like the app's other times. */
-export function formatPlaceClock(place: ThithiPlace, time: Date): string {
-  const { hour, minute } = placeWallClock(place, time);
-  return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
-}
+export { formatPlaceClock } from "./placeClock";

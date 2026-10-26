@@ -2377,6 +2377,14 @@ body {
   overflow-x: clip;
 }
 
+.place-zone-note {
+  margin: 0 0 0.6rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
 .status {
   text-align: center;
   color: var(--muted);

@@ -15,6 +15,7 @@ import {
 } from "./jamam";
 import { formatPatchiName, PATCHI_ORDER, patchiBaseName } from "./bilingual";
 import { getPakshaFromDate, PAKSHA_LABELS, type PakshaId } from "./paksha";
+import { placeWeekday } from "./placeClock";
 
 export interface ActiveScheduleCell {
   groupKey: string;
@@ -193,14 +194,19 @@ function jamamSlotsForYama(
   return { day, night };
 }
 
-function buildGridRow(yama: YamaRow, daySlot: JamamSlot, nightSlot: JamamSlot): ScheduleGridRow {
+function buildGridRow(
+  yama: YamaRow,
+  daySlot: JamamSlot,
+  nightSlot: JamamSlot,
+  coords: GeoCoords | null,
+): ScheduleGridRow {
   return {
     yama: yama.yama,
     yamaLabel: jamamLabel(daySlot.index),
     dayJamamLabel: jamamLabel(daySlot.index),
     nightJamamLabel: jamamLabel(nightSlot.index),
-    dayTimeRange: formatTimeRange(daySlot.start, daySlot.end),
-    nightTimeRange: formatTimeRange(nightSlot.start, nightSlot.end),
+    dayTimeRange: formatTimeRange(daySlot.start, daySlot.end, coords),
+    nightTimeRange: formatTimeRange(nightSlot.start, nightSlot.end, coords),
     dayBirds: yama.day.map((slot) => normalizeBird(slot.bird) || "—"),
     nightBirds: yama.night.map((slot) => normalizeBird(slot.bird) || "—"),
     dayJamamActive: daySlot.isActive,
@@ -224,12 +230,16 @@ function resolveActiveCell(
   };
 }
 
-function getDayGroupContext(selectedDateTime: Date, data: Record<PakshaId, PakshaData | null>) {
+function getDayGroupContext(
+  selectedDateTime: Date,
+  data: Record<PakshaId, PakshaData | null>,
+  coords: GeoCoords | null,
+) {
   const pakshaId = getPakshaFromDate(selectedDateTime);
   const paksha = data[pakshaId];
   if (!paksha) return null;
 
-  const weekday = selectedDateTime.getDay();
+  const weekday = placeWeekday(selectedDateTime, coords);
   const groupKey = getDayGroupKey(weekday);
   const group = paksha.groups.find((g) => g.key === groupKey);
   if (!group) return null;
@@ -242,7 +252,7 @@ export function getScheduleGridForDate(
   data: Record<PakshaId, PakshaData | null>,
   coords: GeoCoords | null = null,
 ): ScheduleGrid | null {
-  const context = getDayGroupContext(selectedDateTime, data);
+  const context = getDayGroupContext(selectedDateTime, data, coords);
   if (!context) return null;
 
   const { paksha, weekday, groupKey, group } = context;
@@ -250,7 +260,7 @@ export function getScheduleGridForDate(
 
   const rows = group.yamas.flatMap((yama) => {
     const slots = jamamSlotsForYama(yama.yama, day, night);
-    return slots ? [buildGridRow(yama, slots.day, slots.night)] : [];
+    return slots ? [buildGridRow(yama, slots.day, slots.night, coords)] : [];
   });
 
   return {
@@ -324,10 +334,11 @@ export interface PatchiThozhilMatrix {
 export function getPatchiThozhilMatrix(
   jamamSlots: JamamSlot[],
   getActivitySlots: (yama: number, period: PeriodId) => ActivitySlot[],
+  coords: GeoCoords | null,
 ): PatchiThozhilMatrix {
   const columns: PatchiThozhilColumn[] = jamamSlots.map((slot) => ({
     jamamIndex: slot.index,
-    timeRange: formatTimeRange(slot.start, slot.end),
+    timeRange: formatTimeRange(slot.start, slot.end, coords),
     period: slot.period,
   }));
 

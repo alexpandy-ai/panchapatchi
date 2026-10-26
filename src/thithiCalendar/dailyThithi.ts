@@ -7,7 +7,6 @@ import {
   firstCalendarYear,
   lastCalendarYear,
   peekCalendarYear,
-  placeWallClockInstant,
   type CalendarDay,
   type EffectiveCalculation,
   type ThithiPlace,
@@ -51,34 +50,15 @@ export function placeForCoords(coords: GeoCoords | null): ThithiPlace {
   };
 }
 
-/** Civil date shown in the shared date card (device-local parts). */
-export function cardDateKey(selectedDateTime: Date): string {
-  const year = selectedDateTime.getFullYear();
-  const month = String(selectedDateTime.getMonth() + 1).padStart(2, "0");
-  const day = String(selectedDateTime.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-function cardMsOfDay(selectedDateTime: Date): number {
-  return (
-    ((selectedDateTime.getHours() * 60 + selectedDateTime.getMinutes()) * 60 + selectedDateTime.getSeconds()) * 1000 +
-    selectedDateTime.getMilliseconds()
-  );
-}
-
-/** The card's date/time is read as wall-clock time at the place. */
-export function selectedPlaceInstant(place: ThithiPlace, selectedDateTime: Date): Date {
-  return placeWallClockInstant(place, cardDateKey(selectedDateTime), cardMsOfDay(selectedDateTime));
-}
-
 function errorDetail(caught: unknown): string {
   return caught instanceof Error ? caught.message : String(caught);
 }
 
+/** `selectedDateTime` is the selected instant (the date card shows and reads it on the place's clock). */
 function resolveDailyThithi(place: ThithiPlace, selectedDateTime: Date, compute: boolean): DailyThithi {
   let effective: EffectiveCalculation;
   try {
-    effective = effectiveCalculationDate(place, selectedPlaceInstant(place, selectedDateTime));
+    effective = effectiveCalculationDate(place, selectedDateTime);
   } catch (caught) {
     return { status: "error", effective: null, detail: errorDetail(caught) };
   }
@@ -110,7 +90,7 @@ function resolveDailyThithi(place: ThithiPlace, selectedDateTime: Date, compute:
 }
 
 /**
- * Daily thithi for the card's date/time at a place: sunrise → next sunrise day boundary,
+ * Daily thithi for the selected instant at a place: sunrise → next sunrise day boundary,
  * custom 32-sector mapping and sunset-based event assignment (see calendar.ts).
  * May compute a whole calendar year (~0.3–0.5 s cold); cached per place and year.
  */

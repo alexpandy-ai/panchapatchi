@@ -60,6 +60,7 @@ import { derivePatchiStatusFromSchedule } from "../utils/patchi";
 
 import { LOCATION_DISPLAY, type GeoCoords } from "../utils/location";
 import type { PakshaId } from "../utils/paksha";
+import { placeWeekday } from "../utils/placeClock";
 import {
   getThithiPatchiEntryForDate,
   getThithiPatchiEntryForThithiNumber,
@@ -126,7 +127,7 @@ export function PatchiStatusView({
     }
   }, [homeChipSelection, isHome]);
 
-  const weekday = selectedDateTime.getDay();
+  const weekday = placeWeekday(selectedDateTime, coords);
 
   /** Home: the shared daily thithi (same calculation as Thithi Details) drives Pirai/Thithi and all lookups. */
   const { daily } = useDailyThithi(selectedDateTime, isHome);
@@ -716,7 +717,7 @@ export function PatchiStatusView({
                           <BilingualText
                             text={thozhilValueWithTime(
                               displayActivityBi(currentJamamActivity),
-                              formatTimeRange(homeJamamSlot.start, homeJamamSlot.end),
+                              formatTimeRange(homeJamamSlot.start, homeJamamSlot.end, coords),
                             )}
                             block={false}
                           />
@@ -745,7 +746,7 @@ export function PatchiStatusView({
                         <BilingualText
                           text={thozhilValueWithTime(
                             displayActivityBi(homeAntharaCurrent.activity),
-                            formatTimeRange(homeAntharaCurrent.start, homeAntharaCurrent.end),
+                            formatTimeRange(homeAntharaCurrent.start, homeAntharaCurrent.end, coords),
                           )}
                           block={false}
                         />
@@ -849,7 +850,7 @@ export function PatchiStatusView({
                         <BilingualText
                           text={thozhilValueWithTime(
                             displayActivityBi(currentJamamActivity),
-                            formatTimeRange(activeSlot.start, activeSlot.end),
+                            formatTimeRange(activeSlot.start, activeSlot.end, coords),
                           )}
                           block={false}
                         />
@@ -857,7 +858,7 @@ export function PatchiStatusView({
                     ) : (
                       <span className="context-value jamam-summary__value">
                         <span className="jamam-summary__time">
-                          {formatTimeRange(activeSlot.start, activeSlot.end)}
+                          {formatTimeRange(activeSlot.start, activeSlot.end, coords)}
                         </span>
                       </span>
                     )}
@@ -878,7 +879,7 @@ export function PatchiStatusView({
                       <BilingualText
                         text={thozhilValueWithTime(
                           displayActivityBi(derivedNext.myPatchiActivity),
-                          formatTimeRange(nextSlot.start, nextSlot.end),
+                          formatTimeRange(nextSlot.start, nextSlot.end, coords),
                         )}
                         block={false}
                       />
@@ -886,7 +887,7 @@ export function PatchiStatusView({
                   ) : (
                     <span className="context-value jamam-summary__value">
                       <span className="jamam-summary__time">
-                        {formatTimeRange(nextSlot.start, nextSlot.end)}
+                        {formatTimeRange(nextSlot.start, nextSlot.end, coords)}
                       </span>
                     </span>
                   )}

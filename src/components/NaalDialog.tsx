@@ -20,7 +20,8 @@ import {
   type Bilingual,
 } from "../utils/bilingual";
 import { ALTERNATE_NIGHT_ACTIVITY_TA } from "../utils/alternateCalculation";
-import type { PeriodId } from "../utils/jamam";
+import { formatTimeWithSeconds, type PeriodId } from "../utils/jamam";
+import { useLocation } from "../context/LocationContext";
 
 import { BilingualText } from "./BilingualText";
 import { InlineEmojiLabel } from "./InlineEmojiLabel";
@@ -168,6 +169,7 @@ export function NaalDialog({
   onClose,
   homeLayout = false,
 }: NaalDialogProps) {
+  const { coords } = useLocation();
   const singleBird = birdRows.length <= 1;
   const showSplitLabels = appendNextDayMorning || appendNextDayNight || appendNightJamam;
   const showSerialColumn = showSplitLabels || homeLayout;
@@ -341,7 +343,7 @@ export function NaalDialog({
                     ) : null}
                     <td className="jamam-segments-table__segment-time-col">
                       <span className="jamam-segments-table__jamam-time">
-                        {column.startTimeLabel}
+                        {formatTimeWithSeconds(column.startTime, coords)}
                       </span>
                     </td>
                     {birdActivityRows.map((row) => {

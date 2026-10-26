@@ -18,13 +18,17 @@ import { FindPatchiView, type FindPatchiQuery } from "./components/FindPatchiVie
 import { PatchiStatusView } from "./components/PatchiStatusView";
 import { SunriseView } from "./components/SunriseView";
 import { TimeTableView } from "./components/TimeTableView";
-import { UI } from "./utils/bilingual";
+import { useLocation } from "./context/LocationContext";
+import { placeZoneNote, UI } from "./utils/bilingual";
+import { placeZoneLabel } from "./utils/placeClock";
 import "./index.css";
 
 export default function App() {
   const { view: activeView, setView: setActiveView } = useNavigation();
   const [selectedDateTime, setSelectedDateTime] = useState(() => new Date());
   const [findPatchiQuery, setFindPatchiQuery] = useState<FindPatchiQuery | null>(null);
+  const { coords } = useLocation();
+  const zoneLabel = placeZoneLabel(coords, selectedDateTime);
 
   return (
     <div
@@ -79,6 +83,12 @@ export default function App() {
       )}
 
       <main className="content">
+        {zoneLabel ? (
+          <p className="place-zone-note">
+            <BilingualText text={placeZoneNote(zoneLabel)} />
+          </p>
+        ) : null}
+
         {activeView === "home" && (
           <PatchiStatusView selectedDateTime={selectedDateTime} variant="home" />
         )}

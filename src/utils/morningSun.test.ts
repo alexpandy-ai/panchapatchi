@@ -4,6 +4,7 @@ import { placeSunrise, placeSunset, placeWallClock } from "../thithiCalendar/cal
 import { placeForCoords } from "../thithiCalendar/dailyThithi.ts";
 import { dateCardSunrise, formatTime, getFullDayJamamSchedule } from "./jamam.ts";
 import { formatPlaceClock, morningSunAltitudeTime, morningSunTimes, type SunPlace } from "./morningSun.ts";
+import { placeInputInstant } from "./placeClock.ts";
 import { getSunrise, getSunset } from "./sunrise.ts";
 
 const CHENNAI: SunPlace = { coords: { lat: 13.0827, lng: 80.2707 }, timeZone: "Asia/Kolkata" };
@@ -87,35 +88,37 @@ test("one sunrise everywhere: Sunrise page 0° row = app sunrise = thithi calend
   const coords = { lat: 13.0827, lng: 80.2707 };
   const place = placeForCoords(coords) as SunPlace;
   const zero = morningSunTimes(place, "2026-10-26").find((entry) => entry.id === "sunrise")!.time!;
-  // The card holds device-local date parts, read as the place's civil date.
-  const selected = new Date(2026, 9, 26, 16, 30);
+  const selected = placeInputInstant("2026-10-26", "16:30", coords);
   assert.equal(getSunrise(selected, coords).getTime(), zero.getTime());
   assert.equal(placeSunrise(place, "2026-10-26").getTime(), zero.getTime());
   assert.equal(formatPlaceClock(place, zero), "06:04");
 });
 
 test("date card sunrise equals the first jamam start (Chennai, London, no location)", () => {
-  const cases: [{ lat: number; lng: number } | null, Date][] = [
-    [{ lat: 13.0827, lng: 80.2707 }, new Date(2026, 9, 26, 16, 30)],
-    [{ lat: 51.5074, lng: -0.1278 }, new Date(2026, 5, 21, 12, 0)],
-    [null, new Date(2026, 9, 26, 16, 30)],
+  const cases: [{ lat: number; lng: number } | null, string, string][] = [
+    [{ lat: 13.0827, lng: 80.2707 }, "2026-10-26", "06:04"],
+    [{ lat: 51.5074, lng: -0.1278 }, "2026-06-21", "04:50"],
+    [{ lat: 51.5074, lng: -0.1278 }, "2026-12-15", "08:06"],
+    [{ lat: 40.7128, lng: -74.006 }, "2026-06-21", "05:30"],
+    [null, "2026-10-26", "06:00"],
   ];
-  for (const [coords, selected] of cases) {
+  for (const [coords, dateKey, sunrise] of cases) {
+    const selected = placeInputInstant(dateKey, "12:00", coords);
     const firstJamam = getFullDayJamamSchedule(selected, coords).all[0];
     assert.equal(firstJamam.index, 1);
     assert.equal(firstJamam.start.getTime(), getSunrise(selected, coords).getTime());
-    assert.equal(dateCardSunrise(selected, coords), formatTime(firstJamam.start));
+    assert.equal(dateCardSunrise(selected, coords), formatTime(firstJamam.start, coords));
+    assert.equal(dateCardSunrise(selected, coords), sunrise, `${dateKey} ${JSON.stringify(coords)}`);
   }
-  assert.equal(dateCardSunrise(new Date(2026, 9, 26, 16, 30), null), "06:00");
 });
 
 test("sunset is the Sun's centre setting through 0°; no location keeps the fixed 18:00", () => {
   const coords = { lat: 13.0827, lng: 80.2707 };
   const place = placeForCoords(coords);
-  const selected = new Date(2026, 9, 26, 16, 30);
+  const selected = placeInputInstant("2026-10-26", "16:30", coords);
   const sunset = getSunset(selected, coords);
   assert.equal(sunset.getTime(), placeSunset(place, "2026-10-26").getTime());
   // timeanddate: 17:44 (−0.833°); setting, the centre crosses 0° a few minutes earlier.
   assertNear(CHENNAI, sunset, "17:41");
-  assert.equal(formatTime(getSunset(selected, null)), "18:00");
+  assert.equal(formatTime(getSunset(selected, null), null), "18:00");
 });

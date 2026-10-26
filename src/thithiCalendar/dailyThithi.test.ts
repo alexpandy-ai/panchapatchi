@@ -6,6 +6,7 @@ import {
   lastCalendarYear,
   placeSunrise,
   placeWallClock,
+  placeWallClockInstant,
   sectorIndex,
   type ThithiPlace,
 } from "./calendar.ts";
@@ -21,10 +22,9 @@ import {
 
 const CHENNAI: ThithiPlace = { coords: { lat: 13.0827, lng: 80.2707 }, timeZone: "Asia/Kolkata" };
 
-/** The date card holds device-local parts; they are read as the place's wall clock. */
-function cardTime(dateKey: string, hour: number, minute = 0, second = 0): Date {
-  const [year, month, day] = dateKey.split("-").map(Number);
-  return new Date(year, month - 1, day, hour, minute, second);
+/** The instant the date card selects when it shows this wall-clock time at the place. */
+function cardTime(dateKey: string, hour: number, minute = 0, second = 0, place: ThithiPlace = CHENNAI): Date {
+  return placeWallClockInstant(place, dateKey, ((hour * 60 + minute) * 60 + second) * 1000);
 }
 
 test("calendar index ↔ Home Pirai/Thithi id mapping", () => {
@@ -115,7 +115,7 @@ test("unnamed sector gives a review state instead of a thithi", () => {
 
 test("peek never computes; calculate fills the shared per-place cache", () => {
   const place: ThithiPlace = { coords: null, timeZone: "Asia/Tokyo" };
-  const selected = cardTime("1990-06-15", 12);
+  const selected = cardTime("1990-06-15", 12, 0, 0, place);
   assert.equal(peekDailyThithi(place, selected).status, "pending");
   const computed = calculateDailyThithi(place, selected);
   assert.ok(computed.status === "ready" || computed.status === "unnamed");

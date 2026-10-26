@@ -8,6 +8,7 @@ import { BilingualText } from "./BilingualText";
 import { bi, pickBilingual, UI, WEEKDAY_EN } from "../utils/bilingual";
 import { TAMIL_WEEKDAYS } from "../utils/dayGroup";
 import { dateCardSunrise } from "../utils/jamam";
+import { dateKeyWeekday, placeDateKey, placeInputInstant, placeInputValues } from "../utils/placeClock";
 
 import { COUNTRIES } from "../data/countries";
 
@@ -46,57 +47,8 @@ interface DateTimeCardProps {
 
 
 
-function toDateInputValue(date: Date): string {
-
-  const year = date.getFullYear();
-
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-
-  const day = String(date.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-
-}
-
-
-
-function toTimeInputValue(date: Date): string {
-
-  const hours = String(date.getHours()).padStart(2, "0");
-
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-
-  return `${hours}:${minutes}`;
-
-}
-
-
-
-function applyDatePart(current: Date, dateValue: string): Date {
-
-  const [year, month, day] = dateValue.split("-").map(Number);
-
-  const next = new Date(current);
-
-  next.setFullYear(year, month - 1, day);
-
-  return next;
-
-}
-
-
-
-function applyTimePart(current: Date, timeValue: string): Date {
-
-  const [hours, minutes] = timeValue.split(":").map(Number);
-
-  const next = new Date(current);
-
-  next.setHours(hours, minutes, 0, 0);
-
-  return next;
-
-}
+const DATE_INPUT = /^\d{4}-\d{2}-\d{2}$/;
+const TIME_INPUT = /^\d{2}:\d{2}/;
 
 
 
@@ -143,12 +95,12 @@ export function DateTimeCard({
   const listId = useId();
   const dayLabelId = useId();
 
-  const [dateInput, setDateInput] = useState(() => toDateInputValue(value));
-  const [timeInput, setTimeInput] = useState(() => toTimeInputValue(value));
+  const [dateInput, setDateInput] = useState(() => placeInputValues(value, coords).date);
+  const [timeInput, setTimeInput] = useState(() => placeInputValues(value, coords).time);
 
   const previewWeekdayIndex = useMemo(
-    () => applyDatePart(new Date(value), dateInput).getDay(),
-    [value, dateInput],
+    () => dateKeyWeekday(DATE_INPUT.test(dateInput) ? dateInput : placeDateKey(value, coords)),
+    [value, coords, dateInput],
   );
   const weekdayBi = bi(
     TAMIL_WEEKDAYS[previewWeekdayIndex] ?? "",
@@ -232,11 +184,13 @@ export function DateTimeCard({
 
     if (draftDirtyRef.current) return;
 
-    setDateInput(toDateInputValue(value));
+    const inputs = placeInputValues(value, coords);
 
-    setTimeInput(toTimeInputValue(value));
+    setDateInput(inputs.date);
 
-  }, [value]);
+    setTimeInput(inputs.time);
+
+  }, [value, coords]);
 
 
 
@@ -332,12 +286,6 @@ export function DateTimeCard({
     if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
     clearPlaceSuggestions();
 
-    const nextDateTime = applyTimePart(
-      applyDatePart(new Date(value), dateInput),
-      timeInput,
-    );
-    onChange(nextDateTime);
-
     const resolved = resolveCountryInput(locationInput);
     let lat = parseCoordInput(latInput);
     let lng = parseCoordInput(lngInput);
@@ -393,6 +341,14 @@ export function DateTimeCard({
 
     const submittedCoords: GeoCoords | null =
       lat !== null && lng !== null && isValidCoords(lat, lng) ? { lat, lng } : null;
+    // The typed date and time are the submitted place's wall clock.
+    const current = placeInputValues(value, submittedCoords);
+    const nextDateTime = placeInputInstant(
+      DATE_INPUT.test(dateInput) ? dateInput : current.date,
+      TIME_INPUT.test(timeInput) ? timeInput : current.time,
+      submittedCoords,
+    );
+    onChange(nextDateTime);
     onSubmit?.({ date: nextDateTime, coords: submittedCoords });
   };
 

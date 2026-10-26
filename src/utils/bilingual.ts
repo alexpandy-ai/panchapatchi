@@ -160,6 +160,11 @@ export const UI = {
   patchiColumn: bi("பட்சி", "Patchi"),
 } as const;
 
+/** One-line note that every time shown is on the selected place's clock, e.g. `Europe/London · GMT+1`. */
+export function placeZoneNote(zone: string): Bilingual {
+  return bi(`நேரங்கள் அனைத்தும் ${zone} உள்ளூர் நேரம்`, `All times are local to ${zone}`);
+}
+
 export function previousJamamTimeHeader(jamamIndex: number): Bilingual {
   return bi(`ஜாமம் ${jamamIndex} — நேரம்`, `Jamam ${jamamIndex} — time`);
 }

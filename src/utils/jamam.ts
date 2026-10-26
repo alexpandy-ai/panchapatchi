@@ -1,6 +1,7 @@
 import { bi, pakshaLabelBilingual, type Bilingual } from "./bilingual";
 import type { GeoCoords } from "./location";
 import type { PakshaId } from "./paksha";
+import { formatClock } from "./placeClock";
 import { getNextSunrise, getPreviousSunrise, getSunrise } from "./sunrise";
 
 export const JAMAM_COUNT = 5;
@@ -194,34 +195,27 @@ export function getJamamState(now: Date, coords: GeoCoords | null): JamamState {
   };
 }
 
-export function formatTime(date: Date): string {
-  return date.toLocaleTimeString("ta-IN", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
+/** `HH:MM` on the selected place's clock. */
+export function formatTime(date: Date, coords: GeoCoords | null): string {
+  return formatClock(date, coords);
 }
 
 /** Date-card sunrise: the start of the date's first jamam; "—" when the Sun does not rise that day. */
 export function dateCardSunrise(date: Date, coords: GeoCoords | null): string {
   try {
-    return formatTime(getSunrise(date, coords));
+    return formatTime(getSunrise(date, coords), coords);
   } catch {
     return "—";
   }
 }
 
-export function formatTimeWithSeconds(date: Date): string {
-  return date.toLocaleTimeString("ta-IN", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-  });
+/** `HH:MM:SS` on the selected place's clock. */
+export function formatTimeWithSeconds(date: Date, coords: GeoCoords | null): string {
+  return formatClock(date, coords, true);
 }
 
-export function formatTimeRange(start: Date, end: Date): string {
-  return `${formatTime(start)} – ${formatTime(end)}`;
+export function formatTimeRange(start: Date, end: Date, coords: GeoCoords | null): string {
+  return `${formatTime(start, coords)} – ${formatTime(end, coords)}`;
 }
 
 const JAMAM_SEGMENT_COUNT = 10;
@@ -259,10 +253,14 @@ export interface JamamSummaryParts {
 }
 
 /** Jamam number, time range, and paksha — shared datetime-card / status-card display. */
-export function getJamamSummaryParts(slot: JamamSlot, pakshaId: PakshaId): JamamSummaryParts {
+export function getJamamSummaryParts(
+  slot: JamamSlot,
+  pakshaId: PakshaId,
+  coords: GeoCoords | null,
+): JamamSummaryParts {
   return {
     label: bi(slot.label, `Jamam ${slot.index}`),
-    timeRange: formatTimeRange(slot.start, slot.end),
+    timeRange: formatTimeRange(slot.start, slot.end, coords),
     paksha: pakshaLabelBilingual(pakshaId),
   };
 }

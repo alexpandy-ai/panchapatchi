@@ -42,9 +42,7 @@ export function getNightThithiWindow(
 ): { sunset: Date; nextSunrise: Date } {
   const sunrise = getSunrise(date, coords);
   if (date < sunrise) {
-    const previousDay = new Date(date);
-    previousDay.setDate(previousDay.getDate() - 1);
-    return { sunset: getSunset(previousDay, coords), nextSunrise: sunrise };
+    return { sunset: getSunset(date, coords, -1), nextSunrise: sunrise };
   }
   return { sunset: getSunset(date, coords), nextSunrise: getNextSunrise(sunrise, coords) };
 }

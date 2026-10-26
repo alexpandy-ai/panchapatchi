@@ -17,7 +17,7 @@ import {
   type Bilingual,
 } from "./bilingual";
 import type { JamamSlot, PeriodId } from "./jamam";
-import { formatTimeWithSeconds, jamamIndexForYama, splitJamamStartTimes, yamaFromJamamIndex } from "./jamam";
+import { jamamIndexForYama, splitJamamStartTimes, yamaFromJamamIndex } from "./jamam";
 import type { GeoCoords } from "./location";
 import {
   resolveNextMorningThithiContext,
@@ -213,7 +213,6 @@ export function getJamamAntharaRows(
 export interface PatchiAntharaColumn {
   segmentIndex: number;
   startTime: Date;
-  startTimeLabel: string;
   /** Appended schedule jamam row — night 6–10 or next-morning 1–5. */
   jamamIndex?: number;
   /** Appended next-day morning jamam (label as morning, not night 6–10). */
@@ -341,7 +340,6 @@ export function getAntharaSegmentColumns(
   return segmentStarts.map((start, index) => ({
     segmentIndex: index,
     startTime: start,
-    startTimeLabel: formatTimeWithSeconds(start),
   }));
 }
 

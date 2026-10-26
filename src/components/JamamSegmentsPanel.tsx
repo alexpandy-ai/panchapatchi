@@ -19,6 +19,7 @@ import type { GeoCoords } from "../utils/location";
 import type { JamamSlot, PeriodId } from "../utils/jamam";
 
 import {
+  formatTimeWithSeconds,
   getPreviousJamamIndex,
   getPreviousJamamSlot,
   getPreviousJamamSlotForIndex,
@@ -207,10 +208,13 @@ export function JamamSegmentsPanel({
       matrix.columns.map((column, segmentIndex) => ({
         column,
         segmentIndex,
-        previousTimeLabel: previousJamamColumns?.[segmentIndex]?.startTimeLabel ?? null,
+        timeLabel: formatTimeWithSeconds(column.startTime, coords),
+        previousTimeLabel: previousJamamColumns?.[segmentIndex]
+          ? formatTimeWithSeconds(previousJamamColumns[segmentIndex].startTime, coords)
+          : null,
         activities: matrix.rows.map((row) => row.activities[segmentIndex] ?? "—"),
       })),
-    [matrix.columns, matrix.rows, previousJamamColumns],
+    [coords, matrix.columns, matrix.rows, previousJamamColumns],
   );
 
   const { period: selectedJamamType } = yamaFromJamamIndex(jamamSlot.index);
@@ -319,7 +323,7 @@ export function JamamSegmentsPanel({
             </tr>
           </thead>
           <tbody>
-            {segmentRows.map(({ column, segmentIndex, previousTimeLabel, activities }) => {
+            {segmentRows.map(({ column, segmentIndex, timeLabel, previousTimeLabel, activities }) => {
               const rowHighlighted = highlightSegmentIndex === segmentIndex;
               const serial = antharaSerialNumber(column);
 
@@ -366,7 +370,7 @@ export function JamamSegmentsPanel({
                       .join(" ")}
                   >
                     <span className="jamam-segments-table__jamam-time">
-                      {column.startTimeLabel}
+                      {timeLabel}
                     </span>
                   </td>
                   {activities.map((activity, patchiIndex) => {

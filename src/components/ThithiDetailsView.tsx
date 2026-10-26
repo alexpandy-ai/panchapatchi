@@ -11,14 +11,14 @@ import {
   lastCalendarYear,
   monthCells,
   peekCalendarYear,
+  localDateKey,
   placeKey,
-  placeWallClock,
   thithiLabel,
   degreeRange,
   type CalendarDay,
   type ThithiPlace,
 } from "../thithiCalendar/calendar";
-import { cardDateKey } from "../thithiCalendar/dailyThithi";
+import { withPlaceDate } from "../utils/placeClock";
 import {
   criticalDateAria,
   MONTH_NUMBERS,
@@ -97,7 +97,7 @@ export function ThithiDetailsView({ selectedDateTime, onDateTimeChange }: Thithi
 
   const firstYear = firstCalendarYear();
   const lastYear = lastCalendarYear(place);
-  const date = cardDateKey(selectedDateTime);
+  const date = localDateKey(place, selectedDateTime);
   const effective = daily && "effective" in daily ? daily.effective : null;
   const effectiveDate = effective?.effectiveDateKey ?? null;
   const selected = daily?.status === "ready" || daily?.status === "unnamed" ? daily.day : null;
@@ -156,25 +156,20 @@ export function ThithiDetailsView({ selectedDateTime, onDateTimeChange }: Thithi
 
   useEffect(() => {
     if (!effective || Math.abs(selectedDateTime.getTime() - Date.now()) > LIVE_WINDOW_MS) return;
-    // The card's wall clock is read as the place's wall clock, so fire when the device clock shows the next sunrise's place time.
-    const end = placeWallClock(place, effective.cycleEnd);
-    const boundary = new Date(end.year, end.month - 1, end.day, end.hour, end.minute, end.second + 1);
     const handle = window.setTimeout(
       () => onDateTimeChange(new Date()),
-      Math.max(0, boundary.getTime() - Date.now()),
+      Math.max(0, effective.cycleEnd.getTime() + 1000 - Date.now()),
     );
     return () => window.clearTimeout(handle);
-  }, [effective, place, selectedDateTime, onDateTimeChange]);
+  }, [effective, selectedDateTime, onDateTimeChange]);
 
   const rows = calendar?.key === yearKey ? calendar.rows : null;
   const monthRows = useMemo(() => rows?.filter((row) => row.month === month) ?? [], [rows, month]);
   const monthLabel = monthName(month, language);
 
   function chooseDate(next: string) {
-    const [nextYear, nextMonth, nextDay] = next.split("-").map(Number);
-    const nextDateTime = new Date(selectedDateTime);
-    nextDateTime.setFullYear(nextYear, nextMonth - 1, nextDay);
-    onDateTimeChange(nextDateTime);
+    const [nextYear, nextMonth] = next.split("-").map(Number);
+    onDateTimeChange(withPlaceDate(selectedDateTime, next, place.coords));
     setYear(nextYear);
     setMonth(nextMonth);
     lookupRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });

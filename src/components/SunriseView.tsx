@@ -2,10 +2,9 @@ import { useMemo } from "react";
 import { BilingualText } from "./BilingualText";
 import { useLanguage } from "../context/LanguageContext";
 import { useLocation } from "../context/LocationContext";
-import { cardDateKey, placeForCoords } from "../thithiCalendar/dailyThithi";
 import { MORNING_SUN_BI, pickBilingual, UI } from "../utils/bilingual";
 import { formatPlaceClock, morningSunTimes, type SunPlace } from "../utils/morningSun";
-import { timeZoneOffsetMs } from "../utils/placeTimeZone";
+import { placeDateKey, placeOf } from "../utils/placeClock";
 import "./SunriseView.css";
 
 interface SunriseViewProps {
@@ -18,13 +17,12 @@ export function SunriseView({ selectedDateTime }: SunriseViewProps) {
   const { language } = useLanguage();
   const lat = coords?.lat ?? null;
   const lng = coords?.lng ?? null;
-  const dateKey = cardDateKey(selectedDateTime);
-  const [year, month, day] = dateKey.split("-");
-
   const place = useMemo(
-    () => (lat !== null && lng !== null ? (placeForCoords({ lat, lng }) as SunPlace) : null),
+    () => (lat !== null && lng !== null ? (placeOf({ lat, lng }) as SunPlace) : null),
     [lat, lng],
   );
+  const dateKey = placeDateKey(selectedDateTime, coords);
+  const [year, month, day] = dateKey.split("-");
   const rows = useMemo(() => (place ? morningSunTimes(place, dateKey) : null), [place, dateKey]);
 
   const placeLabel = pickBilingual(locationDisplay, language);
@@ -44,11 +42,6 @@ export function SunriseView({ selectedDateTime }: SunriseViewProps) {
     <section className="sunrise-page" aria-live="polite">
       <p className="sunrise-page__meta">
         {`${day}-${month}-${year} · ${placeLabel}`}
-        {place.timeZone &&
-        Math.round(timeZoneOffsetMs(place.timeZone, selectedDateTime) / 60_000) !==
-          -selectedDateTime.getTimezoneOffset()
-          ? ` · ${place.timeZone}`
-          : ""}
       </p>
       <ol className="sunrise-times">
         {rows.map((row) => (
