@@ -1,10 +1,17 @@
-/* Thithi Schedule: no panel or card frame; the pirai buttons, chips and tables start at the header's gutter. */
+/* Thithi Schedule: no panel frame. The content area keeps Patchi Schedule's panel colour and runs edge to edge
+   under the header, with the header's gutter and gap moved inside as padding so nothing shifts. */
+.app--thithi-schedule .header {
+  margin-bottom: 0;
+}
+
 .app--thithi-schedule .content {
-  background: transparent;
+  max-width: none;
+  margin-inline: calc(-1 * var(--page-pad-x));
+  padding: 1.25rem var(--page-pad-x) 0.85rem;
+  background: var(--panel-yellow);
   border: none;
   border-radius: 0;
   box-shadow: none;
-  padding: 0;
 }
 
 .app--thithi-schedule .time-table-view--thithi-schedule > .schedule-table-card {
@@ -27,9 +34,27 @@
   padding: 0;
 }
 
-/* Body cells are transparent; this keeps them on the light panel colour they had inside the old frame. */
-.app--thithi-schedule .patchi-pivot-wrap > table {
-  background: var(--panel-yellow);
+/* Pinned label cells: the shared light tint laid over the panel colour, so scrolled cells don't show through. */
+.app--thithi-schedule .alternate-all-chip-table tbody th.alternate-all-chip-table__period-label {
+  background:
+    linear-gradient(
+      color-mix(in srgb, var(--border) 35%, transparent),
+      color-mix(in srgb, var(--border) 35%, transparent)
+    ),
+    var(--panel-yellow);
+}
+
+/* A sticky cell's collapsed left border doesn't move with it, so scrolled glyphs showed through that strip at the table's edge. */
+.app--thithi-schedule .alternate-all-chip-table tbody th.patchi-pivot-table__day::before,
+.app--thithi-schedule .alternate-all-chip-table tbody th.alternate-all-chip-table__period-label::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -1px;
+  width: 1px;
+  background: linear-gradient(var(--border), var(--border)), var(--panel-yellow);
+  pointer-events: none;
 }
 
 @media (max-width: 767px) {
