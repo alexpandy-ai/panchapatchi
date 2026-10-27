@@ -35,6 +35,7 @@ export default function App() {
         "app",
         activeView === "home" ? "app--home" : "",
         activeView === "status" ? "app--find-patchi" : "",
+        activeView === "schedule" ? "app--patchi-schedule" : "",
         activeView === "thithiSchedule" ? "app--thithi-schedule" : "",
       ]
         .filter(Boolean)

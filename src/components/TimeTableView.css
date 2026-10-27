@@ -1,4 +1,10 @@
-/* Patchi Schedule: the content panel is the only frame. The card keeps its panel colour and a transparent 1px border so nothing moves. */
+/* Patchi Schedule: no frames. The content panel and card keep their panel colour and transparent 1px borders so nothing moves. */
+.app--patchi-schedule .content {
+  border-color: transparent;
+  border-radius: 0;
+  box-shadow: none;
+}
+
 .time-table-view--patchi-schedule > .schedule-table-card {
   border-color: transparent;
   border-radius: 0;
