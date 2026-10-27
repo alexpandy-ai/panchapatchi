@@ -1,0 +1,11 @@
+/* Patchi Schedule: the content panel is the only frame. The card keeps its panel colour and a transparent 1px border so nothing moves. */
+.time-table-view--patchi-schedule > .schedule-table-card {
+  border-color: transparent;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* Each Night table already ends in its own line just above the next bird, so the separator line would double it. */
+.time-table-view--patchi-schedule .patchi-schedule-patchi-section + .patchi-schedule-patchi-section {
+  border-top-color: transparent;
+}
